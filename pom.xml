@@ -12,7 +12,38 @@
 	<artifactId>BankingAPI</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>BankingAPI</name>
+
+
 	<description>Group 1</description>
+
+	<developers>
+		<developer>
+			<id>1</id>
+			<name>Joan Mas Castella</name>
+			<email>683029@student.inholland.nl</email>
+		</developer>
+		<developer>
+			<id>2</id>
+			<name>Maike Pierck</name>
+			<email>699725@student.inholland.nl</email>
+		</developer>
+		<developer>
+			<id>3</id>
+			<name>Elian Borcut</name>
+			<email>660210@student.inholland.nl</email>
+		</developer>
+		<developer>
+			<id>4</id>
+			<name>Maria Diaconescu</name>
+			<email>68265@student.inholland.nl</email>
+		</developer>
+		<developer>
+			<id>3</id>
+			<name>Elian Borcut</name>
+			<email>660210@student.inholland.nl</email>
+		</developer>
+	</developers>
+
 	<properties>
 		<java.version>21</java.version>
 	</properties>
