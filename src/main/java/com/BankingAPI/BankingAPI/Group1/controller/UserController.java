@@ -22,6 +22,10 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<Object> createUser(@RequestBody UserDTO userDTO) {
-        return ResponseEntity.status(200).body(userService.createUser(userDTO));
+        try {
+            return ResponseEntity.status(200).body(userService.createUser(userDTO));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
