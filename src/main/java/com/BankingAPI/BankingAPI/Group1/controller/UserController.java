@@ -15,11 +15,13 @@ public class UserController {
         this.userService = userService;
     }
 
+
     @GetMapping
     public ResponseEntity<Object> getAllUsers() {
     return ResponseEntity.status(200).body(userService.getAllUsers());
     }
 
+    @RequestMapping(value = "/register")
     @PostMapping
     public ResponseEntity<Object> createUser(@RequestBody UserDTO userDTO) {
         try {

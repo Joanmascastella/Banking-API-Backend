@@ -15,6 +15,7 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
+
     @GetMapping
     public ResponseEntity<Object> getAllTransactions() {
         return ResponseEntity.status(200).body(transactionService.allTransactions());
