@@ -1,4 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.model;
 
-public class user {
+public enum UserType {
+    CUSTOMER,
+    EMPLOYEE;
 }
