@@ -37,11 +37,7 @@
 			<name>Maria Diaconescu</name>
 			<email>68265@student.inholland.nl</email>
 		</developer>
-		<developer>
-			<id>3</id>
-			<name>Elian Borcut</name>
-			<email>660210@student.inholland.nl</email>
-		</developer>
+
 	</developers>
 
 	<properties>
