@@ -31,6 +31,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request, invalid input or missing required fields.
+        '409':
+          description: Conflict, email or username already exists.
       security:
         - bearerAuth: []
   /accounts/own/transfers:
@@ -52,6 +56,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Transaction'
+
+        '400':
+          description: Invalid transfer details, incomplete or invalid data.
+        '404':
+          description: Source or destination account not found.
+        '422':
+          description: Transfer cannot be completed, insufficient funds or account restrictions.
       security:
         - bearerAuth: []
   /customers/iban:
@@ -81,6 +92,10 @@ paths:
                 properties:
                   IBAN:
                     type: string
+        '400':
+          description: Missing or invalid query parameters.
+        '404':
+          description: No IBAN found for the provided customer name.
       security:
         - bearerAuth: []
   /transactions/transfers:
@@ -103,6 +118,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid transfer details, incomplete or invalid data.
+        '404':
+          description: Account not found (either source or destination).
+        '422':
+          description: Transfer cannot be completed, insufficient funds or account restrictions.
       security:
         - bearerAuth: []
   /accounts/{userId}/details:
@@ -125,6 +146,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CombinedUserAccount'
+        '404':
+          description: User ID not found.
       security:
         - bearerAuth: []
   /transactions/{userId}/history:
@@ -149,6 +172,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Transaction'
+        '404':
+          description: User ID not found.
       security:
         - bearerAuth: []
   /atm/login:
@@ -180,6 +205,8 @@ paths:
                   message:
                     type: string
                     example: "Login successful."
+        '401':
+          description: Unauthorized, incorrect credentials.
       security:
         - bearerAuth: []
   /atm/withdrawals:
@@ -201,6 +228,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid request data.
+        '404':
+          description: Account not found.
+        '422':
+          description: Operation failed due to ATM limits or other operational reasons.
       security:
         - bearerAuth: []
   /atm/deposits:
@@ -222,6 +255,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid request data.
+        '404':
+          description: Account not found.
+        '422':
+          description: Operation failed due to ATM limits or other operational reasons.
       security:
         - bearerAuth: []
   /transactions/search:
@@ -269,6 +308,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid query parameters, such as improperly formatted dates or invalid numeric filters.
+        '404':
+          description: No transactions found matching the criteria.
 
       security:
         - bearerAuth: []
@@ -288,9 +331,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
-
-        "400":
-          description: Invalid status value.
+        '400':
+          description: Invalid query or request parameters.
+        '404':
+          description: No non-customer users found.
+        '403':
+          description: User must be role of employee.
       security:
         - bearerAuth: []
   /users/approve/{userId}:
@@ -320,10 +366,15 @@ paths:
         required: true
 
       responses:
+        '200':
+          description: User approved successfully.
         "400":
           description: Invalid user supplied
+        '403':
+          description: User must be role of employee.
         "404":
           description: User not found
+
       security:
         - bearerAuth: []
   /accounts/customers:
@@ -345,7 +396,10 @@ paths:
 
         "400":
           description: Invalid status value.
-
+        '401':
+          description: User is not authorized
+        '403':
+          description: User must be of role employee
     post:
       tags:
         - Employee
@@ -365,6 +419,12 @@ paths:
       responses:
         "200":
           description: Successful operation
+        "400":
+          description: Invalid status value.
+        '401':
+          description: User is not authorized
+        '403':
+          description: User must be of role employee
       security:
         - bearerAuth: []
   /accounts/customers/{accountId}:
@@ -398,6 +458,10 @@ paths:
           description: Invalid account supplied
         "404":
           description: Account not found
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
       security:
         - bearerAuth: []
   /transactions/ATM:
@@ -416,7 +480,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Transaction"
-
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
         "400":
           description: Invalid status value.
       security:
@@ -448,7 +515,10 @@ paths:
 
         "400":
           description: Invalid status value.
-
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
         "404":
           description: User not found
       security:
@@ -480,9 +550,12 @@ paths:
 
         "400":
           description: Invalid status value.
-
         "404":
           description: Employee not found
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
       security:
         - bearerAuth: []
 
@@ -511,7 +584,9 @@ paths:
         '404':
           description: Customer not found
         '403':
-          description: Unauthorized access
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
       security:
         - bearerAuth: []
   /users/login:
