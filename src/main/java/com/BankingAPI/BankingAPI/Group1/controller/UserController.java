@@ -19,7 +19,7 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> getAllUsers() {
     return ResponseEntity.status(200).body(userService.getAllUsers());
     }

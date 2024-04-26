@@ -1,6 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.util;
 
 
+import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.service.MemberDetailsService;
 import io.jsonwebtoken.*;
@@ -21,10 +22,12 @@ public class JwtTokenProvider {
     private long validityInMicroseconds;
     private final MemberDetailsService memberDetailsService;
     private final JwtKeyProvider jwtKeyProvider;
+    private final BeanFactory beanFactory;
 
-    public JwtTokenProvider(MemberDetailsService memberDetailsService, JwtKeyProvider jwtKeyProvider) {
+    public JwtTokenProvider(MemberDetailsService memberDetailsService, JwtKeyProvider jwtKeyProvider, BeanFactory beanFactory) {
         this.memberDetailsService = memberDetailsService;
         this.jwtKeyProvider = jwtKeyProvider;
+        this.beanFactory = beanFactory;
     }
 
     public String createToken(String username, long userId, List<UserType> roles) throws JwtException {
@@ -58,4 +61,5 @@ public class JwtTokenProvider {
             throw new JwtException("Bearer token not valid");
         }
     }
+
 }

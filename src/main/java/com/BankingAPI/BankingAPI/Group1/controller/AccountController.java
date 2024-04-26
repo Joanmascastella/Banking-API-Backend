@@ -18,7 +18,7 @@ public class AccountController {
 
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> getAllAccounts() {
         return ResponseEntity.status(200).body(accountService.getAllAccounts());
     }
