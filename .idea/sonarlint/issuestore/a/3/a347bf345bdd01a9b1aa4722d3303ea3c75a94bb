@@ -1,0 +1,10 @@
+
+•
+java:S6204,"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8÷Æ¿Íñ1J$a291fc06-92c5-4714-ab0a-8b8bc122be20
+}	java:S125I"<This block of commented-out lines of code should be removed.(¢ú€W8™¤®Îñ1J$b925fbe6-863c-4722-9018-2a7caac42041
+‰
+java:S1128"ARemove this unused import 'javax.naming.AuthenticationException'.(†Ø¯øÿÿÿÿ8›¤®Îñ1J$f8891cf0-f705-4a18-b68e-cb57068808d1
+|
+java:S1068"9Remove this unused "bCryptPasswordEncoder" private field.(¾§©¶8œ¤®Îñ1J$cafc80ca-5489-4fee-81b9-5d415b9bc4b7
+w
+java:S1068"4Remove this unused "jwtTokenProvider" private field.(þ™²8œ¤®Îñ1J$eb1485eb-ad99-43f5-bdac-a42db4d678c5
