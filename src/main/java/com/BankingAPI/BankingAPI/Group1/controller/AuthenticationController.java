@@ -29,11 +29,11 @@ public class AuthenticationController {
     }
 
     //I wrote this to test if the jwt was working
-    //    @RequestMapping(value = "/login")
-    //    @PostMapping
-    //    public Object login(@RequestBody LoginDTO dto) throws Exception {
-    //        return new TokenDTO(
-    //                userService.login(dto.username(), dto.password())
-    //        );
-    //    }
+    //        @RequestMapping(value = "/login")
+    //        @PostMapping
+    //        public Object login(@RequestBody LoginDTO dto) throws Exception {
+    //            return new TokenDTO(
+    //                    userService.login(dto.username(), dto.password())
+    //            );
+    //        }
 }

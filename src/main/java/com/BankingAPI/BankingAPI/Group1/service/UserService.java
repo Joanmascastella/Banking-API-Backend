@@ -70,14 +70,14 @@ public class UserService {
         return userRepository.findByEmail(email).isPresent();
     }
     //I wrote this to test if the jwt was working
-    //    public String login(String username, String password) throws Exception {
-    //        Users user = this.userRepository
-    //                .findMemberByUsername(username)
-    //                .orElseThrow(() -> new AuthenticationException("User not found"));
-    //        if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
-    //            return jwtTokenProvider.createToken(user.getUsername(), user.getId(), user.getUserType());
-    //        } else {
-    //            throw new AuthenticationException("Invalid username/password");
+    //        public String login(String username, String password) throws Exception {
+    //            Users user = this.userRepository
+    //                    .findMemberByUsername(username)
+    //                    .orElseThrow(() -> new AuthenticationException("User not found"));
+    //            if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
+    //                return jwtTokenProvider.createToken(user.getUsername(), user.getId(), user.getUserType());
+    //            } else {
+    //                throw new AuthenticationException("Invalid username/password");
+    //            }
     //        }
-    //    }
 }
