@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 @Component
 public class DatabaseInitializer implements ApplicationRunner {
@@ -33,8 +34,10 @@ public class DatabaseInitializer implements ApplicationRunner {
     }
 
     private void initDatabase() {
-        User newUser = new User("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, UserType.CUSTOMER, bCryptPasswordEncoder.encode("password123"));
-        userRepository.save(newUser);
+        Users newUsers = new Users("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, Arrays.asList(UserType.ROLE_CUSTOMER), bCryptPasswordEncoder.encode("password123"));
+        Users newEmployee = new Users("Employee", "employee@example.com", "Em", "Yee", "1234567893", "01234567891", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, Arrays.asList(UserType.ROLE_EMPLOYEE), bCryptPasswordEncoder.encode("employee"));
+        userRepository.save(newUsers);
+        userRepository.save(newEmployee);
 
         Transaction newTransaction = new Transaction(1, "123456789", "123456789", 2000.0, LocalDate.now());
         transactionRepository.save(newTransaction);
