@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.model;
 
+import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 

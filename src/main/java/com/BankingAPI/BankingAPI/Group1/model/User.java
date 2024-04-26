@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.model;
 
+import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
@@ -25,7 +26,7 @@ public class User {
     private UserType userType;
     private String password;
 
-    public User( String username, String email, String firstName, String lastName, String BSN, String phoneNumber, LocalDate birthDate, double totalBalance, double dailyLimit, boolean isApproved, UserType userType, String password) {
+    public User(String username, String email, String firstName, String lastName, String BSN, String phoneNumber, LocalDate birthDate, double totalBalance, double dailyLimit, boolean isApproved, UserType userType, String password) {
         this.username = username;
         this.email = email;
         this.firstName = firstName;

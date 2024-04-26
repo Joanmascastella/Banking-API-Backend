@@ -1,6 +1,8 @@
 package com.BankingAPI.BankingAPI.Group1.config;
 
 import com.BankingAPI.BankingAPI.Group1.model.*;
+import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
+import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.TransactionRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.UserRepository;

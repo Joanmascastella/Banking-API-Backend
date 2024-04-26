@@ -1,6 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
-import com.BankingAPI.BankingAPI.Group1.model.dto.UserDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +23,9 @@ public class UserController {
 
     @RequestMapping(value = "/register")
     @PostMapping
-    public ResponseEntity<Object> createUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<Object> createUser(@RequestBody UserPOSTResponseDTO userPOSTResponseDTO) {
         try {
-            return ResponseEntity.status(200).body(userService.createUser(userDTO));
+            return ResponseEntity.status(200).body(userService.createUser(userPOSTResponseDTO));
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
