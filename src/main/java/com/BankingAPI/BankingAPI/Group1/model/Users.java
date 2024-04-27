@@ -1,14 +1,16 @@
 package com.BankingAPI.BankingAPI.Group1.model;
 
+import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "app_user")
 @NoArgsConstructor
-public class User {
+public class Users {
     @Id
     @GeneratedValue
     private long id;
@@ -22,10 +24,12 @@ public class User {
     private double totalBalance;
     private double dailyLimit;
     private boolean isApproved;
-    private UserType userType;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private List<UserType> userType;
     private String password;
 
-    public User( String username, String email, String firstName, String lastName, String BSN, String phoneNumber, LocalDate birthDate, double totalBalance, double dailyLimit, boolean isApproved, UserType userType, String password) {
+    public Users(String username, String email, String firstName, String lastName, String BSN, String phoneNumber, LocalDate birthDate, double totalBalance, double dailyLimit, boolean isApproved, List<UserType> userType, String password) {
         this.username = username;
         this.email = email;
         this.firstName = firstName;
@@ -128,11 +132,11 @@ public class User {
         isApproved = approved;
     }
 
-    public UserType getUserType() {
+    public List<UserType> getUserType() {
         return userType;
     }
 
-    public void setUserType(UserType userType) {
+    public void setUserType(List<UserType> userType) {
         this.userType = userType;
     }
 

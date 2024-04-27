@@ -1,0 +1,812 @@
+openapi: 3.0.0
+info:
+  title: Banking API
+  description: Banking API Group 1 Endpoints
+  version: "1.0.0"
+  contact:
+    email: 683029@student.inhollan.nl
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/JOANIDEVELOP/BankingAPIProject/1.0.0
+paths:
+  /register:
+    post:
+      tags:
+        - Customer
+      summary: Register a new customer
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request, invalid input or missing required fields.
+        '409':
+          description: Conflict, email or username already exists.
+      security:
+        - bearerAuth: []
+  /accounts/own/transfers:
+    post:
+      tags:
+        - Customer
+      summary: Transfer funds between user's own accounts
+      operationId: transferBetweenOwnAccounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        '201':
+          description: Transfer successfully completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+
+        '400':
+          description: Invalid transfer details, incomplete or invalid data.
+        '404':
+          description: Source or destination account not found.
+        '422':
+          description: Transfer cannot be completed, insufficient funds or account restrictions.
+      security:
+        - bearerAuth: []
+  /customers/iban:
+    get:
+      tags:
+        - Customer
+      summary: Retrieve IBAN by customer name
+      operationId: getIbanByCustomerName
+      parameters:
+        - in: query
+          name: firstName
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: lastName
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: IBAN retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  IBAN:
+                    type: string
+        '400':
+          description: Missing or invalid query parameters.
+        '404':
+          description: No IBAN found for the provided customer name.
+      security:
+        - bearerAuth: []
+  /transactions/transfers:
+    post:
+      tags:
+        - Customer
+        - Employee
+      summary: Transfer funds to other customers' accounts
+      operationId: createTransferToOtherCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        '201':
+          description: Transfer successfully completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid transfer details, incomplete or invalid data.
+        '404':
+          description: Account not found (either source or destination).
+        '422':
+          description: Transfer cannot be completed, insufficient funds or account restrictions.
+      security:
+        - bearerAuth: []
+  /accounts/{userId}/details:
+    get:
+      tags:
+        - Customer
+      summary: Get account and user details for a user
+      operationId: getAccountAndUserDetails
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User and account details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CombinedUserAccount'
+        '404':
+          description: User ID not found.
+      security:
+        - bearerAuth: []
+  /transactions/{userId}/history:
+    get:
+      tags:
+        - Customer
+      summary: Get user transaction history
+      operationId: getUserTransactionHistory
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Transaction history retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '404':
+          description: User ID not found.
+      security:
+        - bearerAuth: []
+  /atm/login:
+    post:
+      tags:
+        - Customer
+      summary: Log in to ATM
+      operationId: atmLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: ATM login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login successful."
+        '401':
+          description: Unauthorized, incorrect credentials.
+      security:
+        - bearerAuth: []
+  /atm/withdrawals:
+    post:
+      tags:
+        - Customer
+      summary: Withdraw money from ATM
+      operationId: atmWithdraw
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        '201':
+          description: Withdrawal successfully completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid request data.
+        '404':
+          description: Account not found.
+        '422':
+          description: Operation failed due to ATM limits or other operational reasons.
+      security:
+        - bearerAuth: []
+  /atm/deposits:
+    post:
+      tags:
+        - Customer
+      summary: Deposit money into ATM
+      operationId: atmDeposit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        '201':
+          description: Deposit successfully completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid request data.
+        '404':
+          description: Account not found.
+        '422':
+          description: Operation failed due to ATM limits or other operational reasons.
+      security:
+        - bearerAuth: []
+  /transactions/search:
+    get:
+      tags:
+        - Customer
+      summary: Search and filter transactions
+      operationId: searchTransactions
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: amountLessThan
+          schema:
+            type: number
+          description: Filter transactions less than a specific amount
+        - in: query
+          name: amountGreaterThan
+          schema:
+            type: number
+          description: Filter transactions greater than a specific amount
+        - in: query
+          name: amountEqualTo
+          schema:
+            type: number
+          description: Filter transactions equal to a specific amount
+        - in: query
+          name: IBAN
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transactions found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid query parameters, such as improperly formatted dates or invalid numeric filters.
+        '404':
+          description: No transactions found matching the criteria.
+
+      security:
+        - bearerAuth: []
+  /users/noncustomers:
+    get:
+      tags:
+        - Employee
+      summary: Get all users which are not customers
+      description: This can only be done by the employee
+      operationId: getAllUsersNonCustomers
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        '400':
+          description: Invalid query or request parameters.
+        '404':
+          description: No non-customer users found.
+        '403':
+          description: User must be role of employee.
+      security:
+        - bearerAuth: []
+  /users/approve/{userId}:
+    put:
+      tags:
+        - Employee
+      summary: Approve customer after user registration
+      description: This can only be done by the employee.
+      operationId: approveCustomer
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user that needs to be updated
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Updated user object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+            examples:
+              User123e4567-e89b-12d3-a456-426614174000:
+                $ref: "#/components/examples/User123e4567-e89b-12d3-a456-426614174000"
+        required: true
+
+      responses:
+        '200':
+          description: User approved successfully.
+        "400":
+          description: Invalid user supplied
+        '403':
+          description: User must be role of employee.
+        "404":
+          description: User not found
+
+      security:
+        - bearerAuth: []
+  /accounts/customers:
+    get:
+      tags:
+        - Employee
+      summary: Get all customer accounts
+      description: Get all customer accounts
+      operationId: getAllCustomerAccounts
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Account"
+
+        "400":
+          description: Invalid status value.
+        '401':
+          description: User is not authorized
+        '403':
+          description: User must be of role employee
+    post:
+      tags:
+        - Employee
+      summary: Create account
+      description: Create an account for a customer
+      operationId: createAccount
+      requestBody:
+        description: Created account object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Account"
+            examples:
+              Account789e4567-e89b-12d3-a456-426614174000:
+                $ref: "#/components/examples/Account789e4567-e89b-12d3-a456-426614174000"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid status value.
+        '401':
+          description: User is not authorized
+        '403':
+          description: User must be of role employee
+      security:
+        - bearerAuth: []
+  /accounts/customers/{accountId}:
+    put:
+      tags:
+        - Employee
+        - Customer
+      summary: Update account
+      description: This can only be done by the employee and customer.
+      operationId: updateAccount
+      parameters:
+        - name: accountId
+          in: path
+          description: ID of account that needs to be updated
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Updated account object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Account"
+            examples:
+              Account789e4567-e89b-12d3-a456-426614174000:
+                $ref: "#/components/examples/Account789e4567-e89b-12d3-a456-426614174000"
+        required: true
+      responses:
+        "400":
+          description: Invalid account supplied
+        "404":
+          description: Account not found
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+      security:
+        - bearerAuth: []
+  /transactions/ATM:
+    get:
+      tags:
+        - Employee
+      summary: Get all transactions from the ATM
+      description: This can only be done by the employee.
+      operationId: getAllATMTransactions
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "400":
+          description: Invalid status value.
+      security:
+        - bearerAuth: []
+  /transactions/byCustomer/{userId}:
+    get:
+      tags:
+        - Employee
+      summary: Get all transactions initiated by the customer
+      description: This can only be done by the employee.
+      operationId: getTransactionsInitiatedByCustomer
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user which initialized the transactions
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+
+        "400":
+          description: Invalid status value.
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "404":
+          description: User not found
+      security:
+        - bearerAuth: []
+  /transactions/byEmployee/{employeeId}:
+    get:
+      tags:
+        - Employee
+      summary: Get all transactions initiated by the employee
+      description: This can only be done by the employee.
+      operationId: getTransactionsInitiatedByEmployee
+      parameters:
+        - name: employeeId
+          in: path
+          description: ID of employee which initialized the transactions
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+
+        "400":
+          description: Invalid status value.
+        "404":
+          description: Employee not found
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+      security:
+        - bearerAuth: []
+
+  /transactions/customer/{customerId}:
+    get:
+      tags:
+        - Employee
+      summary: Get transaction history for a specific customer
+      description: Retrieve transaction history for a specified customer. Access restricted to employees.
+      parameters:
+        - in: path
+          name: customerId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Transaction history retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Customer not found
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+      security:
+        - bearerAuth: []
+  /users/login:
+    post:
+      tags:
+        - User
+      summary: User login
+      description: Allows users to log in by providing their email and password. Returns a JWT for authentication in subsequent requests.
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                password:
+                  type: string
+                  description: User's password
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Login successful, JWT provided for authentication.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: string
+                    format: uuid
+                    description: Unique identifier for the user
+                  token:
+                    type: string
+                    description: JWT to be used for authentication in subsequent requests
+        '400':
+          description: Bad request, invalid input
+        '401':
+          description: Unauthorized, incorrect email or password
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  examples:
+    User123e4567-e89b-12d3-a456-426614174000:
+      value:
+        id: 123e4567-e89b-12d3-a456-426614174000
+        username: johndoe78
+        email: johndoe@example.com
+        firstName: John
+        lastName: Doe
+        BSN: 999999982
+        phoneNumber: +31612345678
+        birthDate: 1985-04-12
+        totalBalance: 3500.75
+        role: customer
+        dailyLimit: 500.00
+        isApproved: true
+
+    Account789e4567-e89b-12d3-a456-426614174000:
+      value:
+        id: 789e4567-e89b-12d3-a456-426614174000
+        userId: 789e4567-e89b-12d3-a456-426614174000
+        IBAN: NL91ABNA0417164300
+        currency: EUR
+        accountType: savings
+        isActive: true
+        balance: 10250.50
+        absoluteLimit: 0
+
+
+  schemas:
+    CombinedUserAccount:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        account:
+          $ref: '#/components/schemas/Account'
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - email
+        - firstName
+        - lastName
+        - BSN
+        - phoneNumber
+        - birthDate
+        - totalBalance
+        - role
+        - dailyLimit
+        - isApproved
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        username:
+          type: string
+          example: "johndoe78"
+        email:
+          type: string
+          format: email
+          example: "johndoe@example.com"
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        BSN:
+          type: string
+          example: "999999982"
+        phoneNumber:
+          type: string
+          example: "+31612345678"
+        birthDate:
+          type: string
+          format: date
+          example: "1985-04-12"
+        totalBalance:
+          type: number
+          format: double
+          example: 3500.75
+        role:
+          type: string
+          enum:
+            - customer
+            - employee
+          example: "customer"
+        dailyLimit:
+          type: number
+          format: double
+          example: 500.00
+        isApproved:
+          type: boolean
+          example: true
+    Transaction:
+      type: object
+      required:
+        - id
+        - fromAccount
+        - toAccount
+        - amount
+        - date
+        - userId
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "223e4567-e89b-12d3-a456-426614174000"
+        fromAccount:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        toAccount:
+          type: string
+          format: uuid
+          example: "321e4567-e89b-12d3-a456-426614174000"
+        amount:
+          type: number
+          format: double
+          example: 250.00
+        date:
+          type: string
+          format: date-time
+          example: "2023-10-05T14:48:00.000Z"
+        userId:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+    Account:
+      type: object
+      required:
+        - id
+        - userId
+        - IBAN
+        - currency
+        - accountType
+        - isActive
+        - balance
+        - absoluteLimit
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "789e4567-e89b-12d3-a456-426614174000"
+        userId:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        IBAN:
+          type: string
+          example: "NL91ABNA0417164300"
+        currency:
+          type: string
+          example: "EUR"
+        accountType:
+          type: string
+          example: "savings"
+        isActive:
+          type: boolean
+          example: true
+        balance:
+          type: number
+          format: double
+          example: 10250.50
+        absoluteLimit:
+          type: number
+          format: double
+          example: 0

@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.model;
 
+import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
@@ -10,9 +11,7 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    private int userId;
     private String IBAN;
     private String Currency;
     private AccountType accountType;
@@ -20,8 +19,8 @@ public class Account {
     private double balance;
     private double absoluteLimit;
 
-    public Account(User user, String IBAN, String currency, AccountType accountType, boolean isActive, double balance, double absoluteLimit) {
-        this.user = user;
+    public Account(int userId, String IBAN, String currency, AccountType accountType, boolean isActive, double balance, double absoluteLimit) {
+        this.userId = userId;
         this.IBAN = IBAN;
         Currency = currency;
         this.accountType = accountType;
@@ -38,12 +37,12 @@ public class Account {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getIBAN() {
