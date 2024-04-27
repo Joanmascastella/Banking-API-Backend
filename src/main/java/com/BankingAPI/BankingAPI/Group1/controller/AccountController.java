@@ -4,6 +4,7 @@ import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
+import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,10 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/accounts")
 public class AccountController {
-    private AccountService accountService;
+    private final AccountService accountService;
+    private final TransactionService transactionService;
 
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, TransactionService transactionService) {
         this.accountService = accountService;
+        this.transactionService = transactionService;
     }
 
 
@@ -40,7 +43,7 @@ public class AccountController {
     @PreAuthorize("hasAnyRole('CUSTOMER')")
     public ResponseEntity<Object> transferMoneyToOwnAccount(@RequestBody TransactionGETPOSTResponseDTO transactionDTO) {
         try {
-            Object result = accountService.transferMoneyToOwnAccount(transactionDTO);
+            Object result = transactionService.transferMoneyToOwnAccount(transactionDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
             if (e.getMessage().contains("not found")) {
