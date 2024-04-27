@@ -1,12 +1,17 @@
 package com.BankingAPI.BankingAPI.Group1.service;
 
+import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
+import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
+import com.BankingAPI.BankingAPI.Group1.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,9 +19,13 @@ import java.util.stream.Collectors;
 @Service
 public class AccountService {
     private AccountRepository accountRepository;
+    private final BeanFactory beanFactory;
+    private TransactionRepository transactionRepository;
 
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository, BeanFactory beanFactory, TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
+        this.beanFactory = beanFactory;
+        this.transactionRepository = transactionRepository;
     }
 
     public List<AccountGETPOSTResponseDTO> getAllAccounts(){
@@ -56,5 +65,74 @@ public class AccountService {
         } else {
             throw new Exception("No account found for user ID: " + userId);
         }
+    }
+
+    public TransactionGETPOSTResponseDTO transferMoneyToOwnAccount(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
+        validateAuthentication();
+
+        Account fromAccount = getAccount(transactionDTO.fromAccount());
+        Account toAccount = getAccount(transactionDTO.toAccount());
+
+        validateAccountOwnership(fromAccount, toAccount);
+        validateTransactionLimits(fromAccount, transactionDTO.amount());
+
+        performTransfer(fromAccount, toAccount, transactionDTO.amount());
+        Transaction newTransaction = createAndSaveTransaction(fromAccount, toAccount, transactionDTO.amount());
+
+        return mapToTransactionResponse(newTransaction);
+    }
+
+    private void validateAuthentication() throws Exception {
+        if (beanFactory.getCurrentUserId() == null) {
+            throw new Exception("User not authenticated");
+        }
+    }
+
+    private Account getAccount(String iban) throws Exception {
+        return accountRepository.findByIBAN(iban)
+                .orElseThrow(() -> new Exception("Account with IBAN: " + iban + " not found"));
+    }
+
+    private void validateAccountOwnership(Account fromAccount, Account toAccount) throws Exception {
+        Long currentUserId = beanFactory.getCurrentUserId();
+        if (fromAccount.getUser().getId() != currentUserId || toAccount.getUser().getId() != currentUserId) {
+            throw new Exception("Both accounts must belong to the same user");
+        }
+    }
+
+    private void validateTransactionLimits(Account fromAccount, double amount) throws Exception {
+        if (fromAccount.getBalance() < amount) {
+            throw new Exception("Insufficient funds");
+        }
+        if (amount > fromAccount.getUser().getDailyLimit()) {
+            throw new Exception("Transaction exceeds daily limit");
+        }
+    }
+
+    private void performTransfer(Account fromAccount, Account toAccount, double amount) {
+        fromAccount.setBalance(fromAccount.getBalance() - amount);
+        toAccount.setBalance(toAccount.getBalance() + amount);
+        accountRepository.save(fromAccount);
+        accountRepository.save(toAccount);
+    }
+
+    private Transaction createAndSaveTransaction(Account fromAccount, Account toAccount, double amount) {
+        Transaction transaction = new Transaction();
+        transaction.setUserId(beanFactory.getCurrentUserId());
+        transaction.setFromAccount(fromAccount.getIBAN());
+        transaction.setToAccount(toAccount.getIBAN());
+        transaction.setAmount(amount);
+        transaction.setDate(LocalDate.now());
+        return transactionRepository.save(transaction);
+    }
+
+    private TransactionGETPOSTResponseDTO mapToTransactionResponse(Transaction transaction) {
+        return new TransactionGETPOSTResponseDTO(
+                transaction.getFromAccount(),
+                transaction.getToAccount(),
+                transaction.getAmount(),
+                transaction.getDate(),
+                (int) transaction.getUserId()
+        );
     }
 }
