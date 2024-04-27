@@ -2,8 +2,10 @@ package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
+import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserGETResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.UserRepository;
 import com.BankingAPI.BankingAPI.Group1.util.JwtTokenProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,15 +18,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
+    private final AccountRepository accountRepository;
     private UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider, AccountRepository accountRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.accountRepository = accountRepository;
     }
 
     public List<UserGETResponseDTO> getAllUsers() {
@@ -72,15 +76,21 @@ public class UserService {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    //I wrote this to test if the jwt was working
-    //        public String login(String username, String password) throws Exception {
-    //            Users user = this.userRepository
-    //                    .findMemberByUsername(username)
-    //                    .orElseThrow(() -> new AuthenticationException("User not found"));
-    //            if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
-    //                return jwtTokenProvider.createToken(user.getUsername(), user.getId(), user.getUserType());
-    //            } else {
-    //                throw new AuthenticationException("Invalid username/password");
-    //            }
-    //        }
+    public FindIbanResponseDTO getIbanByFirstNameLastName(String firstName, String lastName) {
+        return accountRepository.findIbanByNames(firstName, lastName)
+                .map(iban -> new FindIbanResponseDTO(iban))
+                .orElse(null);
+    }
+
+
+            public String login(String username, String password) throws Exception {
+                Users user = this.userRepository
+                        .findMemberByUsername(username)
+                        .orElseThrow(() -> new AuthenticationException("User not found"));
+                if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
+                    return jwtTokenProvider.createToken(user.getUsername(), user.getId(), user.getUserType());
+                } else {
+                    throw new AuthenticationException("Invalid username/password");
+                }
+            }
 }

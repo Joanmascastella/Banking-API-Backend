@@ -63,7 +63,7 @@ paths:
           description: Transfer cannot be completed, insufficient funds or account restrictions.
       security:
         - bearerAuth: []
-  /customers/iban:
+  /users/iban:
     get:
       tags:
         - Customer
