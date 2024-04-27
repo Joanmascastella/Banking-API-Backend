@@ -121,7 +121,7 @@ public class TransactionService {
         );
     }
 
-    public List<Transaction> filterTransactions(String IBAN, Double amount, LocalDate startDate, LocalDate endDate) {
+    public List<Transaction> filterTransactions(String IBAN, Double amount, Double amountGreater, Double amountLess, LocalDate startDate, LocalDate endDate) {
         Specification<Transaction> spec = Specification.where(null);
 
         if (IBAN != null) {
@@ -129,6 +129,12 @@ public class TransactionService {
         }
         if (amount != null) {
             spec = spec.and(TransactionSpecification.amountEquals(amount));
+        }
+        if (amountGreater != null) {
+            spec = spec.and(TransactionSpecification.amountGreaterThan(amountGreater));
+        }
+        if (amountLess != null) {
+            spec = spec.and(TransactionSpecification.amountLessThan(amountLess));
         }
         if (startDate != null && endDate != null) {
             spec = spec.and(TransactionSpecification.isBetweenDates(startDate, endDate));

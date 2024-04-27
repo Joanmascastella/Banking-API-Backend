@@ -43,9 +43,11 @@ public class TransactionController {
             @RequestParam(required = false) String IBAN,
             @RequestParam(required = false) Double amount,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) Double amountGreater,
+            @RequestParam(required = false) Double amountLess) {
 
-        List<Transaction> transactions = transactionService.filterTransactions(IBAN, amount, startDate, endDate);
+        List<Transaction> transactions = transactionService.filterTransactions(IBAN, amount,amountGreater,amountLess, startDate, endDate);
         List<TransactionGETPOSTResponseDTO> transactionDto = transactions.stream()
                 .map(t -> new TransactionGETPOSTResponseDTO(t.getFromAccount(), t.getToAccount(), t.getAmount(), t.getDate(), t.getUserId()))
                 .collect(Collectors.toList());
