@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.service;
 
+import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserGETResponseDTO;
@@ -9,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,30 +47,31 @@ public class UserService {
     }
 
 
-    public Users createUser(UserPOSTResponseDTO userPOSTResponseDTO) {
-        if (emailExists(userPOSTResponseDTO.email())) {
+    public Users createUser(UserPOSTResponseDTO userDTO) {
+        if (emailExists(userDTO.email())) {
             throw new IllegalStateException("Email already in use");
         }
-        Users newUsers = new Users(
-                userPOSTResponseDTO.username(),
-                userPOSTResponseDTO.email(),
-                userPOSTResponseDTO.firstName(),
-                userPOSTResponseDTO.lastName(),
-                userPOSTResponseDTO.BSN(),
-                userPOSTResponseDTO.phoneNumber(),
-                userPOSTResponseDTO.birthDate(),
-                userPOSTResponseDTO.totalBalance(),
-                userPOSTResponseDTO.dailyLimit(),
-                userPOSTResponseDTO.isApproved(),
-                userPOSTResponseDTO.userType(),
-                userPOSTResponseDTO.password()
+        Users newUser = new Users(
+                userDTO.username(),
+                userDTO.email(),
+                userDTO.firstName(),
+                userDTO.lastName(),
+                userDTO.BSN(),
+                userDTO.phoneNumber(),
+                userDTO.birthDate(),
+                0.0,
+                0.0,
+                false,
+                Collections.singletonList(UserType.ROLE_CUSTOMER),
+                bCryptPasswordEncoder.encode(userDTO.password())
         );
-        return userRepository.save(newUsers);
+        return userRepository.save(newUser);
     }
 
     public boolean emailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
+
     //I wrote this to test if the jwt was working
     //        public String login(String username, String password) throws Exception {
     //            Users user = this.userRepository

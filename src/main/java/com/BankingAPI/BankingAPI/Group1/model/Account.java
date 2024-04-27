@@ -11,24 +11,30 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int userId;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private Users user;  // Relationship to Users class
+
     private String IBAN;
-    private String Currency;
+    private String currency;
+    @Enumerated(EnumType.STRING)
     private AccountType accountType;
     private boolean isActive;
     private double balance;
     private double absoluteLimit;
 
-    public Account(int userId, String IBAN, String currency, AccountType accountType, boolean isActive, double balance, double absoluteLimit) {
-        this.userId = userId;
+    public Account(Users user, String IBAN, String currency, AccountType accountType, boolean isActive, double balance, double absoluteLimit) {
+        this.user = user;
         this.IBAN = IBAN;
-        Currency = currency;
+        this.currency = currency;
         this.accountType = accountType;
         this.isActive = isActive;
         this.balance = balance;
         this.absoluteLimit = absoluteLimit;
     }
 
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -37,12 +43,12 @@ public class Account {
         this.id = id;
     }
 
-    public int getUserId() {
-        return userId;
+    public Users getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(Users user) {
+        this.user = user;
     }
 
     public String getIBAN() {
@@ -54,11 +60,11 @@ public class Account {
     }
 
     public String getCurrency() {
-        return Currency;
+        return currency;
     }
 
     public void setCurrency(String currency) {
-        Currency = currency;
+        this.currency = currency;
     }
 
     public AccountType getAccountType() {
@@ -74,7 +80,7 @@ public class Account {
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.isActive = active;
     }
 
     public double getBalance() {

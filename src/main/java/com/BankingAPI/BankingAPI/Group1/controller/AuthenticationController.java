@@ -18,12 +18,15 @@ public class AuthenticationController {
     public AuthenticationController(UserService userService) {
         this.userService = userService;
     }
-    @RequestMapping(value = "/register")
-    @PostMapping
-    public ResponseEntity<Object> createUser(@RequestBody UserPOSTResponseDTO userPOSTResponseDTO) {
+
+    @PostMapping("/register")
+    public ResponseEntity<Object> registerUser(@RequestBody UserPOSTResponseDTO userDTO) {
         try {
-            return ResponseEntity.status(200).body(userService.createUser(userPOSTResponseDTO));
+            userService.createUser(userDTO);
+            return ResponseEntity.status(201).body("User registered successfully");
         } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

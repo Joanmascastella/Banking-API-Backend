@@ -35,8 +35,6 @@ paths:
           description: Bad request, invalid input or missing required fields.
         '409':
           description: Conflict, email or username already exists.
-      security:
-        - bearerAuth: []
   /accounts/own/transfers:
     post:
       tags:
