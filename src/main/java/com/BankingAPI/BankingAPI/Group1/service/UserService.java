@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.service;
 
+import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserGETResponseDTO;
@@ -44,6 +45,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public  Users findById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+    public  Users findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
 
     public Users createUser(UserPOSTResponseDTO userPOSTResponseDTO) {
         if (emailExists(userPOSTResponseDTO.email())) {

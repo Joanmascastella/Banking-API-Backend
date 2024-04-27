@@ -2,11 +2,15 @@ package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
+import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.TransactionRepository;
+import com.BankingAPI.BankingAPI.Group1.repository.specification.TransactionSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +22,8 @@ public class TransactionService {
 
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private UserService userService;
 
     public TransactionService(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
@@ -31,25 +37,38 @@ public class TransactionService {
                         transaction.getToAccount(),
                         transaction.getAmount(),
                         transaction.getDate(),
-                        (int) transaction.getUserId()
+                        transaction.getUserId()
                 ))
                 .collect(Collectors.toList());
     }
-    public List<Transaction> getTransactionsByUserId(Long userId) {
-        return transactionRepository.findByUserId(userId);
+    public List<TransactionGETPOSTResponseDTO> getTransactionsByUserId(Long userId) {
+        List<Transaction> transactions = transactionRepository.findByUserId(userId);
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                       transaction.getUserId()
+                ))
+                .collect(Collectors.toList());
     }
 
-    public Transaction processWithdrawal(Transaction transaction) throws IllegalArgumentException, IllegalStateException {
-        Account account = accountService.findById(transaction.getUser().getId());
+    public TransactionGETPOSTResponseDTO processWithdrawal(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException, IllegalStateException {
+        Account account = accountService.findById(transactionDTO.userId());
         if (account == null) {
             throw new IllegalArgumentException("Account not found");
         }
+        Users user = userService.findById(transactionDTO.userId());
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
 
-        if (!accountService.checkAndUpdateDailyLimit(transaction.getUser(), transaction.getAmount())) {
+        if (!accountService.checkAndUpdateDailyLimit(user, transactionDTO.amount())) {
             throw new IllegalStateException("Daily limit exceeded");
         }
 
-        double newBalance = account.getBalance() - transaction.getAmount();
+        double newBalance = account.getBalance() - transactionDTO.amount();
         if (newBalance < account.getAbsoluteLimit()) {
             throw new IllegalStateException("Withdrawal exceeds absolute limit");
         }
@@ -57,21 +76,67 @@ public class TransactionService {
         account.setBalance(newBalance);
         accountService.save(account);
 
-        transaction.setFromAccount(account.getIBAN());  // Set the user's account IBAN for withdrawal
-        return transactionRepository.save(transaction);
+
+        Transaction transaction = new Transaction(
+                transactionDTO.userId(),
+                account.getIBAN(),
+                "ATM",
+                transactionDTO.amount(),
+                transactionDTO.date()
+        );
+        this.save(transaction);
+
+        return new TransactionGETPOSTResponseDTO(
+                account.getIBAN(),
+                "ATM",
+                transactionDTO.amount(),
+                transactionDTO.date(),
+                transactionDTO.userId()
+        );
     }
 
-    public Transaction processDeposit(Transaction transaction) {
-        Account account = accountService.findById(transaction.getUser().getId());
+    public TransactionGETPOSTResponseDTO processDeposit(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException {
+
+        Account account = accountService.findById(transactionDTO.userId());
         if (account == null) {
             throw new IllegalArgumentException("Account not found");
         }
-
-        double newBalance = account.getBalance() + transaction.getAmount();
+        double newBalance = account.getBalance() + transactionDTO.amount();
         account.setBalance(newBalance);
         accountService.save(account);
+        Transaction transaction = new Transaction(
+                transactionDTO.userId(),
+                "ATM",
+                account.getIBAN(),
+                transactionDTO.amount(),
+                transactionDTO.date()
+        );
+        this.save(transaction);
+        return new TransactionGETPOSTResponseDTO(
+                "ATM",
+                account.getIBAN(),
+                transactionDTO.amount(),
+                transactionDTO.date(),
+                transactionDTO.userId()
+        );
+    }
 
-        transaction.setToAccount(account.getIBAN());
-        return transactionRepository.save(transaction);
+    public List<Transaction> filterTransactions(String IBAN, Double amount, LocalDate startDate, LocalDate endDate) {
+        Specification<Transaction> spec = Specification.where(null);
+
+        if (IBAN != null) {
+            spec = spec.and(TransactionSpecification.hasIBAN(IBAN));
+        }
+        if (amount != null) {
+            spec = spec.and(TransactionSpecification.amountEquals(amount));
+        }
+        if (startDate != null && endDate != null) {
+            spec = spec.and(TransactionSpecification.isBetweenDates(startDate, endDate));
+        }
+
+        return transactionRepository.findAll(spec);
+    }
+    public void save(Transaction transaction) {
+        transactionRepository.save(transaction);
     }
 }

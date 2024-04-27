@@ -19,7 +19,7 @@ public class Transaction {
     private LocalDate date;
     private long userId;
 
-    public Transaction(int userId, String fromAccount, String toAccount, double amount, LocalDate date) {
+    public Transaction(Long userId, String fromAccount, String toAccount, double amount, LocalDate date) {
         this.userId = userId;
         this.fromAccount = fromAccount;
         this.toAccount = toAccount;

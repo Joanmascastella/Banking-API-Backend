@@ -1,7 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.model.Account;
-import com.BankingAPI.BankingAPI.Group1.model.User;
+import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class AccountService {
         return accountRepository.findById(accountId).orElse(null);
     }
 
-    public boolean checkAndUpdateDailyLimit(User user, double amount) {
+    public boolean checkAndUpdateDailyLimit(Users user, double amount) {
         double updatedAmount = user.getDailyLimit() - amount;
         if (updatedAmount < 0) {
             return false;
