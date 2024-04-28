@@ -18,14 +18,21 @@ import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
+    private final BeanFactory beanFactory;
 
 
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository, BeanFactory beanFactory) {
         this.accountRepository = accountRepository;
+        this.beanFactory = beanFactory;
     }
 
     public List<AccountGETPOSTResponseDTO> getAllAccounts(){
+        try {
+            beanFactory.validateAuthentication();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         List<Account> accounts = accountRepository.findAll();
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(
@@ -41,6 +48,11 @@ public class AccountService {
     }
 
     public UserDetailsDTO getAccountDetails(Long userId) throws Exception {
+        try {
+            beanFactory.validateAuthentication();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         Optional<Account> accountOptional = accountRepository.findByUserId(userId);
         if (accountOptional.isPresent()) {
             Account account = accountOptional.get();

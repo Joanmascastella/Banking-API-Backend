@@ -26,6 +26,11 @@ public class TransactionService {
     }
 
     public List<TransactionGETPOSTResponseDTO> allTransactions() {
+        try {
+            beanFactory.validateAuthentication();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         List<Transaction> transactions = transactionRepository.findAll();
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
@@ -39,7 +44,7 @@ public class TransactionService {
     }
 
     public TransactionGETPOSTResponseDTO transferToOtherCustomer(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
-        validateAuthentication();
+        beanFactory.validateAuthentication();
 
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
@@ -61,7 +66,7 @@ public class TransactionService {
 
 
     public TransactionGETPOSTResponseDTO transferMoneyToOwnAccount(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
-        validateAuthentication();
+        beanFactory.validateAuthentication();
 
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
@@ -75,11 +80,7 @@ public class TransactionService {
         return mapToTransactionResponse(newTransaction);
     }
 
-    private void validateAuthentication() throws Exception {
-        if (beanFactory.getCurrentUserId() == null) {
-            throw new Exception("User not authenticated");
-        }
-    }
+
 
     private Account getAccount(String iban) throws Exception {
         Account account = accountRepository.findByIBAN(iban)

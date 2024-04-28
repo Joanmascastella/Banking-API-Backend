@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.service;
 
+import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
@@ -22,16 +23,23 @@ public class UserService {
     private UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final BeanFactory beanFactory;
 
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider, AccountRepository accountRepository) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider, AccountRepository accountRepository, BeanFactory beanFactory) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.accountRepository = accountRepository;
+        this.beanFactory = beanFactory;
     }
 
     public List<UserGETResponseDTO> getAllUsers() {
+        try {
+            beanFactory.validateAuthentication();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         List<Users> users = userRepository.findAll();
         return users.stream()
                 .map(user -> new UserGETResponseDTO(
@@ -77,20 +85,25 @@ public class UserService {
     }
 
     public FindIbanResponseDTO getIbanByFirstNameLastName(String firstName, String lastName) {
+        try {
+            beanFactory.validateAuthentication();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return accountRepository.findIbanByNames(firstName, lastName)
                 .map(iban -> new FindIbanResponseDTO(iban))
                 .orElse(null);
     }
 
 
-            public String login(String username, String password) throws Exception {
-                Users user = this.userRepository
-                        .findMemberByUsername(username)
-                        .orElseThrow(() -> new AuthenticationException("User not found"));
-                if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
-                    return jwtTokenProvider.createToken(user.getUsername(), user.getId(), user.getUserType());
-                } else {
-                    throw new AuthenticationException("Invalid username/password");
-                }
-            }
+    public String login(String username, String password) throws Exception {
+        Users user = this.userRepository
+                .findMemberByUsername(username)
+                .orElseThrow(() -> new AuthenticationException("User not found"));
+        if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
+            return jwtTokenProvider.createToken(user.getUsername(), user.getId(), user.getUserType());
+        } else {
+            throw new AuthenticationException("Invalid username/password");
+        }
+    }
 }

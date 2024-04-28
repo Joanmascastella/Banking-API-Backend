@@ -24,5 +24,12 @@ public class BeanFactory {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         return userDetails.getId();
     }
+
+    @Bean
+    public void validateAuthentication() throws Exception {
+        if (this.getCurrentUserId() == null) {
+            throw new Exception("User not authenticated");
+        }
+    }
 }
 
