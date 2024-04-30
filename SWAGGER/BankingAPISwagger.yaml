@@ -63,6 +63,40 @@ paths:
           description: Transfer cannot be completed, insufficient funds or account restrictions.
       security:
         - bearerAuth: []
+  /accounts/{accountId}:
+    delete:
+      tags:
+        - Employee
+      summary: Close account
+      description: This can only be done by the employee.
+      operationId: closeAccount
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+            description: ID of the account to be closed
+      responses:
+        '200':
+          description: Account closed successfully
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Account was closed successfully"
+        '404':
+          description: Account not found
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        '500':
+          description: Internal server error
+      security:
+        - bearerAuth: [ ]
   /customers/iban:
     get:
       tags:

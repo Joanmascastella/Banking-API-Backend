@@ -45,4 +45,15 @@ public class AccountController {
             return ResponseEntity.status(404).body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/{accountId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity<Object> closeAccount(@PathVariable long accountId) {
+        try{
+            accountService.closeAccount(accountId);
+            return ResponseEntity.status(200).body("Account was closed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
 }

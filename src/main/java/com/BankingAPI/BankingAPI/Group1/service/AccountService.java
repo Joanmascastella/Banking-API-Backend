@@ -109,4 +109,11 @@ public class AccountService {
         currentAccount.setAbsoluteLimit(account.getAbsoluteLimit());
         accountRepository.save(currentAccount);
     }
+
+    public void closeAccount(long accountId) {
+        Account currentAccount = accountRepository.findById(accountId)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found."));
+        currentAccount.setActive(false);
+        accountRepository.save(currentAccount);
+    }
 }
