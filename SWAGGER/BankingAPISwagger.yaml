@@ -429,22 +429,12 @@ paths:
           description: User must be of role employee
       security:
         - bearerAuth: []
-  /accounts/customers/{accountId}:
     put:
       tags:
         - Employee
-        - Customer
       summary: Update account
-      description: This can only be done by the employee and customer.
+      description: This can only be done by the employee
       operationId: updateAccount
-      parameters:
-        - name: accountId
-          in: path
-          description: ID of account that needs to be updated
-          required: true
-          schema:
-            type: string
-            format: uuid
       requestBody:
         description: Updated account object
         content:
