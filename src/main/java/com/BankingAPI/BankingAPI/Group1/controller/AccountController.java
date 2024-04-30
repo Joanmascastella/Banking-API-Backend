@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
+import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
@@ -29,6 +30,17 @@ public class AccountController {
         try {
             UserDetailsDTO userDetails = accountService.getAccountDetails(userId);
             return ResponseEntity.ok(userDetails);
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/customers")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity<Object> updateAccount(@RequestBody Account account) {
+        try{
+            accountService.updateAccount(account);
+            return ResponseEntity.status(200).body("Account was updated successfully");
         } catch (Exception e) {
             return ResponseEntity.status(404).body(e.getMessage());
         }

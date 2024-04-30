@@ -6,6 +6,7 @@ import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -100,5 +101,12 @@ public class AccountService {
 
     private boolean ibanExists(String iban) {
         return accountRepository.existsByIBAN(iban);
+    }
+
+    public void updateAccount(Account account) {
+        Account currentAccount = accountRepository.findById(account.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Account not found."));
+        currentAccount.setAbsoluteLimit(account.getAbsoluteLimit());
+        accountRepository.save(currentAccount);
     }
 }
