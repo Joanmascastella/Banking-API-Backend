@@ -103,6 +103,13 @@ public class UserService {
         userRepository.save(currentUser);
     }
 
+    public void updateDailyLimit(Users user) {
+        Users currentUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
+        currentUser.setDailyLimit(user.getDailyLimit());
+        userRepository.save(currentUser);
+    }
+
     //I wrote this to test if the jwt was working
     //        public String login(String username, String password) throws Exception {
     //            Users user = this.userRepository

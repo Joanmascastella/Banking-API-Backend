@@ -41,4 +41,14 @@ public class UserController {
             return ResponseEntity.status(404).body("User not found.");
         }
     }
+    @PutMapping
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<Object> updateDailyLimit(@RequestBody Users user){
+        try{
+            userService.updateDailyLimit(user);
+            return ResponseEntity.status(200).body("Daily limit was updated successfully.");
+        } catch (Exception ex) {
+            return ResponseEntity.status(404).body("User not found.");
+        }
+    }
 }
