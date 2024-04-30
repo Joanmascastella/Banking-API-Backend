@@ -6,6 +6,7 @@ import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserGETResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.UserRepository;
 import com.BankingAPI.BankingAPI.Group1.util.JwtTokenProvider;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +18,14 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private UserRepository userRepository;
+    private AccountService accountService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider) {
+    public UserService(UserRepository userRepository, AccountService accountService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
+        this.accountService = accountService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
     }
@@ -70,6 +73,34 @@ public class UserService {
 
     public boolean emailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
+    }
+
+    public List<UserGETResponseDTO> getUnapprovedUsers() {
+        List<Users> users = userRepository.findByIsApproved(false);
+        return users.stream()
+                .map(user -> new UserGETResponseDTO(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getBSN(),
+                    user.getPhoneNumber(),
+                    user.getBirthDate(),
+                    user.getTotalBalance(),
+                    user.getDailyLimit(),
+                    user.isApproved(),
+                    user.getUserType()))
+                .collect(Collectors.toList());
+    }
+
+    public void approveUser(Users user, double absoluteSavingLimit, double absoluteCheckingLimit) {
+        Users currentUser = userRepository.findById(user.getId())
+                        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
+        currentUser.setApproved(true);
+        currentUser.setDailyLimit(user.getDailyLimit());
+        accountService.createAccountsForUser(user, absoluteSavingLimit, absoluteCheckingLimit);
+        userRepository.save(currentUser);
     }
 
     //I wrote this to test if the jwt was working
