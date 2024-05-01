@@ -79,7 +79,7 @@ public class TransactionController {
 
         List<Transaction> transactions = transactionService.filterTransactions(IBAN, amount,amountGreater,amountLess, startDate, endDate);
         List<TransactionGETPOSTResponseDTO> transactionDto = transactions.stream()
-                .map(t -> new TransactionGETPOSTResponseDTO(t.getFromAccount(), t.getToAccount(), t.getAmount(), t.getDate(), t.getUserId()))
+                .map(t -> new TransactionGETPOSTResponseDTO(t.getFromAccount(), t.getToAccount(), t.getAmount(), t.getDate(), t.getUser().getId()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(transactionDto);

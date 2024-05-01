@@ -24,12 +24,10 @@ public class Users {
     private double totalBalance;
     private double dailyLimit;
     private boolean isApproved;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    private List<UserType> userType;
+    private UserType userType;
     private String password;
 
-    public Users(String username, String email, String firstName, String lastName, String BSN, String phoneNumber, LocalDate birthDate, double totalBalance, double dailyLimit, boolean isApproved, List<UserType> userType, String password) {
+    public Users(String username, String email, String firstName, String lastName, String BSN, String phoneNumber, LocalDate birthDate, double totalBalance, double dailyLimit, boolean isApproved, UserType userType, String password) {
         this.username = username;
         this.email = email;
         this.firstName = firstName;
@@ -132,11 +130,11 @@ public class Users {
         isApproved = approved;
     }
 
-    public List<UserType> getUserType() {
+    public UserType getUserType() {
         return userType;
     }
 
-    public void setUserType(List<UserType> userType) {
+    public void setUserType(UserType userType) {
         this.userType = userType;
     }
 

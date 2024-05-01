@@ -10,10 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
@@ -30,15 +32,10 @@ public class JwtTokenProvider {
         this.beanFactory = beanFactory;
     }
 
-    public String createToken(String username, long userId, List<UserType> roles) throws JwtException {
-        Claims claims = Jwts.claims().setSubject(username);
+    public String createToken(String username, long userId, UserType type) {
+        Claims claims = Jwts.claims().setSubject(username);  // Use username or another unique identifier here
         claims.put("userId", userId);
-        claims.put("auth",
-                roles
-                        .stream()
-                        .map(UserType::name)
-                        .toList());
-
+        claims.put("auth", type.name());
 
         Date now = new Date();
         Date expiration = new Date(now.getTime() + validityInMicroseconds);
@@ -51,15 +48,22 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+
+
+
     public Authentication getAuthentication(String token) {
-        try {
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(jwtKeyProvider.getPrivateKey()).build().parseClaimsJws(token);
-            String username = claims.getBody().getSubject();
-            UserDetails userDetails = memberDetailsService.loadUserByUsername(username);
-            return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtException("Bearer token not valid");
-        }
+        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(jwtKeyProvider.getPrivateKey()).build().parseClaimsJws(token);
+        String username = claims.getBody().getSubject();
+        List<SimpleGrantedAuthority> authorities = ((List<String>) claims.getBody().get("auth"))
+                .stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+
+        System.out.println("Authorities: " + authorities);  // Add this line for debugging
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(username, "", authorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
     }
+
+
 
 }

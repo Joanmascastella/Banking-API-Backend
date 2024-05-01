@@ -9,8 +9,11 @@ import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserGETResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.UserRepository;
+import com.BankingAPI.BankingAPI.Group1.util.CustomUserDetails;
 import com.BankingAPI.BankingAPI.Group1.util.JwtTokenProvider;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,11 +42,6 @@ public class UserService {
     }
 
     public List<UserGETResponseDTO> getAllUsers() {
-        try {
-            beanFactory.validateAuthentication();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         List<Users> users = userRepository.findAll();
         return users.stream()
                 .map(user -> new UserGETResponseDTO(
@@ -67,7 +65,16 @@ public class UserService {
     }
 
     public  Users findByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+        return userRepository.findUserByEmail(email).orElse(null);
+    }
+    public Users getCurrentUser() throws IllegalArgumentException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new IllegalArgumentException("No authenticated user found");
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
     public Users createUser(UserPOSTResponseDTO userDTO) {
@@ -85,7 +92,7 @@ public class UserService {
                 0.0,
                 0.0,
                 false,
-                Collections.singletonList(UserType.ROLE_CUSTOMER),
+                UserType.ROLE_CUSTOMER,
                 bCryptPasswordEncoder.encode(userDTO.password())
         );
         return userRepository.save(newUser);
@@ -101,7 +108,7 @@ public class UserService {
 
 
     public boolean emailExists(String email) {
-        return userRepository.findByEmail(email).isPresent();
+        return userRepository.findUserByEmail(email).isPresent();
     }
 
     public FindIbanResponseDTO getIbanByFirstNameLastName(String firstName, String lastName) {
@@ -116,8 +123,7 @@ public class UserService {
     }
 
     public String login(String username, String password) throws Exception {
-        Users user = this.userRepository
-                .findMemberByUsername(username)
+        Users user = this.userRepository.findMemberByUsername(username)
                 .orElseThrow(() -> new AuthenticationException("User not found"));
         if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
             return jwtTokenProvider.createToken(user.getUsername(), user.getId(), user.getUserType());
@@ -125,6 +131,7 @@ public class UserService {
             throw new AuthenticationException("Invalid username/password");
         }
     }
+
 
     public List<UserGETResponseDTO> getUnapprovedUsers() {
         List<Users> users = userRepository.findByIsApproved(false);

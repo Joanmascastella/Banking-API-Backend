@@ -48,14 +48,14 @@ public class TransactionService {
                         transaction.getToAccount(),
                         transaction.getAmount(),
                         transaction.getDate(),
-                        transaction.getUserId()
+                        transaction.getUser().getId()
                 ))
                 .collect(Collectors.toList());
     }
 
     public TransactionGETPOSTResponseDTO transferToOtherCustomer(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
          beanFactory.validateAuthentication();
-
+        Users user = userService.getCurrentUser();
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
 
@@ -70,13 +70,14 @@ public class TransactionService {
         validateTransactionLimits(fromAccount, transactionDTO.amount());
         performTransfer(fromAccount, toAccount, transactionDTO.amount());
 
-        Transaction newTransaction = createAndSaveTransaction(fromAccount, toAccount, transactionDTO.amount());
+        Transaction newTransaction = createAndSaveTransaction(user, fromAccount.getIBAN(), toAccount.getIBAN(), transactionDTO.amount());
         return mapToTransactionResponse(newTransaction);
     }
 
 
     public TransactionGETPOSTResponseDTO transferMoneyToOwnAccount(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
          beanFactory.validateAuthentication();
+         Users user = userService.getCurrentUser();
 
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
@@ -85,7 +86,7 @@ public class TransactionService {
         validateTransactionLimits(fromAccount, transactionDTO.amount());
 
         performTransfer(fromAccount, toAccount, transactionDTO.amount());
-        Transaction newTransaction = createAndSaveTransaction(fromAccount, toAccount, transactionDTO.amount());
+        Transaction newTransaction = createAndSaveTransaction(user, fromAccount.getIBAN(), toAccount.getIBAN(), transactionDTO.amount());
 
         return mapToTransactionResponse(newTransaction);
     }
@@ -124,15 +125,16 @@ public class TransactionService {
         accountRepository.save(toAccount);
     }
 
-    private Transaction createAndSaveTransaction(Account fromAccount, Account toAccount, double amount) {
+    private Transaction createAndSaveTransaction(Users user, String fromIBAN, String toIBAN, double amount) {
         Transaction transaction = new Transaction();
-        transaction.setUserId(beanFactory.getCurrentUserId());
-        transaction.setFromAccount(fromAccount.getIBAN());
-        transaction.setToAccount(toAccount.getIBAN());
+        transaction.setUser(user);
+        transaction.setFromAccount(fromIBAN);
+        transaction.setToAccount(toIBAN);
         transaction.setAmount(amount);
         transaction.setDate(LocalDate.now());
         return transactionRepository.save(transaction);
     }
+
 
     private TransactionGETPOSTResponseDTO mapToTransactionResponse(Transaction transaction) {
         return new TransactionGETPOSTResponseDTO(
@@ -140,7 +142,7 @@ public class TransactionService {
                 transaction.getToAccount(),
                 transaction.getAmount(),
                 transaction.getDate(),
-                transaction.getUserId()
+                transaction.getUser().getId()
         );
     }
     public List<TransactionGETPOSTResponseDTO> getTransactionsByUserId(Long userId) {
@@ -151,7 +153,7 @@ public class TransactionService {
                         transaction.getToAccount(),
                         transaction.getAmount(),
                         transaction.getDate(),
-                        transaction.getUserId()
+                        transaction.getUser().getId()
                 ))
                 .collect(Collectors.toList());
     }
@@ -165,32 +167,30 @@ public class TransactionService {
                         transaction.getToAccount(),
                         transaction.getAmount(),
                         transaction.getDate(),
-                        transaction.getUserId()
+                        transaction.getUser().getId()
                 ))
                 .collect(Collectors.toList());
     }
 
     public TransactionGETPOSTResponseDTO processWithdrawal(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException, IllegalStateException {
+        Users user = userService.getCurrentUser();
         Account account = validateAccount(transactionDTO.userId());
-        Users user = validateUser(transactionDTO.userId());
+
         checkAndUpdateDailyLimit(user, transactionDTO.amount());
-        updateAccountBalance(account,-transactionDTO.amount());
-        Transaction transaction = new Transaction(
-                transactionDTO.userId(),
-                account.getIBAN(),
-                "ATM",
-                transactionDTO.amount(),
-                transactionDTO.date()
-        );
-        this.save(transaction);
+        updateAccountBalance(account, -transactionDTO.amount());
+
+        Transaction transaction = new Transaction(user, account.getIBAN(), "ATM", transactionDTO.amount(), transactionDTO.date());
+        transactionRepository.save(transaction);
+
         return new TransactionGETPOSTResponseDTO(
                 account.getIBAN(),
                 "ATM",
                 transactionDTO.amount(),
                 transactionDTO.date(),
-                transactionDTO.userId()
+                user.getId()
         );
     }
+
     private void updateAccountBalance(Account account, double amountChange) throws IllegalStateException {
         double newBalance = account.getBalance() + amountChange;
         if (newBalance < account.getAbsoluteLimit()) {
@@ -220,22 +220,20 @@ public class TransactionService {
     }
 
     public TransactionGETPOSTResponseDTO processDeposit(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException {
+        Users user = userService.getCurrentUser();
         Account account = validateAccount(transactionDTO.userId());
-        updateAccountBalance(account,transactionDTO.amount());
-        Transaction transaction = new Transaction(
-                transactionDTO.userId(),
-                "ATM",
-                account.getIBAN(),
-                transactionDTO.amount(),
-                transactionDTO.date()
-        );
-        this.save(transaction);
+
+        updateAccountBalance(account, transactionDTO.amount());
+
+        Transaction transaction = new Transaction(user, "ATM", account.getIBAN(), transactionDTO.amount(), transactionDTO.date());
+        transactionRepository.save(transaction);
+
         return new TransactionGETPOSTResponseDTO(
                 "ATM",
                 account.getIBAN(),
                 transactionDTO.amount(),
                 transactionDTO.date(),
-                transactionDTO.userId()
+                user.getId()
         );
     }
 
@@ -272,7 +270,7 @@ public class TransactionService {
                         transaction.getToAccount(),
                         transaction.getAmount(),
                         transaction.getDate(),
-                        transaction.getUserId()
+                        transaction.getUser().getId()
                 ))
                 .collect(Collectors.toList());
     }
@@ -285,7 +283,7 @@ public class TransactionService {
                         transaction.getToAccount(),
                         transaction.getAmount(),
                         transaction.getDate(),
-                        transaction.getUserId()
+                        transaction.getUser().getId()
                 ))
                 .collect(Collectors.toList());
     }

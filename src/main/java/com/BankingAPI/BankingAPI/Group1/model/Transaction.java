@@ -17,10 +17,12 @@ public class Transaction {
     private String toAccount;
     private double amount;
     private LocalDate date;
-    private long userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
 
-    public Transaction(Long userId, String fromAccount, String toAccount, double amount, LocalDate date) {
-        this.userId = userId;
+    public Transaction(Users user, String fromAccount, String toAccount, double amount, LocalDate date) {
+        this.user = user;
         this.fromAccount = fromAccount;
         this.toAccount = toAccount;
         this.amount = amount;
@@ -67,11 +69,11 @@ public class Transaction {
         this.date = date;
     }
 
-    public long getUserId() {
-        return userId;
+    public Users getUser() {
+        return user;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setUser(Users user) {
+        this.user = user;
     }
 }

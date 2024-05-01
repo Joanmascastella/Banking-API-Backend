@@ -27,9 +27,8 @@ public class AccountController {
         this.transactionService = transactionService;
     }
 
-
-    @GetMapping
-    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @GetMapping(value = "/all")
     public ResponseEntity<Object> getAllAccounts() {
         return ResponseEntity.status(200).body(accountService.getAllAccounts());
     }
