@@ -34,7 +34,7 @@ public class DatabaseInitializer implements ApplicationRunner {
     }
 
     private void initDatabase() {
-        Users newUsers = new Users("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, Arrays.asList(UserType.ROLE_CUSTOMER), bCryptPasswordEncoder.encode("password123"));
+        Users newUsers = new Users("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, Arrays.asList(UserType.ROLE_CUSTOMER), bCryptPasswordEncoder.encode("123"));
         Users newEmployee = new Users("Employee", "employee@example.com", "Em", "Yee", "1234567893", "01234567891", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, Arrays.asList(UserType.ROLE_EMPLOYEE), bCryptPasswordEncoder.encode("employee"));
         userRepository.save(newUsers);
         userRepository.save(newEmployee);
