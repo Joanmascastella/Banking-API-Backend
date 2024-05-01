@@ -39,7 +39,7 @@ public class DatabaseInitializer implements ApplicationRunner {
         userRepository.save(newUsers);
         userRepository.save(newEmployee);
 
-        Transaction newTransaction = new Transaction(1, "123456789", "123456789", 2000.0, LocalDate.now());
+        Transaction newTransaction = new Transaction(1L, "123456789", "123456789", 2000.0, LocalDate.now());
         transactionRepository.save(newTransaction);
 
         Account newAccount = new Account(newUsers, "DE89 3704 0044 0532 0130 00", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);

@@ -2,6 +2,7 @@ package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
+import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
@@ -61,6 +62,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public  Users findById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+    public  Users findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
 
     public Users createUser(UserPOSTResponseDTO userDTO) {
         if (emailExists(userDTO.email())) {
@@ -82,6 +90,15 @@ public class UserService {
         );
         return userRepository.save(newUser);
     }
+    public boolean checkAndUpdateDailyLimit(Users user, double amount) {
+        double updatedAmount = user.getDailyLimit() - amount;
+        if (updatedAmount < 0) {
+            return false;
+        }
+        user.setDailyLimit(updatedAmount);
+        return true;
+    }
+
 
     public boolean emailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
@@ -108,7 +125,7 @@ public class UserService {
             throw new AuthenticationException("Invalid username/password");
         }
     }
-    
+
     public List<UserGETResponseDTO> getUnapprovedUsers() {
         List<Users> users = userRepository.findByIsApproved(false);
         return users.stream()

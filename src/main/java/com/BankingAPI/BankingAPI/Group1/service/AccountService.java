@@ -10,6 +10,7 @@ import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.TransactionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final BeanFactory beanFactory;
+    private final AccountRepository accountRepository;
 
 
     public AccountService(AccountRepository accountRepository, BeanFactory beanFactory) {
@@ -135,5 +137,13 @@ public class AccountService {
                 .orElseThrow(() -> new EntityNotFoundException("Account not found."));
         currentAccount.setActive(false);
         accountRepository.save(currentAccount);
+    }
+    public Account findById(Long accountId) {
+        return accountRepository.findById(accountId).orElse(null);
+    }
+
+
+    public void save(Account account) {
+        accountRepository.save(account);
     }
 }
