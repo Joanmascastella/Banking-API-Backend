@@ -73,6 +73,15 @@ public class UserService {
         );
         return userRepository.save(newUsers);
     }
+    public boolean checkAndUpdateDailyLimit(Users user, double amount) {
+        double updatedAmount = user.getDailyLimit() - amount;
+        if (updatedAmount < 0) {
+            return false;
+        }
+        user.setDailyLimit(updatedAmount);
+        return true;
+    }
+
 
     public boolean emailExists(String email) {
         return userRepository.findByEmail(email).isPresent();

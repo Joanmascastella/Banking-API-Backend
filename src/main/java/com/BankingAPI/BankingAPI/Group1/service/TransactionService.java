@@ -64,7 +64,7 @@ public class TransactionService {
             throw new IllegalArgumentException("User not found");
         }
 
-        if (!accountService.checkAndUpdateDailyLimit(user, transactionDTO.amount())) {
+        if (!userService.checkAndUpdateDailyLimit(user, transactionDTO.amount())) {
             throw new IllegalStateException("Daily limit exceeded");
         }
 

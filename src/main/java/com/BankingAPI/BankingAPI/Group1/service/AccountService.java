@@ -37,14 +37,6 @@ public class AccountService {
         return accountRepository.findById(accountId).orElse(null);
     }
 
-    public boolean checkAndUpdateDailyLimit(Users user, double amount) {
-        double updatedAmount = user.getDailyLimit() - amount;
-        if (updatedAmount < 0) {
-            return false;
-        }
-        user.setDailyLimit(updatedAmount);
-        return true;
-    }
 
     public void save(Account account) {
         accountRepository.save(account);
