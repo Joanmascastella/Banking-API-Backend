@@ -2,22 +2,17 @@ package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
-import com.BankingAPI.BankingAPI.Group1.model.Transaction;
+
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
-import com.BankingAPI.BankingAPI.Group1.repository.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
