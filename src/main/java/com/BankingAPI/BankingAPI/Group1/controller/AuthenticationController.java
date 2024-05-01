@@ -30,13 +30,10 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-
-            @RequestMapping(value = "/login")
-            @PostMapping
-            public Object login(@RequestBody LoginDTO dto) throws Exception {
-                return new TokenDTO(
-                        userService.login(dto.username(), dto.password())
-                );
-            }
+    @PostMapping(value = "/login")
+    public Object login(@RequestBody LoginDTO dto) throws Exception {
+        return new TokenDTO(
+                userService.login(dto.username(), dto.password())
+        );
+    }
 }
