@@ -1,11 +1,16 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
+import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/transactions")
@@ -39,6 +44,36 @@ public class TransactionController {
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
             }
+        }
+    }
+
+    @RequestMapping(value = "/transactions/{userType}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getTransactionsByUserType(@PathVariable UserType userType) {
+        try {
+            List<Object> transactions = Collections.singletonList(transactionService.findByUserType(userType));
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @RequestMapping(value = "/transactions/ATM", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getATMTransactions() {
+        try {
+            List<Object> transactions = Collections.singletonList(transactionService.findATMTransactions());
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @RequestMapping(value = "/transactions/ATM/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getATMTransactionsByUser(@PathVariable long userId) {
+        try {
+            List<Object> transactions = Collections.singletonList(transactionService.findATMTransactionsByUserId(userId));
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
