@@ -5,6 +5,7 @@ import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
+import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.TransactionRepository;
@@ -136,7 +137,7 @@ public class TransactionService {
     }
 
 
-    public List<TransactionGETPOSTResponseDTO> findByUserType(UserType userType) {
+    public List<TransactionGETPOSTResponseDTO> findTransactionsByUserType(UserType userType) {
         List<Transaction> transactions = transactionRepository.findByUserType(userType);
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
@@ -174,4 +175,6 @@ public class TransactionService {
                 ))
                 .collect(Collectors.toList());
     }
+
+
 }

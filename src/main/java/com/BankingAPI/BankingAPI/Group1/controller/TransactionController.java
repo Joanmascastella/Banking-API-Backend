@@ -50,7 +50,7 @@ public class TransactionController {
     @RequestMapping(value = "/transactions/{userType}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getTransactionsByUserType(@PathVariable UserType userType) {
         try {
-            List<Object> transactions = Collections.singletonList(transactionService.findByUserType(userType));
+            List<Object> transactions = Collections.singletonList(transactionService.findTransactionsByUserType(userType));
             return ResponseEntity.status(HttpStatus.OK).body(transactions);
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
