@@ -55,28 +55,10 @@ public class TransactionService {
     }
 
     public TransactionGETPOSTResponseDTO processWithdrawal(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException, IllegalStateException {
-        Account account = accountService.findById(transactionDTO.userId());
-        if (account == null) {
-            throw new IllegalArgumentException("Account not found");
-        }
-        Users user = userService.findById(transactionDTO.userId());
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
-
-        if (!userService.checkAndUpdateDailyLimit(user, transactionDTO.amount())) {
-            throw new IllegalStateException("Daily limit exceeded");
-        }
-
-        double newBalance = account.getBalance() - transactionDTO.amount();
-        if (newBalance < account.getAbsoluteLimit()) {
-            throw new IllegalStateException("Withdrawal exceeds absolute limit");
-        }
-
-        account.setBalance(newBalance);
-        accountService.save(account);
-
-
+        Account account = validateAccount(transactionDTO.userId());
+        Users user = validateUser(transactionDTO.userId());
+        checkAndUpdateDailyLimit(user, transactionDTO.amount());
+        updateAccountBalance(account,-transactionDTO.amount());
         Transaction transaction = new Transaction(
                 transactionDTO.userId(),
                 account.getIBAN(),
@@ -85,7 +67,6 @@ public class TransactionService {
                 transactionDTO.date()
         );
         this.save(transaction);
-
         return new TransactionGETPOSTResponseDTO(
                 account.getIBAN(),
                 "ATM",
@@ -94,16 +75,37 @@ public class TransactionService {
                 transactionDTO.userId()
         );
     }
-
-    public TransactionGETPOSTResponseDTO processDeposit(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException {
-
-        Account account = accountService.findById(transactionDTO.userId());
+    private void updateAccountBalance(Account account, double amountChange) throws IllegalStateException {
+        double newBalance = account.getBalance() + amountChange;
+        if (newBalance < account.getAbsoluteLimit()) {
+            throw new IllegalStateException("Withdrawal exceeds absolute limit");
+        }
+        account.setBalance(newBalance);
+        accountService.save(account);
+    }
+    private Account validateAccount(Long userId) throws IllegalArgumentException {
+        Account account = accountService.findById(userId);
         if (account == null) {
             throw new IllegalArgumentException("Account not found");
         }
-        double newBalance = account.getBalance() + transactionDTO.amount();
-        account.setBalance(newBalance);
-        accountService.save(account);
+        return account;
+    }
+    private Users validateUser(Long userId) throws IllegalArgumentException {
+        Users user = userService.findById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+        return user;
+    }
+    private void checkAndUpdateDailyLimit(Users user, double amount) throws IllegalStateException {
+        if (!userService.checkAndUpdateDailyLimit(user, amount)) {
+            throw new IllegalStateException("Daily limit exceeded");
+        }
+    }
+
+    public TransactionGETPOSTResponseDTO processDeposit(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException {
+        Account account = validateAccount(transactionDTO.userId());
+        updateAccountBalance(account,transactionDTO.amount());
         Transaction transaction = new Transaction(
                 transactionDTO.userId(),
                 "ATM",
