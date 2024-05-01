@@ -6,7 +6,6 @@ import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.TransactionRepository;
@@ -18,6 +17,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -146,4 +147,66 @@ public class AccountService {
     public void save(Account account) {
         accountRepository.save(account);
     }
+    public List<AccountGETPOSTResponseDTO> findSavingsAccountsByUserId(long userId) {
+        List<Account> accounts = accountRepository.findSavingsAccountsByUserId(userId);
+        return accounts.stream()
+                .map(account -> new AccountGETPOSTResponseDTO(
+                        account.getUser().getId(),
+                        account.getIBAN(),
+                        account.getCurrency(),
+                        account.getAccountType(),
+                        account.isActive(),
+                        account.getBalance(),
+                        account.getAbsoluteLimit()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<AccountGETPOSTResponseDTO> findCheckingAccountsByUserId(long userId) {
+        List<Account> accounts = accountRepository.findCheckingAccountsByUserId(userId);
+        return accounts.stream()
+                .map(account -> new AccountGETPOSTResponseDTO(
+                        account.getUser().getId(),
+                        account.getIBAN(),
+                        account.getCurrency(),
+                        account.getAccountType(),
+                        account.isActive(),
+                        account.getBalance(),
+                        account.getAbsoluteLimit()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
+    public List<AccountGETPOSTResponseDTO> findByAbsoluteLimit(double absoluteLimit) {
+        List<Account> accounts = accountRepository.findByAbsoluteLimit(absoluteLimit);
+        return accounts.stream()
+                .map(account -> new AccountGETPOSTResponseDTO(
+                        account.getUser().getId(),
+                        account.getIBAN(),
+                        account.getCurrency(),
+                        account.getAccountType(),
+                        account.isActive(),
+                        account.getBalance(),
+                        account.getAbsoluteLimit()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<AccountGETPOSTResponseDTO> findByInactiveTag() {
+        List<Account> accounts = accountRepository.findByInactiveTag();
+        return accounts.stream()
+                .map(account -> new AccountGETPOSTResponseDTO(
+                        account.getUser().getId(),
+                        account.getIBAN(),
+                        account.getCurrency(),
+                        account.getAccountType(),
+                        account.isActive(),
+                        account.getBalance(),
+                        account.getAbsoluteLimit()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
 }

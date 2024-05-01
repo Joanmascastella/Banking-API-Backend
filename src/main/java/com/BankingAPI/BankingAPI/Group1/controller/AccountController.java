@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
+import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
@@ -7,9 +8,13 @@ import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/accounts")
@@ -75,4 +80,45 @@ public class AccountController {
             return ResponseEntity.status(404).body(e.getMessage());
         }
     }
+
+    @RequestMapping(value = "/accounts/savings/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getSavingsAccountsOfUser(@PathVariable long userId) {
+        try {
+            List<Object> accounts = Collections.singletonList(accountService.findSavingsAccountsByUserId(userId));
+            return ResponseEntity.status(HttpStatus.OK).body(accounts);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @RequestMapping(value = "/accounts/checking/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getCheckingAccountsOfUser(@PathVariable long userId) {
+        try {
+            List<Object> accounts = Collections.singletonList(accountService.findCheckingAccountsByUserId(userId));
+            return ResponseEntity.status(HttpStatus.OK).body(accounts);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/accounts/byAbsoluteLimit")
+    public ResponseEntity getAccountsByAbsoluteLimit(@RequestParam(required = true) double absoluteLimit) {
+        try {
+            List<Object> accounts = Collections.singletonList(accountService.findByAbsoluteLimit(absoluteLimit));
+            return ResponseEntity.status(HttpStatus.OK).body(accounts);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @RequestMapping(value = "/accounts/inactive", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getInactiveAccounts() {
+        try {
+            List<Object> accounts = Collections.singletonList(accountService.findByInactiveTag());
+            return ResponseEntity.status(HttpStatus.OK).body(accounts);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 }
