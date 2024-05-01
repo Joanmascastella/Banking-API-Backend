@@ -1,6 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
 import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
@@ -40,5 +41,30 @@ public class UserController {
         }
     }
 
+    @GetMapping("/noncustomers")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<Object> getUnapprovedUsers() {
+        return ResponseEntity.status(200).body(userService.getUnapprovedUsers());
+    }
 
+    @PutMapping("/approve")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<Object> approveUser(@RequestBody Users user, double absoluteSavingLimit, double absoluteCheckingLimit){
+        try{
+            userService.approveUser(user, absoluteSavingLimit, absoluteCheckingLimit);
+            return ResponseEntity.status(200).body("User approved and accounts created succesfully.");
+        } catch (Exception ex) {
+            return ResponseEntity.status(404).body("User not found.");
+        }
+    }
+    @PutMapping
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<Object> updateDailyLimit(@RequestBody Users user){
+        try{
+            userService.updateDailyLimit(user);
+            return ResponseEntity.status(200).body("Daily limit was updated successfully.");
+        } catch (Exception ex) {
+            return ResponseEntity.status(404).body("User not found.");
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
@@ -53,6 +54,25 @@ public class AccountController {
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
             }
+    @PutMapping("/customers")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity<Object> updateAccount(@RequestBody Account account) {
+        try{
+            accountService.updateAccount(account);
+            return ResponseEntity.status(200).body("Account was updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{accountId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity<Object> closeAccount(@PathVariable long accountId) {
+        try{
+            accountService.closeAccount(accountId);
+            return ResponseEntity.status(200).body("Account was closed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(e.getMessage());
         }
     }
 }

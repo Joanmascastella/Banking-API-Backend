@@ -63,7 +63,41 @@ paths:
           description: Transfer cannot be completed, insufficient funds or account restrictions.
       security:
         - bearerAuth: []
-  /users/iban:
+  /accounts/{accountId}:
+    delete:
+      tags:
+        - Employee
+      summary: Close account
+      description: This can only be done by the employee.
+      operationId: closeAccount
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+            description: ID of the account to be closed
+      responses:
+        '200':
+          description: Account closed successfully
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Account was closed successfully"
+        '404':
+          description: Account not found
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        '500':
+          description: Internal server error
+      security:
+        - bearerAuth: [ ]
+  /customers/iban:
     get:
       tags:
         - Customer
@@ -337,32 +371,36 @@ paths:
           description: User must be role of employee.
       security:
         - bearerAuth: []
-  /users/approve/{userId}:
+  /users/approve:
     put:
       tags:
         - Employee
       summary: Approve customer after user registration
       description: This can only be done by the employee.
       operationId: approveCustomer
-      parameters:
-        - name: userId
-          in: path
-          description: ID of user that needs to be updated
-          required: true
-          schema:
-            type: string
-            format: uuid
       requestBody:
-        description: Updated user object
+        description: Updated user object and absolute saving and checking limits
+        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              type: object
+              properties:
+                user:
+                  $ref: "#/components/schemas/User"
+                absoluteSavingLimit:
+                  type: number
+                  description: Absolute limit for saving account
+                absoluteCheckingLimit:
+                  type: number
+                  description: Absolute limit for checking account
             examples:
               User123e4567-e89b-12d3-a456-426614174000:
-                $ref: "#/components/examples/User123e4567-e89b-12d3-a456-426614174000"
-        required: true
-
+                value:
+                  user:
+                    $ref: "#/components/examples/User123e4567-e89b-12d3-a456-426614174000"
+                  absoluteSavingLimit: 5000.0
+                  absoluteCheckingLimit: 1000.0
       responses:
         '200':
           description: User approved successfully.
@@ -374,7 +412,7 @@ paths:
           description: User not found
 
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /accounts/customers:
     get:
       tags:
@@ -425,22 +463,12 @@ paths:
           description: User must be of role employee
       security:
         - bearerAuth: []
-  /accounts/customers/{accountId}:
     put:
       tags:
         - Employee
-        - Customer
       summary: Update account
-      description: This can only be done by the employee and customer.
+      description: This can only be done by the employee
       operationId: updateAccount
-      parameters:
-        - name: accountId
-          in: path
-          description: ID of account that needs to be updated
-          required: true
-          schema:
-            type: string
-            format: uuid
       requestBody:
         description: Updated account object
         content:

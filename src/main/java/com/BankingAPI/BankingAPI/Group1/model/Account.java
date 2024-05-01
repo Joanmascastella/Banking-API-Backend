@@ -16,6 +16,7 @@ public class Account {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Users user;  // Relationship to Users class
 
+    @Column(unique = true)
     private String IBAN;
     private String currency;
     @Enumerated(EnumType.STRING)

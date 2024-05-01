@@ -15,4 +15,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Query("SELECT a.IBAN FROM Account a JOIN a.user u WHERE u.firstName = :firstName AND u.lastName = :lastName")
     Optional<String> findIbanByNames(String firstName, String lastName);
+
+    boolean existsByIBAN(String iban);
 }
