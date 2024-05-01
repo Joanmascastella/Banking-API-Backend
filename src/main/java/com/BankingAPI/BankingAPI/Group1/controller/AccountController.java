@@ -59,6 +59,10 @@ public class AccountController {
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
             }
+
+        }
+    }
+
     @PutMapping("/customers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> updateAccount(@RequestBody Account account) {

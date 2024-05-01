@@ -140,7 +140,7 @@ public class TransactionService {
                 transaction.getToAccount(),
                 transaction.getAmount(),
                 transaction.getDate(),
-                (int) transaction.getUserId()
+                transaction.getUserId()
         );
     }
     public List<TransactionGETPOSTResponseDTO> getTransactionsByUserId(Long userId) {
@@ -151,7 +151,7 @@ public class TransactionService {
                         transaction.getToAccount(),
                         transaction.getAmount(),
                         transaction.getDate(),
-                        (int) transaction.getUserId()
+                        transaction.getUserId()
                 ))
                 .collect(Collectors.toList());
     }
@@ -165,7 +165,7 @@ public class TransactionService {
                         transaction.getToAccount(),
                         transaction.getAmount(),
                         transaction.getDate(),
-                        (int) transaction.getUserId()
+                        transaction.getUserId()
                 ))
                 .collect(Collectors.toList());
     }
@@ -272,7 +272,7 @@ public class TransactionService {
                         transaction.getToAccount(),
                         transaction.getAmount(),
                         transaction.getDate(),
-                        (int) transaction.getUserId()
+                        transaction.getUserId()
                 ))
                 .collect(Collectors.toList());
     }
@@ -285,7 +285,7 @@ public class TransactionService {
                         transaction.getToAccount(),
                         transaction.getAmount(),
                         transaction.getDate(),
-                        (int) transaction.getUserId()
+                        transaction.getUserId()
                 ))
                 .collect(Collectors.toList());
     }

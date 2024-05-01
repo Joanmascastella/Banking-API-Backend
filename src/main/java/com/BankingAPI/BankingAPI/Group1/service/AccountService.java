@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final BeanFactory beanFactory;
-    private final AccountRepository accountRepository;
+
 
 
     public AccountService(AccountRepository accountRepository, BeanFactory beanFactory) {
