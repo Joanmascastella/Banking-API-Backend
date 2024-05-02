@@ -31,7 +31,7 @@ public class AccountService {
         this.beanFactory = beanFactory;
     }
 
-    public List<AccountGETPOSTResponseDTO> getAllAccounts(){
+    public List<AccountGETPOSTResponseDTO> getAllCustomerAccounts(){
         try {
             beanFactory.validateAuthentication();
         } catch (Exception e) {

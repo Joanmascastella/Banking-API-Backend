@@ -496,7 +496,7 @@ paths:
         - Employee
       summary: Get all transactions from the ATM
       description: This can only be done by the employee.
-      operationId: getAllATMTransactions
+      operationId: getATMTransactions
       responses:
         "200":
           description: Successful operation
@@ -514,13 +514,191 @@ paths:
           description: Invalid status value.
       security:
         - bearerAuth: []
+
+  /transactions/online:
+    get:
+      tags:
+        - Employee
+      summary: Get all transactions made online
+      description: This can only be done by the employee.
+      operationId: getOnlineTransactions
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "400":
+          description: Invalid status value.
+      security:
+        - bearerAuth: []
+        
+  /transactions/ATM/{userId}:
+    get:
+      tags:
+        - Employee
+      summary: Get all transactions from the ATM by user ID
+      description: This can only be done by the employee.
+      operationId: getATMTransactionsByUserId
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user which initialized the transactions
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "400":
+          description: Invalid status value.
+      security:
+        - bearerAuth: []
+        
+        
+  
+  /transactions/ATM/withdrawals/{userId}:
+    get:
+      tags:
+        - Employee
+      summary: Get all withdrawals from the ATM by user ID
+      description: This can only be done by the employee.
+      operationId: getATMWithdrawalsByUserId
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user which initialized the transactions
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "400":
+          description: Invalid status value.
+      security:
+        - bearerAuth: []
+        
+  /transactions/ATM/deposits/{userId}:
+    get:
+      tags:
+        - Employee
+      summary: Get all deposits from the ATM by user ID
+      description: This can only be done by the employee.
+      operationId: getATMDepositsByUserId
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user which initialized the transactions
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "400":
+          description: Invalid status value.
+      security:
+        - bearerAuth: []   
+        
+  /transactions/byCustomers:
+    get:
+      tags:
+        - Employee
+      summary: Get all transactions initialized by customers
+      description: This can only be done by the employee.
+      operationId: getTransactionsInitializedByCustomers
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "400":
+          description: Invalid status value.
+      security:
+        - bearerAuth: []
+        
+  /transactions/byEmployees:
+    get:
+      tags:
+        - Employee
+      summary: Get all transactions initialized by employees
+      description: This can only be done by the employee.
+      operationId: getTransactionsInitializedByEmployees
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "400":
+          description: Invalid status value.
+      security:
+        - bearerAuth: []
+        
+  
   /transactions/byCustomer/{userId}:
     get:
       tags:
         - Employee
       summary: Get all transactions initiated by the customer
       description: This can only be done by the employee.
-      operationId: getTransactionsInitiatedByCustomer
+      operationId: getTransactionsInitializedByCustomer
       parameters:
         - name: userId
           in: path
@@ -555,7 +733,7 @@ paths:
         - Employee
       summary: Get all transactions initiated by the employee
       description: This can only be done by the employee.
-      operationId: getTransactionsInitiatedByEmployee
+      operationId: getTransactionsInitializedByEmployee
       parameters:
         - name: employeeId
           in: path

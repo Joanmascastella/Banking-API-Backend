@@ -3,10 +3,8 @@ package com.BankingAPI.BankingAPI.Group1.service;
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
-import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
-import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.TransactionRepository;
@@ -159,18 +157,6 @@ public class TransactionService {
     }
 
 
-    public List<TransactionGETPOSTResponseDTO> findTransactionsByUserType(UserType userType) {
-        List<Transaction> transactions = transactionRepository.findByUserType(userType);
-        return transactions.stream()
-                .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getFromAccount(),
-                        transaction.getToAccount(),
-                        transaction.getAmount(),
-                        transaction.getDate(),
-                        transaction.getUser().getId()
-                ))
-                .collect(Collectors.toList());
-    }
 
     public TransactionGETPOSTResponseDTO processWithdrawal(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException, IllegalStateException {
         Users user = userService.getCurrentUser();
@@ -262,6 +248,59 @@ public class TransactionService {
         transactionRepository.save(transaction);
     }
 
+    public List<TransactionGETPOSTResponseDTO> findTransactionsInitializedByCustomers() {
+        List<Transaction> transactions = transactionRepository.findByUserTypeCustomer();
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getUser().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<TransactionGETPOSTResponseDTO> findTransactionsInitializedByEmployees() {
+        List<Transaction> transactions = transactionRepository.findByUserTypeEmployee();
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getUser().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
+    public List<TransactionGETPOSTResponseDTO> findTransactionsInitializedByCustomer(long idOfUser) {
+        List<Transaction> transactions = transactionRepository.findTransactionsInitializedByCustomer(idOfUser);
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getUser().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<TransactionGETPOSTResponseDTO> findTransactionsInitializedByEmployee(long idOfUser) {
+        List<Transaction> transactions = transactionRepository.findTransactionsInitializedByEmployee(idOfUser);
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getUser().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
     public List<TransactionGETPOSTResponseDTO> findATMTransactions() {
         List<Transaction> transactions = transactionRepository.findATMTransactions();
         return transactions.stream()
@@ -275,8 +314,48 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
+    public List<TransactionGETPOSTResponseDTO> findOnlineTransactions() {
+        List<Transaction> transactions = transactionRepository.findOnlineTransactions();
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getUser().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
     public List<TransactionGETPOSTResponseDTO> findATMTransactionsByUserId(long idOfUser) {
-        List<Transaction> transactions = transactionRepository.findATMTransactionsByUser(idOfUser);
+        List<Transaction> transactions = transactionRepository.findATMTransactionsByUserId(idOfUser);
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getUser().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<TransactionGETPOSTResponseDTO> findATMWithdrawalsByUserId(long idOfUser) {
+        List<Transaction> transactions = transactionRepository.findATMWithdrawalsByUserId(idOfUser);
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getUser().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<TransactionGETPOSTResponseDTO> findATMDepositsByUserId(long idOfUser) {
+        List<Transaction> transactions = transactionRepository.findATMDepositsByUserId(idOfUser);
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
                         transaction.getFromAccount(),
