@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +35,7 @@ public class JwtTokenProvider {
     }
 
     public String createToken(String username, long userId, UserType type) {
-        Claims claims = Jwts.claims().setSubject(username);  // Use username or another unique identifier here
+        Claims claims = Jwts.claims().setSubject(username);
         claims.put("userId", userId);
         claims.put("auth", type.name());
 
@@ -54,15 +56,15 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(jwtKeyProvider.getPrivateKey()).build().parseClaimsJws(token);
         String username = claims.getBody().getSubject();
-        List<SimpleGrantedAuthority> authorities = ((List<String>) claims.getBody().get("auth"))
-                .stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        String authority = claims.getBody().get("auth", String.class); // Get the authority directly as a String
 
-        System.out.println("Authorities: " + authorities);  // Add this line for debugging
+        List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(authority));
+
+        System.out.println("Authorities: " + authorities);
         UserDetails userDetails = new org.springframework.security.core.userdetails.User(username, "", authorities);
         return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
     }
+
 
 
 

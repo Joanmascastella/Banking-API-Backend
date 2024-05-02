@@ -15,6 +15,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -30,7 +32,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
@@ -47,12 +49,13 @@ public class WebSecurityConfig {
         httpSecurity.cors().configurationSource(corsConfigurationSource());
 
         httpSecurity.authorizeHttpRequests()
-                .requestMatchers(new AntPathRequestMatcher("/login")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/register")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/users/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/accounts/**")).hasAuthority("ROLE_EMPLOYEE")  // Corrected to check for ROLE_EMPLOYEE
-                .requestMatchers(new AntPathRequestMatcher("/atm/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/transactions/**")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+                .requestMatchers(("/login")).permitAll()
+                .requestMatchers(("/register")).permitAll()
+                .requestMatchers(("/users/**")).permitAll()
+                .requestMatchers(("/accounts/**")).permitAll()
+                .requestMatchers(("/atm/**")).permitAll()
+                .requestMatchers(("/transactions/**")).permitAll()
                 .anyRequest().authenticated();
 
         httpSecurity.headers().frameOptions().disable();
