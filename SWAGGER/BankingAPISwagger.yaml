@@ -514,7 +514,7 @@ paths:
           description: Invalid status value.
       security:
         - bearerAuth: []
-
+        
   /transactions/online:
     get:
       tags:
@@ -564,6 +564,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Transaction"
+        '404':
+          description: User not found
         '403':
           description: User must be of role employee
         '401':
@@ -599,6 +601,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Transaction"
+        '404':
+          description: User not found
         '403':
           description: User must be of role employee
         '401':
@@ -632,6 +636,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Transaction"
+        '404':
+          description: User not found
         '403':
           description: User must be of role employee
         '401':

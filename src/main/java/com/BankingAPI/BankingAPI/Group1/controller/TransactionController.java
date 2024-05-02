@@ -3,12 +3,15 @@ package com.BankingAPI.BankingAPI.Group1.controller;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
+import org.apache.coyote.BadRequestException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.AuthenticationException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +32,18 @@ public class TransactionController {
     @GetMapping
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> getAllTransactions() {
-        return ResponseEntity.status(200).body(transactionService.allTransactions());
+        try {
+            return ResponseEntity.status(200).body(transactionService.allTransactions());
+        }
+        catch (Exception exception) {
+             if (exception instanceof BadCredentialsException){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PostMapping("/transfers")
@@ -81,9 +95,16 @@ public class TransactionController {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByCustomers());
             return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+       catch (Exception exception) {
+                if (exception instanceof BadCredentialsException){
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
+                else if (exception instanceof AuthenticationException) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
     }
 
     @GetMapping("/byEmployees")
@@ -92,8 +113,15 @@ public class TransactionController {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByEmployees());
             return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -104,10 +132,19 @@ public class TransactionController {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByCustomer(userId));
             return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            } else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else if (exception instanceof IllegalArgumentException) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
 
     @GetMapping("/byEmployee/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
@@ -115,8 +152,16 @@ public class TransactionController {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByEmployee(userId));
             return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            } else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else if (exception instanceof IllegalArgumentException) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -127,10 +172,16 @@ public class TransactionController {
     public ResponseEntity getATMTransactions() {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findATMTransactions());
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);}
+        catch (Exception exception) {
+                if (exception instanceof BadCredentialsException){
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
+                else if (exception instanceof AuthenticationException) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
     }
 
     @GetMapping("/online")
@@ -138,10 +189,17 @@ public class TransactionController {
     public ResponseEntity getOnlineTransactions() {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findOnlineTransactions());
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);}
+        catch (Exception exception) {
+                if (exception instanceof BadCredentialsException){
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
+                else if (exception instanceof AuthenticationException) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
     }
 
     @GetMapping("/ATM/{userId}")
@@ -150,10 +208,20 @@ public class TransactionController {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findATMTransactionsByUserId(userId));
             return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            } else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else if (exception instanceof IllegalArgumentException) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
+
 
     @GetMapping("/ATM/withdrawals/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
@@ -161,10 +229,19 @@ public class TransactionController {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findATMWithdrawalsByUserId(userId));
             return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            } else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else if (exception instanceof IllegalArgumentException) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
 
     @GetMapping("/ATM/deposits/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
@@ -172,8 +249,16 @@ public class TransactionController {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findATMDepositsByUserId(userId));
             return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            } else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else if (exception instanceof IllegalArgumentException) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
