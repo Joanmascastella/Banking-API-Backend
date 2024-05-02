@@ -31,25 +31,7 @@ public class AccountService {
         this.beanFactory = beanFactory;
     }
 
-    public List<AccountGETPOSTResponseDTO> getAllCustomerAccounts(){
-        try {
-            beanFactory.validateAuthentication();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        List<Account> accounts = accountRepository.findAll();
-        return accounts.stream()
-                .map(account -> new AccountGETPOSTResponseDTO(
-                        account.getUser().getId(),
-                        account.getIBAN(),
-                        account.getCurrency(),
-                        account.getAccountType(),
-                        account.isActive(),
-                        account.getBalance(),
-                        account.getAbsoluteLimit()
-                ))
-                .collect(Collectors.toList());
-    }
+
 
     public UserDetailsDTO getAccountDetails(Long userId) throws Exception {
         try {
@@ -142,7 +124,26 @@ public class AccountService {
     public void save(Account account) {
         accountRepository.save(account);
     }
-    public List<AccountGETPOSTResponseDTO> findSavingsAccountsByUserId(long userId) {
+
+    public List<AccountGETPOSTResponseDTO> getAllCustomerAccounts() throws Exception{
+        beanFactory.validateAuthentication();
+        List<Account> accounts = accountRepository.findAll();
+        return accounts.stream()
+                .map(account -> new AccountGETPOSTResponseDTO(
+                        account.getUser().getId(),
+                        account.getIBAN(),
+                        account.getCurrency(),
+                        account.getAccountType(),
+                        account.isActive(),
+                        account.getBalance(),
+                        account.getAbsoluteLimit()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
+    public List<AccountGETPOSTResponseDTO> findSavingsAccountsByUserId(long userId) throws Exception {
+        beanFactory.validateAuthentication();
         List<Account> accounts = accountRepository.findSavingsAccountsByUserId(userId);
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(
@@ -157,7 +158,10 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
-    public List<AccountGETPOSTResponseDTO> findCheckingAccountsByUserId(long userId) {
+
+
+    public List<AccountGETPOSTResponseDTO> findCheckingAccountsByUserId(long userId) throws Exception {
+        beanFactory.validateAuthentication();
         List<Account> accounts = accountRepository.findCheckingAccountsByUserId(userId);
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(
@@ -173,7 +177,8 @@ public class AccountService {
     }
 
 
-    public List<AccountGETPOSTResponseDTO> findByAbsoluteLimit(double absoluteLimit) {
+    public List<AccountGETPOSTResponseDTO> findByAbsoluteLimit(double absoluteLimit) throws Exception {
+        beanFactory.validateAuthentication();
         List<Account> accounts = accountRepository.findByAbsoluteLimit(absoluteLimit);
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(
@@ -188,7 +193,8 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
-    public List<AccountGETPOSTResponseDTO> findByInactiveTag() {
+    public List<AccountGETPOSTResponseDTO> findByInactiveTag() throws Exception {
+        beanFactory.validateAuthentication();
         List<Account> accounts = accountRepository.findByInactiveTag();
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(
@@ -202,6 +208,4 @@ public class AccountService {
                 ))
                 .collect(Collectors.toList());
     }
-
-
 }

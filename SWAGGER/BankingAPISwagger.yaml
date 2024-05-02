@@ -490,6 +490,138 @@ paths:
           description: User is not authorized
       security:
         - bearerAuth: []
+        
+  /accounts/savings/{userId}:
+    get:
+      tags:
+        - Employee
+      summary: Get all savings accounts of the user
+      description: This can only be done by the employee.
+      operationId: getSavingsAccountsOfUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user which owns the accounts
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+
+        "400":
+          description: Invalid status value.
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "404":
+          description: User not found
+      security:
+        - bearerAuth: []
+        
+  /accounts/checking/{userId}:
+    get:
+      tags:
+        - Employee
+      summary: Get all checking accounts of the user
+      description: This can only be done by the employee.
+      operationId: getCheckingAccountsOfUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user which owns the accounts
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+
+        "400":
+          description: Invalid status value.
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "404":
+          description: User not found
+      security:
+        - bearerAuth: []
+        
+  /accounts/byAbsoluteLimit:
+    get:
+      tags:
+        - Employee
+      summary: Get all accounts with an absolute limit less than or equal to a specific limit
+      description: This can only be done by the employee.
+      operationId: getAccountsByAbsoluteLimit
+      parameters:
+        - name: absoluteLimit
+          in: query
+          description: the absolute limit applicable for an account
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+
+        "400":
+          description: Invalid status value.
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+      security:
+        - bearerAuth: []
+        
+  /accounts/inactive:
+    get:
+      tags:
+        - Employee
+      summary: Get all accounts which were set as inactive by the bank
+      description: This can only be done by the employee.
+      operationId: getInactiveAccounts
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "400":
+          description: Invalid status value.
+      security:
+        - bearerAuth: []
+
   /transactions/ATM:
     get:
       tags:
