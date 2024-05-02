@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "app_user")
@@ -24,6 +23,8 @@ public class Users {
     private double totalBalance;
     private double dailyLimit;
     private boolean isApproved;
+
+    @Enumerated(EnumType.STRING)
     private UserType userType;
     private String password;
 

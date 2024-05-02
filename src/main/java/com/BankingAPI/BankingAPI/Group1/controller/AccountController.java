@@ -1,14 +1,11 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
-import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +25,9 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @GetMapping(value = "/all")
-    public ResponseEntity<Object> getAllAccounts() {
-        return ResponseEntity.status(200).body(accountService.getAllAccounts());
+    @GetMapping(value = "/customers")
+    public ResponseEntity<Object> getAllCustomerAccounts() {
+        return ResponseEntity.status(200).body(accountService.getAllCustomerAccounts());
     }
 
     @GetMapping("/{userId}/details")
@@ -84,7 +81,8 @@ public class AccountController {
         }
     }
 
-    @RequestMapping(value = "/accounts/savings/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/savings/{userId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity getSavingsAccountsOfUser(@PathVariable long userId) {
         try {
             List<Object> accounts = Collections.singletonList(accountService.findSavingsAccountsByUserId(userId));
@@ -94,7 +92,8 @@ public class AccountController {
         }
     }
 
-    @RequestMapping(value = "/accounts/checking/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/checking/{userId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity getCheckingAccountsOfUser(@PathVariable long userId) {
         try {
             List<Object> accounts = Collections.singletonList(accountService.findCheckingAccountsByUserId(userId));
@@ -104,7 +103,8 @@ public class AccountController {
         }
     }
 
-    @GetMapping("/accounts/byAbsoluteLimit")
+    @GetMapping("/byAbsoluteLimit")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity getAccountsByAbsoluteLimit(@RequestParam(required = true) double absoluteLimit) {
         try {
             List<Object> accounts = Collections.singletonList(accountService.findByAbsoluteLimit(absoluteLimit));
@@ -114,7 +114,8 @@ public class AccountController {
         }
     }
 
-    @RequestMapping(value = "/accounts/inactive", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/inactive")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity getInactiveAccounts() {
         try {
             List<Object> accounts = Collections.singletonList(accountService.findByInactiveTag());

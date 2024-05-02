@@ -1,27 +1,18 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
-import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
-import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/transactions")
@@ -84,17 +75,55 @@ public class TransactionController {
 
         return ResponseEntity.ok(transactionDto);
     }
-    @RequestMapping(value = "/transactions/{userType}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getTransactionsByUserType(@PathVariable UserType userType) {
+    @GetMapping("/byCustomers")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getTransactionsInitializedByCustomers() {
         try {
-            List<Object> transactions = Collections.singletonList(transactionService.findTransactionsByUserType(userType));
+            List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByCustomers());
             return ResponseEntity.status(HttpStatus.OK).body(transactions);
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    @RequestMapping(value = "/transactions/ATM", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/byEmployees")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getTransactionsInitializedByEmployees() {
+        try {
+            List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByEmployees());
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+
+    @GetMapping("/byCustomer/{userId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getTransactionsInitializedByCustomer(@PathVariable long userId) {
+        try {
+            List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByCustomer(userId));
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/byEmployee/{userId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getTransactionsInitializedByEmployee(@PathVariable long userId) {
+        try {
+            List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByEmployee(userId));
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+
+
+    @GetMapping("/ATM")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity getATMTransactions() {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findATMTransactions());
@@ -104,10 +133,44 @@ public class TransactionController {
         }
     }
 
-    @RequestMapping(value = "/transactions/ATM/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getATMTransactionsByUser(@PathVariable long userId) {
+    @GetMapping("/online")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getOnlineTransactions() {
+        try {
+            List<Object> transactions = Collections.singletonList(transactionService.findOnlineTransactions());
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/ATM/{userId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getATMTransactionsByUserId(@PathVariable long userId) {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findATMTransactionsByUserId(userId));
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/ATM/withdrawals/{userId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getATMWithdrawalsByUserId(@PathVariable long userId) {
+        try {
+            List<Object> transactions = Collections.singletonList(transactionService.findATMWithdrawalsByUserId(userId));
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/ATM/deposits/{userId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getATMDepositsByUserId(@PathVariable long userId) {
+        try {
+            List<Object> transactions = Collections.singletonList(transactionService.findATMDepositsByUserId(userId));
             return ResponseEntity.status(HttpStatus.OK).body(transactions);
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
