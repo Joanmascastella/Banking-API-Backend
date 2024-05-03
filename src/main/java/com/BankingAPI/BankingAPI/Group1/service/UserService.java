@@ -2,23 +2,18 @@ package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
-import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserGETResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.UserRepository;
-import com.BankingAPI.BankingAPI.Group1.util.CustomUserDetails;
 import com.BankingAPI.BankingAPI.Group1.util.JwtTokenProvider;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -2,7 +2,6 @@ package com.BankingAPI.BankingAPI.Group1.config;
 
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.repository.UserRepository;
-import com.BankingAPI.BankingAPI.Group1.util.CustomUserDetails;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
