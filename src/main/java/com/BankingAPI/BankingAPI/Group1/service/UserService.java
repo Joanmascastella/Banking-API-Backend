@@ -145,19 +145,27 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void approveUser(long userId, UserApprovalDTO approvalDTO) {
-        Users currentUser = userRepository.findById(userId)
-                        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        currentUser.setApproved(true);
-        currentUser.setDailyLimit(approvalDTO.dailyLimit());
-        accountService.createAccountsForUser(currentUser, approvalDTO);
-        userRepository.save(currentUser);
+    public void approveUser(long userId, UserApprovalDTO approvalDTO) throws EntityNotFoundException{
+        try {
+            Users currentUser = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+            currentUser.setApproved(true);
+            currentUser.setDailyLimit(approvalDTO.dailyLimit());
+            accountService.createAccountsForUser(currentUser, approvalDTO);
+            userRepository.save(currentUser);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Failed to approve user: " + e.getMessage(), e);
+        }
     }
 
-    public void updateDailyLimit(Users user) {
-        Users currentUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
-        currentUser.setDailyLimit(user.getDailyLimit());
-        userRepository.save(currentUser);
+    public void updateDailyLimit(Users user) throws EntityNotFoundException, RuntimeException{
+        try {
+            Users currentUser = userRepository.findById(user.getId())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
+            currentUser.setDailyLimit(user.getDailyLimit());
+            userRepository.save(currentUser);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Failed to update daily limit: " + e.getMessage(), e);
+        }
     }
 }

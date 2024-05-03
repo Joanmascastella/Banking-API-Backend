@@ -6,6 +6,7 @@ import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -76,22 +77,26 @@ public class AccountController {
     @PutMapping("/customers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> updateAccount(@RequestBody AccountGETPOSTResponseDTO account) {
-        try{
+        try {
             accountService.updateAccount(account);
-            return ResponseEntity.status(200).body("Account was updated successfully");
+            return ResponseEntity.status(HttpStatus.OK).body("Account was updated successfully");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{accountId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> closeAccount(@PathVariable long accountId) {
-        try{
+        try {
             accountService.closeAccount(accountId);
-            return ResponseEntity.status(200).body("Account was closed successfully");
+            return ResponseEntity.status(HttpStatus.OK).body("Account was closed successfully");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
