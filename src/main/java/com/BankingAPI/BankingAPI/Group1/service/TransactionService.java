@@ -102,6 +102,8 @@ public class TransactionService {
 
     private void performTransfer(Account fromAccount, Account toAccount, double amount) {
         fromAccount.setBalance(fromAccount.getBalance() - amount);
+        double dailyLimit =fromAccount.getUser().getDailyLimit();
+        fromAccount.getUser().setDailyLimit(dailyLimit - amount);
         toAccount.setBalance(toAccount.getBalance() + amount);
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
