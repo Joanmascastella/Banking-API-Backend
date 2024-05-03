@@ -68,15 +68,7 @@ public class UserService {
     public  Users findByEmail(String email) {
         return userRepository.findUserByEmail(email).orElse(null);
     }
-    public Users getCurrentUser() throws IllegalArgumentException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new IllegalArgumentException("No authenticated user found");
-        }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        return userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-    }
+
 
     public Users createUser(UserPOSTResponseDTO userDTO) {
         if (emailExists(userDTO.email())) {

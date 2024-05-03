@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -24,14 +25,10 @@ public class JwtTokenProvider {
 
     @Value("${application.token.validity}")
     private long validityInMicroseconds;
-    private final MemberDetailsService memberDetailsService;
     private final JwtKeyProvider jwtKeyProvider;
-    private final BeanFactory beanFactory;
 
-    public JwtTokenProvider(MemberDetailsService memberDetailsService, JwtKeyProvider jwtKeyProvider, BeanFactory beanFactory) {
-        this.memberDetailsService = memberDetailsService;
+    public JwtTokenProvider( JwtKeyProvider jwtKeyProvider) {
         this.jwtKeyProvider = jwtKeyProvider;
-        this.beanFactory = beanFactory;
     }
 
     public String createToken(String username, long userId, UserType type) {
@@ -50,22 +47,23 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-
-
-
     public Authentication getAuthentication(String token) {
-        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(jwtKeyProvider.getPrivateKey()).build().parseClaimsJws(token);
-        String username = claims.getBody().getSubject();
-        String authority = claims.getBody().get("auth", String.class); // Get the authority directly as a String
+        Jws<Claims> claims = Jwts.parserBuilder()
+                .setSigningKey(jwtKeyProvider.getPrivateKey())
+                .build()
+                .parseClaimsJws(token);
 
-        List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(authority));
+        Claims body = claims.getBody();
+        String username = body.getSubject();
+        String authority = body.get("auth", String.class);
+        Long userId = body.get("userId", Long.class);
 
-        System.out.println("Authorities: " + authorities);
-        UserDetails userDetails = new org.springframework.security.core.userdetails.User(username, "", authorities);
+        List<SimpleGrantedAuthority> authorities =
+                Collections.singletonList(new SimpleGrantedAuthority(authority));
+        CustomUserDetails userDetails =
+                new CustomUserDetails(username, "", userId, authorities);
+
         return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
     }
-
-
-
 
 }
