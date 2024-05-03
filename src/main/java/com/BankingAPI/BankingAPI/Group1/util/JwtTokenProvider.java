@@ -31,9 +31,8 @@ public class JwtTokenProvider {
         this.jwtKeyProvider = jwtKeyProvider;
     }
 
-    public String createToken(String username, long userId, UserType type) {
-        Claims claims = Jwts.claims().setSubject(username);
-        claims.put("userId", userId);
+    public String createToken(Long userId, UserType type) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
         claims.put("auth", type.name());
 
         Date now = new Date();
@@ -48,22 +47,13 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        Jws<Claims> claims = Jwts.parserBuilder()
-                .setSigningKey(jwtKeyProvider.getPrivateKey())
-                .build()
-                .parseClaimsJws(token);
+        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(jwtKeyProvider.getPrivateKey()).build().parseClaimsJws(token);
+        String userID = claims.getBody().getSubject();
+        String authority = claims.getBody().get("auth", String.class);
+        List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(authority));
 
-        Claims body = claims.getBody();
-        String username = body.getSubject();
-        String authority = body.get("auth", String.class);
-        Long userId = body.get("userId", Long.class);
-
-        List<SimpleGrantedAuthority> authorities =
-                Collections.singletonList(new SimpleGrantedAuthority(authority));
-        CustomUserDetails userDetails =
-                new CustomUserDetails(username, "", userId, authorities);
-
+        System.out.println("Authorities: " + authorities);
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(userID, "", authorities);
         return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
     }
-
 }

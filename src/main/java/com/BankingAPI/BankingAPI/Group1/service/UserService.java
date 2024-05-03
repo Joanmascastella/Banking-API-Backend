@@ -119,7 +119,7 @@ public class UserService {
         Users user = this.userRepository.findMemberByUsername(username)
                 .orElseThrow(() -> new AuthenticationException("User not found"));
         if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
-            return jwtTokenProvider.createToken(user.getUsername(), user.getId(), user.getUserType());
+            return jwtTokenProvider.createToken(user.getId(), user.getUserType());
         } else {
             throw new AuthenticationException("Invalid username/password");
         }
