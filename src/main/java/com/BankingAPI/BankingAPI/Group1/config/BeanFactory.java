@@ -7,11 +7,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
 public class BeanFactory {
-
     private final UserRepository userRepository;
 
     public BeanFactory(UserRepository userRepository) {
@@ -28,8 +28,13 @@ public class BeanFactory {
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
             return null;
         }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        return userDetails.getId();
+
+        User user = (User) authentication.getPrincipal();
+        try {
+            return Long.parseLong(user.getUsername());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     public void validateAuthentication() throws Exception {
@@ -43,8 +48,14 @@ public class BeanFactory {
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new IllegalArgumentException("No authenticated user found");
         }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        return userRepository.findById(userDetails.getId())
+
+        User user = (User) authentication.getPrincipal();
+        Long userId = getCurrentUserId();
+        if (userId == null) {
+            throw new IllegalArgumentException("Invalid user ID");
+        }
+
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 }
