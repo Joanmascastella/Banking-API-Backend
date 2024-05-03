@@ -37,7 +37,7 @@ public class TransactionService {
 
     public TransactionGETPOSTResponseDTO transferToOtherCustomer(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
          beanFactory.validateAuthentication();
-        Users user = userService.getCurrentUser();
+         Users user = beanFactory.getCurrentUser();
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
 
@@ -59,7 +59,7 @@ public class TransactionService {
 
     public TransactionGETPOSTResponseDTO transferMoneyToOwnAccount(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
          beanFactory.validateAuthentication();
-         Users user = userService.getCurrentUser();
+        Users user = beanFactory.getCurrentUser();
 
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
@@ -143,7 +143,7 @@ public class TransactionService {
 
 
     public TransactionGETPOSTResponseDTO processWithdrawal(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException, IllegalStateException {
-        Users user = userService.getCurrentUser();
+        Users user = beanFactory.getCurrentUser();
         Account account = validateAccount(transactionDTO.userId());
 
         checkAndUpdateDailyLimit(user, transactionDTO.amount());
@@ -190,7 +190,7 @@ public class TransactionService {
     }
 
     public TransactionGETPOSTResponseDTO processDeposit(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException {
-        Users user = userService.getCurrentUser();
+        Users user = beanFactory.getCurrentUser();
         Account account = validateAccount(transactionDTO.userId());
 
         updateAccountBalance(account, transactionDTO.amount());
