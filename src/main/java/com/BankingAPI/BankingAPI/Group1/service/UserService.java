@@ -5,6 +5,7 @@ import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.UserApprovalDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserGETResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
@@ -152,12 +153,12 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void approveUser(Users user, double absoluteSavingLimit, double absoluteCheckingLimit) {
-        Users currentUser = userRepository.findById(user.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
+    public void approveUser(long userId, UserApprovalDTO approvalDTO) {
+        Users currentUser = userRepository.findById(userId)
+                        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
         currentUser.setApproved(true);
-        currentUser.setDailyLimit(user.getDailyLimit());
-        accountService.createAccountsForUser(user, absoluteSavingLimit, absoluteCheckingLimit);
+        currentUser.setDailyLimit(approvalDTO.dailyLimit());
+        accountService.createAccountsForUser(currentUser, approvalDTO);
         userRepository.save(currentUser);
     }
 

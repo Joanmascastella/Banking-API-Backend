@@ -1,10 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
-import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
-import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,23 +39,23 @@ public class UserController {
     }
 
     @GetMapping("/noncustomers")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> getUnapprovedUsers() {
         return ResponseEntity.status(200).body(userService.getUnapprovedUsers());
     }
 
-    @PutMapping("/approve")
-    @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<Object> approveUser(@RequestBody Users user, double absoluteSavingLimit, double absoluteCheckingLimit){
+    @PutMapping("/{userId}/approve")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity<Object> approveUser(@PathVariable Long userId, @RequestBody UserApprovalDTO approvalDTO){
         try{
-            userService.approveUser(user, absoluteSavingLimit, absoluteCheckingLimit);
+            userService.approveUser(userId, approvalDTO);
             return ResponseEntity.status(200).body("User approved and accounts created succesfully.");
         } catch (Exception ex) {
-            return ResponseEntity.status(404).body("User not found.");
+            return ResponseEntity.status(404).body(ex.getMessage());
         }
     }
     @PutMapping
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> updateDailyLimit(@RequestBody Users user){
         try{
             userService.updateDailyLimit(user);

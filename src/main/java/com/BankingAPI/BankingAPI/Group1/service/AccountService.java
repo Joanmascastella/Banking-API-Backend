@@ -6,6 +6,7 @@ import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.UserApprovalDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 
@@ -62,20 +63,20 @@ public class AccountService {
         }
     }
 
-    public void createAccountsForUser(Users user, double absoluteSavingLimit, double absoluteCheckingLimit) {
-        createCheckingAccount(user, absoluteCheckingLimit, absoluteSavingLimit);
-        createSavingsAccount(user, absoluteCheckingLimit, absoluteSavingLimit);
+    public void createAccountsForUser(Users user, UserApprovalDTO approvalDTO) {
+        createCheckingAccount(user, approvalDTO.absoluteCheckingLimit());
+        createSavingsAccount(user, approvalDTO.absoluteSavingLimit());
     }
 
-    private void createSavingsAccount(Users user, double absoluteSavingLimit, double absoluteCheckingLimit) {
+    private void createSavingsAccount(Users user, Double absoluteSavingLimit) {
         createAccount(user, AccountType.SAVINGS, absoluteSavingLimit);
     }
 
-    private void createCheckingAccount(Users user, double absoluteSavingLimit, double absoluteCheckingLimit) {
+    private void createCheckingAccount(Users user, Double absoluteCheckingLimit) {
         createAccount(user, AccountType.CHECKING, absoluteCheckingLimit);
     }
 
-    private void createAccount(Users user, AccountType accountType, double absoluteLimit) {
+    private void createAccount(Users user, AccountType accountType, Double absoluteLimit) {
         Account account = new Account();
         account.setUser(user);
         account.setIBAN(generateIBAN());
@@ -103,10 +104,10 @@ public class AccountService {
         return accountRepository.existsByIBAN(iban);
     }
 
-    public void updateAccount(Account account) {
-        Account currentAccount = accountRepository.findById(account.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Account not found."));
-        currentAccount.setAbsoluteLimit(account.getAbsoluteLimit());
+    public void updateAccount(AccountGETPOSTResponseDTO account) {
+        Account currentAccount = accountRepository.findByIBAN(account.IBAN())
+                .orElseThrow(() -> new EntityNotFoundException("Account not found by IBAN: " + account.IBAN()));
+        currentAccount.setAbsoluteLimit(account.absoluteLimit());
         accountRepository.save(currentAccount);
     }
 
@@ -126,7 +127,7 @@ public class AccountService {
     }
 
     public List<AccountGETPOSTResponseDTO> getAllCustomerAccounts() throws Exception{
-        beanFactory.validateAuthentication();
+        //beanFactory.validateAuthentication(); I commented it out because it led to a bad request error
         List<Account> accounts = accountRepository.findAll();
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(

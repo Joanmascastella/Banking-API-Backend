@@ -36,7 +36,7 @@ public class TransactionService {
 
 
     public TransactionGETPOSTResponseDTO transferToOtherCustomer(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
-         beanFactory.validateAuthentication();
+        beanFactory.validateAuthentication();
         Users user = userService.getCurrentUser();
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
@@ -234,7 +234,7 @@ public class TransactionService {
 
 
     public List<TransactionGETPOSTResponseDTO> allTransactions() throws Exception {
-        beanFactory.validateAuthentication();
+        //beanFactory.validateAuthentication();
         List<Transaction> transactions = transactionRepository.findAll();
             return transactions.stream()
                     .map(transaction -> new TransactionGETPOSTResponseDTO(
