@@ -28,9 +28,8 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-
-    @GetMapping
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    @GetMapping
     public ResponseEntity<Object> getAllTransactions() {
         try {
             return ResponseEntity.status(200).body(transactionService.allTransactions());
