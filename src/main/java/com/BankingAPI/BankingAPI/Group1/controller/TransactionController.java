@@ -92,8 +92,7 @@ public class TransactionController {
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity getTransactionsInitializedByCustomers() {
         try {
-            List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByCustomers());
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findTransactionsInitializedByCustomers());
         }
        catch (Exception exception) {
                 if (exception instanceof BadCredentialsException){
@@ -110,8 +109,7 @@ public class TransactionController {
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity getTransactionsInitializedByEmployees() {
         try {
-            List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByEmployees());
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findTransactionsInitializedByEmployees());
         }
         catch (Exception exception) {
             if (exception instanceof BadCredentialsException){
@@ -170,8 +168,7 @@ public class TransactionController {
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity getATMTransactions() {
         try {
-            List<Object> transactions = Collections.singletonList(transactionService.findATMTransactions());
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);}
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findATMTransactions());}
         catch (Exception exception) {
                 if (exception instanceof BadCredentialsException){
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -187,8 +184,7 @@ public class TransactionController {
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity getOnlineTransactions() {
         try {
-            List<Object> transactions = Collections.singletonList(transactionService.findOnlineTransactions());
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);}
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactions());}
         catch (Exception exception) {
                 if (exception instanceof BadCredentialsException){
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
