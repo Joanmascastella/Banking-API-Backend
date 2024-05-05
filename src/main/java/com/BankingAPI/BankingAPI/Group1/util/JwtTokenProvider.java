@@ -31,9 +31,10 @@ public class JwtTokenProvider {
         this.jwtKeyProvider = jwtKeyProvider;
     }
 
-    public String createToken(Long userId, UserType type) {
+    public String createToken(Long userId, UserType type, Boolean isApproved) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
         claims.put("auth", type.name());
+        claims.put("approved", String.valueOf(isApproved));
 
         Date now = new Date();
         Date expiration = new Date(now.getTime() + validityInMicroseconds);
