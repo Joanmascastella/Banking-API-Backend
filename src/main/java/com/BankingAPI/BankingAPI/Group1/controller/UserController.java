@@ -1,11 +1,10 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
-import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
-import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -42,29 +41,33 @@ public class UserController {
     }
 
     @GetMapping("/noncustomers")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> getUnapprovedUsers() {
         return ResponseEntity.status(200).body(userService.getUnapprovedUsers());
     }
 
-    @PutMapping("/approve")
-    @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<Object> approveUser(@RequestBody Users user, double absoluteSavingLimit, double absoluteCheckingLimit){
-        try{
-            userService.approveUser(user, absoluteSavingLimit, absoluteCheckingLimit);
-            return ResponseEntity.status(200).body("User approved and accounts created succesfully.");
-        } catch (Exception ex) {
-            return ResponseEntity.status(404).body("User not found.");
+    @PutMapping("/{userId}/approve")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity<Object> approveUser(@PathVariable Long userId, @RequestBody UserApprovalDTO approvalDTO){
+        try {
+            userService.approveUser(userId, approvalDTO);
+            return ResponseEntity.status(HttpStatus.OK).body("User approved and accounts created successfully.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
     @PutMapping
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> updateDailyLimit(@RequestBody Users user){
-        try{
+        try {
             userService.updateDailyLimit(user);
-            return ResponseEntity.status(200).body("Daily limit was updated successfully.");
-        } catch (Exception ex) {
-            return ResponseEntity.status(404).body("User not found.");
+            return ResponseEntity.status(HttpStatus.OK).body("Daily limit was updated successfully.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }

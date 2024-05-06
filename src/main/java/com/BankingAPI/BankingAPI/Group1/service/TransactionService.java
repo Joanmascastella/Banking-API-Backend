@@ -36,8 +36,8 @@ public class TransactionService {
 
 
     public TransactionGETPOSTResponseDTO transferToOtherCustomer(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
-         beanFactory.validateAuthentication();
-         Users user = beanFactory.getCurrentUser();
+        beanFactory.validateAuthentication();
+        Users user = beanFactory.getCurrentUser();
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
 
@@ -59,7 +59,7 @@ public class TransactionService {
 
     public TransactionGETPOSTResponseDTO transferMoneyToOwnAccount(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
          beanFactory.validateAuthentication();
-        Users user = beanFactory.getCurrentUser();
+         Users user = beanFactory.getCurrentUser();
 
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
@@ -102,6 +102,8 @@ public class TransactionService {
 
     private void performTransfer(Account fromAccount, Account toAccount, double amount) {
         fromAccount.setBalance(fromAccount.getBalance() - amount);
+        double dailyLimit =fromAccount.getUser().getDailyLimit();
+        fromAccount.getUser().setDailyLimit(dailyLimit - amount);
         toAccount.setBalance(toAccount.getBalance() + amount);
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
