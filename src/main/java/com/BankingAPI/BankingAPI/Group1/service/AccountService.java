@@ -125,11 +125,15 @@ public class AccountService {
         accountRepository.save(currentAccount);
     }
 
-    public void closeAccount(long accountId) throws EntityNotFoundException{
-        Account currentAccount = accountRepository.findById(accountId)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found."));
-        currentAccount.setActive(false);
-        accountRepository.save(currentAccount);
+    public void closeAccount(long userId) throws EntityNotFoundException{
+        List<Account> accounts = accountRepository.findAccountsByUserId(userId);
+        if (accounts.isEmpty()) {
+            throw new EntityNotFoundException("No accounts found for user with ID: " + userId);
+        }
+        for (Account account: accounts) {
+            account.setActive(false);
+            accountRepository.save(account);
+        }
     }
     public Account findById(Long accountId) {
         return accountRepository.findById(accountId).orElse(null);

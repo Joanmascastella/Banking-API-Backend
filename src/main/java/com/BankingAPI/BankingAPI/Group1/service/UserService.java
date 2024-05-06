@@ -1,6 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
+import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
@@ -121,23 +122,27 @@ public class UserService {
     }
 
 
-    public List<UserGETResponseDTO> getUnapprovedUsers() {
-        List<Users> users = userRepository.findByIsApproved(false);
-        return users.stream()
-                .map(user -> new UserGETResponseDTO(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getBSN(),
-                    user.getPhoneNumber(),
-                    user.getBirthDate(),
-                    user.getTotalBalance(),
-                    user.getDailyLimit(),
-                    user.isApproved(),
-                    user.getUserType()))
-                .collect(Collectors.toList());
+    public List<UserGETResponseDTO> getUnapprovedUsers() throws RuntimeException{
+        try{
+            List<Users> users = userRepository.findByIsApproved(false);
+            return users.stream()
+                    .map(user -> new UserGETResponseDTO(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getEmail(),
+                            user.getFirstName(),
+                            user.getLastName(),
+                            user.getBSN(),
+                            user.getPhoneNumber(),
+                            user.getBirthDate(),
+                            user.getTotalBalance(),
+                            user.getDailyLimit(),
+                            user.isApproved(),
+                            user.getUserType()))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get unapproved users: " + e.getMessage());
+        }
     }
 
     public void approveUser(long userId, UserApprovalDTO approvalDTO) throws EntityNotFoundException{

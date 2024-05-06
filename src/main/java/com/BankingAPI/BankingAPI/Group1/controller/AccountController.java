@@ -79,20 +79,7 @@ public class AccountController {
     public ResponseEntity<Object> updateAccount(@RequestBody AccountGETPOSTResponseDTO account) {
         try {
             accountService.updateAccount(account);
-            return ResponseEntity.status(HttpStatus.OK).body("Account was updated successfully");
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{accountId}")
-    @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity<Object> closeAccount(@PathVariable long accountId) {
-        try {
-            accountService.closeAccount(accountId);
-            return ResponseEntity.status(HttpStatus.OK).body("Account was closed successfully");
+            return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
@@ -174,4 +161,16 @@ public class AccountController {
         }
     }
 
+    @DeleteMapping("/{userId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity<Object> closeAccount(@PathVariable long userId) {
+        try {
+            accountService.closeAccount(userId);
+            return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }

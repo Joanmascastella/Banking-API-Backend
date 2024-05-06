@@ -43,7 +43,11 @@ public class UserController {
     @GetMapping("/noncustomers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> getUnapprovedUsers() {
-        return ResponseEntity.status(200).body(userService.getUnapprovedUsers());
+        try{
+            return ResponseEntity.status(200).body(userService.getUnapprovedUsers());
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 
     @PutMapping("/{userId}/approve")
@@ -51,7 +55,7 @@ public class UserController {
     public ResponseEntity<Object> approveUser(@PathVariable Long userId, @RequestBody UserApprovalDTO approvalDTO){
         try {
             userService.approveUser(userId, approvalDTO);
-            return ResponseEntity.status(HttpStatus.OK).body("User approved and accounts created successfully.");
+            return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (RuntimeException e) {
@@ -63,7 +67,7 @@ public class UserController {
     public ResponseEntity<Object> updateDailyLimit(@RequestBody Users user){
         try {
             userService.updateDailyLimit(user);
-            return ResponseEntity.status(HttpStatus.OK).body("Daily limit was updated successfully.");
+            return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         } catch (RuntimeException e) {
