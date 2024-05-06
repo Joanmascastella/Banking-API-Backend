@@ -33,11 +33,9 @@ public class TransactionService {
         this.accountRepository = accountRepository;
     }
 
-
-
     public TransactionGETPOSTResponseDTO transferToOtherCustomer(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
-         beanFactory.validateAuthentication();
-         Users user = beanFactory.getCurrentUser();
+        beanFactory.validateAuthentication();
+        Users user = beanFactory.getCurrentUser();
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
 
@@ -59,7 +57,7 @@ public class TransactionService {
 
     public TransactionGETPOSTResponseDTO transferMoneyToOwnAccount(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
          beanFactory.validateAuthentication();
-        Users user = beanFactory.getCurrentUser();
+         Users user = beanFactory.getCurrentUser();
 
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
@@ -72,8 +70,6 @@ public class TransactionService {
 
         return mapToTransactionResponse(newTransaction);
     }
-
-
     private Account getAccount(String iban) throws Exception {
         Account account = accountRepository.findByIBAN(iban)
                 .orElseThrow(() -> new Exception("Account with IBAN: " + iban + " not found"));
@@ -102,6 +98,8 @@ public class TransactionService {
 
     private void performTransfer(Account fromAccount, Account toAccount, double amount) {
         fromAccount.setBalance(fromAccount.getBalance() - amount);
+        double dailyLimit =fromAccount.getUser().getDailyLimit();
+        fromAccount.getUser().setDailyLimit(dailyLimit - amount);
         toAccount.setBalance(toAccount.getBalance() + amount);
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
@@ -175,13 +173,6 @@ public class TransactionService {
             throw new IllegalArgumentException("Account not found");
         }
         return account;
-    }
-    private Users validateUser(Long userId) throws IllegalArgumentException {
-        Users user = userService.findById(userId);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
-        return user;
     }
     private void checkAndUpdateDailyLimit(Users user, double amount) throws IllegalStateException {
         if (!userService.checkAndUpdateDailyLimit(user, amount)) {

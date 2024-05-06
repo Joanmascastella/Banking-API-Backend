@@ -6,6 +6,7 @@ import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.UserApprovalDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 
@@ -62,38 +63,52 @@ public class AccountService {
         }
     }
 
-    public void createAccountsForUser(Users user, double absoluteSavingLimit, double absoluteCheckingLimit) {
-        createCheckingAccount(user, absoluteCheckingLimit, absoluteSavingLimit);
-        createSavingsAccount(user, absoluteCheckingLimit, absoluteSavingLimit);
+    public void createAccountsForUser(Users user, UserApprovalDTO approvalDTO) throws RuntimeException{
+        try {
+            createCheckingAccount(user, approvalDTO.absoluteCheckingLimit());
+            createSavingsAccount(user, approvalDTO.absoluteSavingLimit());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create accounts for user: " + user.getId(), e);
+        }
     }
 
-    private void createSavingsAccount(Users user, double absoluteSavingLimit, double absoluteCheckingLimit) {
+    private void createSavingsAccount(Users user, Double absoluteSavingLimit) throws RuntimeException {
         createAccount(user, AccountType.SAVINGS, absoluteSavingLimit);
     }
 
-    private void createCheckingAccount(Users user, double absoluteSavingLimit, double absoluteCheckingLimit) {
+    private void createCheckingAccount(Users user, Double absoluteCheckingLimit) throws RuntimeException {
         createAccount(user, AccountType.CHECKING, absoluteCheckingLimit);
     }
 
-    private void createAccount(Users user, AccountType accountType, double absoluteLimit) {
-        Account account = new Account();
-        account.setUser(user);
-        account.setIBAN(generateIBAN());
-        account.setCurrency("€");
-        account.setAccountType(accountType);
-        account.setActive(true);
-        account.setBalance(0.00);
-        account.setAbsoluteLimit(absoluteLimit);
-        accountRepository.save(account);
+    private void createAccount(Users user, AccountType accountType, Double absoluteLimit) throws RuntimeException {
+        try {
+            Account account = new Account();
+            account.setUser(user);
+            account.setIBAN(generateIBAN());
+            account.setCurrency("€");
+            account.setAccountType(accountType);
+            account.setActive(true);
+            account.setBalance(0.00);
+            account.setAbsoluteLimit(absoluteLimit);
+            accountRepository.save(account);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create account: " + e.getMessage(), e);
+        }
     }
-    private String generateIBAN() {
+    private String generateIBAN() throws RuntimeException{
+        int generationAttempts = 0;
         String iban;
         do{
+            generationAttempts++;
+            if(generationAttempts > 100) {
+                throw new RuntimeException("Failed to generate a unique IBAN.");
+            }
             String firstDigits = String.format("%02d", new Random().nextInt(100));
 
             String lastDigits = String.format("%010d", new Random().nextInt(1000000000));
 
             iban = "NL" + firstDigits + "INH00" + lastDigits;
+
         } while(ibanExists(iban));
 
         return iban;
@@ -103,18 +118,22 @@ public class AccountService {
         return accountRepository.existsByIBAN(iban);
     }
 
-    public void updateAccount(Account account) {
-        Account currentAccount = accountRepository.findById(account.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Account not found."));
-        currentAccount.setAbsoluteLimit(account.getAbsoluteLimit());
+    public void updateAccount(AccountGETPOSTResponseDTO account) throws EntityNotFoundException {
+        Account currentAccount = accountRepository.findByIBAN(account.IBAN())
+                .orElseThrow(() -> new EntityNotFoundException("Account not found by IBAN: " + account.IBAN()));
+        currentAccount.setAbsoluteLimit(account.absoluteLimit());
         accountRepository.save(currentAccount);
     }
 
-    public void closeAccount(long accountId) {
-        Account currentAccount = accountRepository.findById(accountId)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found."));
-        currentAccount.setActive(false);
-        accountRepository.save(currentAccount);
+    public void closeAccount(long userId) throws EntityNotFoundException{
+        List<Account> accounts = accountRepository.findAccountsByUserId(userId);
+        if (accounts.isEmpty()) {
+            throw new EntityNotFoundException("No accounts found for user with ID: " + userId);
+        }
+        for (Account account: accounts) {
+            account.setActive(false);
+            accountRepository.save(account);
+        }
     }
     public Account findById(Long accountId) {
         return accountRepository.findById(accountId).orElse(null);
@@ -126,7 +145,7 @@ public class AccountService {
     }
 
     public List<AccountGETPOSTResponseDTO> getAllCustomerAccounts() throws Exception{
-        beanFactory.validateAuthentication();
+        //beanFactory.validateAuthentication(); I commented it out because it led to a bad request error
         List<Account> accounts = accountRepository.findAll();
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(

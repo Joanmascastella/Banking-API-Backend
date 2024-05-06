@@ -35,5 +35,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query("SELECT a FROM Account a  WHERE a.isActive = FALSE")
     List<Account> findByInactiveTag();
 
-
+    @Query("SELECT a FROM Account a WHERE a.user.id = :userId")
+    List<Account> findAccountsByUserId(@Param("userId") long userId);
 }

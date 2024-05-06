@@ -6,6 +6,7 @@ import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountDetailsGETResponse;
 import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.UserApprovalDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserGETResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
@@ -124,23 +125,27 @@ public class UserService {
     }
 
 
-    public List<UserGETResponseDTO> getUnapprovedUsers() {
-        List<Users> users = userRepository.findByIsApproved(false);
-        return users.stream()
-                .map(user -> new UserGETResponseDTO(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getBSN(),
-                    user.getPhoneNumber(),
-                    user.getBirthDate(),
-                    user.getTotalBalance(),
-                    user.getDailyLimit(),
-                    user.isApproved(),
-                    user.getUserType()))
-                .collect(Collectors.toList());
+    public List<UserGETResponseDTO> getUnapprovedUsers() throws RuntimeException{
+        try{
+            List<Users> users = userRepository.findByIsApproved(false);
+            return users.stream()
+                    .map(user -> new UserGETResponseDTO(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getEmail(),
+                            user.getFirstName(),
+                            user.getLastName(),
+                            user.getBSN(),
+                            user.getPhoneNumber(),
+                            user.getBirthDate(),
+                            user.getTotalBalance(),
+                            user.getDailyLimit(),
+                            user.isApproved(),
+                            user.getUserType()))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get unapproved users: " + e.getMessage());
+        }
     }
 
     public List<AccountDetailsGETResponse> getAccountDetailsForCurrentUser(){
@@ -165,20 +170,27 @@ public class UserService {
         )).collect(Collectors.toList());
     }
 
-
-    public void approveUser(Users user, double absoluteSavingLimit, double absoluteCheckingLimit) {
-        Users currentUser = userRepository.findById(user.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
-        currentUser.setApproved(true);
-        currentUser.setDailyLimit(user.getDailyLimit());
-        accountService.createAccountsForUser(user, absoluteSavingLimit, absoluteCheckingLimit);
-        userRepository.save(currentUser);
+    public void approveUser(long userId, UserApprovalDTO approvalDTO) throws EntityNotFoundException{
+        try {
+            Users currentUser = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+            currentUser.setApproved(true);
+            currentUser.setDailyLimit(approvalDTO.dailyLimit());
+            accountService.createAccountsForUser(currentUser, approvalDTO);
+            userRepository.save(currentUser);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Failed to approve user: " + e.getMessage(), e);
+        }
     }
 
-    public void updateDailyLimit(Users user) {
-        Users currentUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
-        currentUser.setDailyLimit(user.getDailyLimit());
-        userRepository.save(currentUser);
+    public void updateDailyLimit(Users user) throws EntityNotFoundException, RuntimeException{
+        try {
+            Users currentUser = userRepository.findById(user.getId())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
+            currentUser.setDailyLimit(user.getDailyLimit());
+            userRepository.save(currentUser);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Failed to update daily limit: " + e.getMessage(), e);
+        }
     }
 }
