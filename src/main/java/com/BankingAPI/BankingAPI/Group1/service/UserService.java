@@ -1,8 +1,10 @@
 package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
+import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
+import com.BankingAPI.BankingAPI.Group1.model.dto.AccountDetailsGETResponse;
 import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserGETResponseDTO;
@@ -14,7 +16,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -138,6 +142,29 @@ public class UserService {
                     user.getUserType()))
                 .collect(Collectors.toList());
     }
+
+    public List<AccountDetailsGETResponse> getAccountDetailsForCurrentUser(){
+        Users currentUser = beanFactory.getCurrentUser();
+        Optional<Account> accounts = accountRepository.findByUserId(currentUser.getId());
+        if (accounts.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return accounts.stream().map(account -> new AccountDetailsGETResponse(
+                currentUser.getUsername(),
+                currentUser.getEmail(),
+                currentUser.getFirstName(),
+                currentUser.getLastName(),
+                currentUser.getBSN(),
+                currentUser.getPhoneNumber(),
+                currentUser.getBirthDate(),
+                account.getIBAN(),
+                account.getCurrency(),
+                account.getAccountType(),
+                account.getBalance(),
+                account.getAbsoluteLimit()
+        )).collect(Collectors.toList());
+    }
+
 
     public void approveUser(Users user, double absoluteSavingLimit, double absoluteCheckingLimit) {
         Users currentUser = userRepository.findById(user.getId())

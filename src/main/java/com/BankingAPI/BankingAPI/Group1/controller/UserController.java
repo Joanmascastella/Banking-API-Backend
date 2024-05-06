@@ -1,14 +1,13 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
-import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
-import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/users")
@@ -23,7 +22,25 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> getAllUsers() {
-    return ResponseEntity.status(200).body(userService.getAllUsers());
+        try {
+            return ResponseEntity.status(200).body(userService.getAllUsers());
+        } catch (Exception ex) {
+            return ResponseEntity.status(404).body("User not found.");
+        }
+    }
+
+    @GetMapping(value = "/details")
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
+    public ResponseEntity<Object> getUserDetails(){
+        try {
+            List<AccountDetailsGETResponse> details = userService.getAccountDetailsForCurrentUser();
+            if (details.isEmpty()) {
+                return ResponseEntity.status(404).body("No accounts found for user.");
+            }
+            return ResponseEntity.ok(details);
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body("An internal error occurred.");
+        }
     }
 
     @GetMapping("/iban")
