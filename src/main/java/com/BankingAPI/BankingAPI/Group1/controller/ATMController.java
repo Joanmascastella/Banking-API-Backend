@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ public class ATMController {
     private UserService userService;
 
     @PostMapping("/login")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<String> login(@RequestBody ATMLoginDTO loginDTO) {
         try {
             Users user = userService.findByEmail(loginDTO.email());
@@ -40,6 +42,7 @@ public class ATMController {
     }
 
     @PostMapping("/withdrawals")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<TransactionGETPOSTResponseDTO> withdraw(@Valid @RequestBody TransactionGETPOSTResponseDTO transaction) {
         try {
             TransactionGETPOSTResponseDTO completedTransaction = transactionService.processWithdrawal(transaction);
@@ -53,6 +56,7 @@ public class ATMController {
         }
     }
     @PostMapping("/deposits")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<TransactionGETPOSTResponseDTO> deposit(@RequestBody TransactionGETPOSTResponseDTO transaction) {
         try {
             TransactionGETPOSTResponseDTO completedTransaction = transactionService.processDeposit(transaction);

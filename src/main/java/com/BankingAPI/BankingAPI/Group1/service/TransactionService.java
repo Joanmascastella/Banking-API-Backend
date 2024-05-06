@@ -33,8 +33,6 @@ public class TransactionService {
         this.accountRepository = accountRepository;
     }
 
-
-
     public TransactionGETPOSTResponseDTO transferToOtherCustomer(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
         beanFactory.validateAuthentication();
         Users user = beanFactory.getCurrentUser();
@@ -72,8 +70,6 @@ public class TransactionService {
 
         return mapToTransactionResponse(newTransaction);
     }
-
-
     private Account getAccount(String iban) throws Exception {
         Account account = accountRepository.findByIBAN(iban)
                 .orElseThrow(() -> new Exception("Account with IBAN: " + iban + " not found"));
@@ -177,13 +173,6 @@ public class TransactionService {
             throw new IllegalArgumentException("Account not found");
         }
         return account;
-    }
-    private Users validateUser(Long userId) throws IllegalArgumentException {
-        Users user = userService.findById(userId);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
-        return user;
     }
     private void checkAndUpdateDailyLimit(Users user, double amount) throws IllegalStateException {
         if (!userService.checkAndUpdateDailyLimit(user, amount)) {

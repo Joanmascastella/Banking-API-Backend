@@ -65,6 +65,7 @@ public class TransactionController {
     }
 
     @GetMapping("/{userId}/history")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<Object> getTransactionsByUserId(@PathVariable Long userId) {
         try {
             return ResponseEntity.ok(transactionService.getTransactionsByUserId(userId));
@@ -73,6 +74,7 @@ public class TransactionController {
         }
     }
     @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<List<TransactionGETPOSTResponseDTO>> searchTransactions(
             @RequestParam(required = false) String IBAN,
             @RequestParam(required = false) Double amount,
