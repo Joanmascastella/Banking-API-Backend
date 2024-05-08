@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping(value = "/users")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -41,7 +41,7 @@ public class UserController {
             }
             return ResponseEntity.ok(details);
         } catch (Exception ex) {
-            return ResponseEntity.status(500).body("An internal error occurred.");
+            return ResponseEntity.status(500).body("An internal error occurred: " + ex.getMessage());
         }
     }
 

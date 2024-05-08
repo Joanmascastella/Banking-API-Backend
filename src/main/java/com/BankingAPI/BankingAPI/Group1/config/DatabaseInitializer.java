@@ -45,7 +45,9 @@ public class DatabaseInitializer implements ApplicationRunner {
         transactionRepository.save(newTransaction);
 
         Account newAccount = new Account(newUsers, "DE89 3704 0044 0532 0130 00", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
+        Account newAccounts = new Account(newUsers, "DE89 3704 0044 0532 0130 12", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
         accountRepository.save(newAccount);
+        accountRepository.save(newAccounts);
     }
 
 

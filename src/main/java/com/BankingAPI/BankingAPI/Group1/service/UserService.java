@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final AccountRepository accountRepository;
-    private UserRepository userRepository;
-    private AccountService accountService;
+    private final UserRepository userRepository;
+    private final AccountService accountService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final BeanFactory beanFactory;
@@ -148,12 +148,15 @@ public class UserService {
         }
     }
 
-    public List<AccountDetailsGETResponse> getAccountDetailsForCurrentUser(){
+    public List<AccountDetailsGETResponse> getAccountDetailsForCurrentUser() {
         Users currentUser = beanFactory.getCurrentUser();
-        Optional<Account> accounts = accountRepository.findByUserId(currentUser.getId());
+        List<Account> accounts = accountRepository.findAccountsByUserId(currentUser.getId()); // Ensure this is returning List<Account>
+
         if (accounts.isEmpty()) {
-            return Collections.emptyList();
+            return Collections.emptyList(); // Properly handle empty list scenario
         }
+
+        // Process each account in the list and create a new DTO for each
         return accounts.stream().map(account -> new AccountDetailsGETResponse(
                 currentUser.getUsername(),
                 currentUser.getEmail(),
@@ -169,6 +172,7 @@ public class UserService {
                 account.getAbsoluteLimit()
         )).collect(Collectors.toList());
     }
+
 
     public void approveUser(long userId, UserApprovalDTO approvalDTO) throws EntityNotFoundException{
         try {
