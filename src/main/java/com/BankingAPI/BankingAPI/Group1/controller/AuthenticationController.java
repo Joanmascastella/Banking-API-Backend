@@ -23,7 +23,7 @@ public class AuthenticationController {
     public ResponseEntity<Object> registerUser(@RequestBody UserPOSTResponseDTO userDTO) {
         try {
             userService.createUser(userDTO);
-            return ResponseEntity.status(201).body("User registered successfully");
+            return ResponseEntity.status(201).body(new Object[0]);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(409).body(e.getMessage());
         } catch (Exception e) {
