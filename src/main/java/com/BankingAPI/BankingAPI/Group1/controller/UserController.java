@@ -45,11 +45,31 @@ public class UserController {
         }
     }
 
+    @GetMapping(value = "/getOne")
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
+    public ResponseEntity<Object> getUser(){
+        try {
+            UserGetOneRESPONSE details = userService.getUserDetails();
+            if (details == null) {
+                return ResponseEntity.status(404).body("No Such User");
+            }
+            return ResponseEntity.ok(details);
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body("An internal error occurred: " + ex.getMessage());
+        }
+    }
+
+
+
+
     @GetMapping("/iban")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<Object> getIbanByFirstNameLastName(@RequestParam String firstName, @RequestParam String lastName) {
+    public ResponseEntity<Object> getIbanByFirstNameLastName(
+            @RequestParam String firstName,
+            @RequestParam String lastName) {
         try {
-            FindIbanResponseDTO iban = userService.getIbanByFirstNameLastName(firstName, lastName);
+            FindIbanRequestDTO findIban = new FindIbanRequestDTO(firstName, lastName);
+            FindIbanResponseDTO iban = userService.getIbanByFirstNameLastName(findIban);
             if (iban != null) {
                 return ResponseEntity.ok(iban);
             } else {

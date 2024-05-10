@@ -6,6 +6,7 @@ import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.TransactionRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.specification.TransactionSpecification;
@@ -33,7 +34,7 @@ public class TransactionService {
         this.accountRepository = accountRepository;
     }
 
-    public TransactionGETPOSTResponseDTO transferToOtherCustomer(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
+    public TransactionGETPOSTResponseDTO transferToOtherCustomer(TransferMoneyPOSTResponse transactionDTO) throws Exception {
         beanFactory.validateAuthentication();
         Users user = beanFactory.getCurrentUser();
         Account fromAccount = getAccount(transactionDTO.fromAccount());
@@ -55,7 +56,7 @@ public class TransactionService {
     }
 
 
-    public TransactionGETPOSTResponseDTO transferMoneyToOwnAccount(TransactionGETPOSTResponseDTO transactionDTO) throws Exception {
+    public TransactionGETPOSTResponseDTO transferMoneyToOwnAccount(TransferMoneyPOSTResponse transactionDTO) throws Exception {
          beanFactory.validateAuthentication();
          Users user = beanFactory.getCurrentUser();
 
@@ -98,7 +99,7 @@ public class TransactionService {
 
     private void performTransfer(Account fromAccount, Account toAccount, double amount) {
         fromAccount.setBalance(fromAccount.getBalance() - amount);
-        double dailyLimit =fromAccount.getUser().getDailyLimit();
+        double dailyLimit = fromAccount.getUser().getDailyLimit();
         fromAccount.getUser().setDailyLimit(dailyLimit - amount);
         toAccount.setBalance(toAccount.getBalance() + amount);
         accountRepository.save(fromAccount);
@@ -125,6 +126,7 @@ public class TransactionService {
                 transaction.getUser().getId()
         );
     }
+
     public List<TransactionGETPOSTResponseDTO> getTransactionsByUserId(Long userId) {
         List<Transaction> transactions = transactionRepository.findByUserId(userId);
            return transactions.stream()

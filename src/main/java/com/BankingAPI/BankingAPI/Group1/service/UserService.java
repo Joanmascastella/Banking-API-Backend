@@ -4,11 +4,7 @@ import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
-import com.BankingAPI.BankingAPI.Group1.model.dto.AccountDetailsGETResponse;
-import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.UserApprovalDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.UserGETResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.UserRepository;
 import com.BankingAPI.BankingAPI.Group1.util.JwtTokenProvider;
@@ -103,14 +99,14 @@ public class UserService {
         return userRepository.findUserByEmail(email).isPresent();
     }
 
-    public FindIbanResponseDTO getIbanByFirstNameLastName(String firstName, String lastName) {
+    public FindIbanResponseDTO getIbanByFirstNameLastName(FindIbanRequestDTO request) {
         try {
             beanFactory.validateAuthentication();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return accountRepository.findIbanByNames(firstName, lastName)
-                .map(iban -> new FindIbanResponseDTO(iban))
+        return accountRepository.findIbanByNames(request.firstName(), request.lastName())
+                .map(FindIbanResponseDTO::new)
                 .orElse(null);
     }
 
@@ -150,13 +146,12 @@ public class UserService {
 
     public List<AccountDetailsGETResponse> getAccountDetailsForCurrentUser() {
         Users currentUser = beanFactory.getCurrentUser();
-        List<Account> accounts = accountRepository.findAccountsByUserId(currentUser.getId()); // Ensure this is returning List<Account>
+        List<Account> accounts = accountRepository.findAccountsByUserId(currentUser.getId());
 
         if (accounts.isEmpty()) {
-            return Collections.emptyList(); // Properly handle empty list scenario
+            return Collections.emptyList();
         }
 
-        // Process each account in the list and create a new DTO for each
         return accounts.stream().map(account -> new AccountDetailsGETResponse(
                 currentUser.getUsername(),
                 currentUser.getEmail(),
@@ -196,5 +191,11 @@ public class UserService {
         } catch (RuntimeException e) {
             throw new RuntimeException("Failed to update daily limit: " + e.getMessage(), e);
         }
+    }
+
+
+    public UserGetOneRESPONSE getUserDetails() {
+        Users currentUser = beanFactory.getCurrentUser();
+        return new UserGetOneRESPONSE(currentUser.getFirstName(), currentUser.getLastName());
     }
 }

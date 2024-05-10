@@ -2,6 +2,7 @@ package com.BankingAPI.BankingAPI.Group1.controller;
 
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -47,7 +48,7 @@ public class TransactionController {
 
     @PostMapping("/transfers")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
-    public ResponseEntity<Object> transferToOtherCustomer(@RequestBody TransactionGETPOSTResponseDTO transactionDTO) {
+    public ResponseEntity<Object> transferToOtherCustomer(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
             TransactionGETPOSTResponseDTO result = transactionService.transferToOtherCustomer(transactionDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);

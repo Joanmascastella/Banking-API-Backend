@@ -1,8 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
-import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
@@ -58,7 +57,7 @@ public class AccountController {
 
     @PostMapping("/own/transfers")
     @PreAuthorize("hasAnyRole('CUSTOMER')")
-    public ResponseEntity<Object> transferMoneyToOwnAccount(@RequestBody TransactionGETPOSTResponseDTO transactionDTO) {
+    public ResponseEntity<Object> transferMoneyToOwnAccount(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
             Object result = transactionService.transferMoneyToOwnAccount(transactionDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
