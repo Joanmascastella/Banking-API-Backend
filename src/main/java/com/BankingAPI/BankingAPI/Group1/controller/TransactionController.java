@@ -29,23 +29,6 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    @GetMapping
-    public ResponseEntity<Object> getAllTransactions() {
-        try {
-            return ResponseEntity.status(200).body(transactionService.allTransactions());
-        }
-        catch (Exception exception) {
-             if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
     @PostMapping("/transfers")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<Object> transferToOtherCustomer(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
@@ -91,6 +74,25 @@ public class TransactionController {
 
         return ResponseEntity.ok(transactionDto);
     }
+
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    @GetMapping
+    public ResponseEntity<Object> getAllTransactions() {
+        try {
+            return ResponseEntity.status(200).body(transactionService.allTransactions());
+        }
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+
     @GetMapping("/byCustomers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity getTransactionsInitializedByCustomers() {
@@ -126,45 +128,6 @@ public class TransactionController {
     }
 
 
-    @GetMapping("/byCustomer/{userId}")
-    @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getTransactionsInitializedByCustomer(@PathVariable long userId) {
-        try {
-            List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByCustomer(userId));
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            } else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            } else if (exception instanceof IllegalArgumentException) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-
-    @GetMapping("/byEmployee/{userId}")
-    @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getTransactionsInitializedByEmployee(@PathVariable long userId) {
-        try {
-            List<Object> transactions = Collections.singletonList(transactionService.findTransactionsInitializedByEmployee(userId));
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            } else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            } else if (exception instanceof IllegalArgumentException) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
 
 
     @GetMapping("/ATM")
@@ -183,22 +146,7 @@ public class TransactionController {
             }
     }
 
-    @GetMapping("/online")
-    @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getOnlineTransactions() {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactions());}
-        catch (Exception exception) {
-                if (exception instanceof BadCredentialsException){
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-                }
-                else if (exception instanceof AuthenticationException) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-                }
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
 
-    }
 
     @GetMapping("/ATM/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
@@ -246,6 +194,77 @@ public class TransactionController {
     public ResponseEntity getATMDepositsByUserId(@PathVariable long userId) {
         try {
             List<Object> transactions = Collections.singletonList(transactionService.findATMDepositsByUserId(userId));
+            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+        }
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            } else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else if (exception instanceof IllegalArgumentException) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @GetMapping("/online")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getOnlineTransactions() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactions());}
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+    }
+
+
+    @GetMapping("/online/byEmployees")
+     @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getOnlineTransactionsByEmployees() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactionsByEmployees());}
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+    }
+
+    @GetMapping("/online/byCustomers")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getOnlineTransactionsByCustomers() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactionsByCustomers());}
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+    }
+
+    @GetMapping("/online/{userId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getOnlineTransactionsByUserId(@PathVariable long userId) {
+        try {
+            List<Object> transactions = Collections.singletonList(transactionService.findOnlineTransactionsByUserId(userId));
             return ResponseEntity.status(HttpStatus.OK).body(transactions);
         }
         catch (Exception exception) {

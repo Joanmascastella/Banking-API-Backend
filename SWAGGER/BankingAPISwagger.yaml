@@ -674,30 +674,7 @@ paths:
       security:
         - bearerAuth: []
         
-  /transactions/online:
-    get:
-      tags:
-        - Employee
-      summary: Get all transactions made online
-      description: This can only be done by the employee.
-      operationId: getOnlineTransactions
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Transaction"
-        '403':
-          description: User must be of role employee
-        '401':
-          description: User is not authorized
-        "400":
-          description: Invalid status value.
-      security:
-        - bearerAuth: []
+
         
   /transactions/ATM/{userId}:
     get:
@@ -855,15 +832,90 @@ paths:
           description: Invalid status value.
       security:
         - bearerAuth: []
-        
-  
-  /transactions/byCustomer/{userId}:
+
+  /transactions/online:
     get:
       tags:
         - Employee
-      summary: Get all transactions initiated by the customer
+      summary: Get all transactions made online
       description: This can only be done by the employee.
-      operationId: getTransactionsInitializedByCustomer
+      operationId: getOnlineTransactions
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "400":
+          description: Invalid status value.
+      security:
+        - bearerAuth: []
+
+  /transactions/online/byCustomers:
+    get:
+      tags:
+        - Employee
+      summary: Get all transactions made online by the customers
+      description: This can only be done by the employee.
+      operationId: getOnlineTransactionsByCustomers
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "400":
+          description: Invalid status value.
+      security:
+        - bearerAuth: []
+
+  /transactions/online/byEmployees:
+    get:
+      tags:
+        - Employee
+      summary: Get all transactions made online by the employees
+      description: This can only be done by the employee.
+      operationId: getOnlineTransactionsByEmployees
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        '403':
+          description: User must be of role employee
+        '401':
+          description: User is not authorized
+        "400":
+          description: Invalid status value.
+      security:
+        - bearerAuth: []
+        
+  
+  /transactions/online/{userId}:
+    get:
+      tags:
+        - Employee
+      summary: Get all online transactions initiated by the user
+      description: This can only be done by the employee.
+      operationId: getOnlineTransactionsByUserId
       parameters:
         - name: userId
           in: path
@@ -884,49 +936,16 @@ paths:
 
         "400":
           description: Invalid status value.
-        '403':
-          description: User must be of role employee
-        '401':
-          description: User is not authorized
         "404":
           description: User not found
-      security:
-        - bearerAuth: []
-  /transactions/byEmployee/{employeeId}:
-    get:
-      tags:
-        - Employee
-      summary: Get all transactions initiated by the employee
-      description: This can only be done by the employee.
-      operationId: getTransactionsInitializedByEmployee
-      parameters:
-        - name: employeeId
-          in: path
-          description: ID of employee which initialized the transactions
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Transaction"
-
-        "400":
-          description: Invalid status value.
-        "404":
-          description: Employee not found
         '403':
           description: User must be of role employee
         '401':
           description: User is not authorized
       security:
         - bearerAuth: []
+
+
 
   /transactions/customer/{customerId}:
     get:

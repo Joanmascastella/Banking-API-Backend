@@ -27,23 +27,6 @@ public class AccountController {
         this.transactionService = transactionService;
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
-    @GetMapping(value = "/customers")
-    public ResponseEntity<Object> getAllCustomerAccounts() {
-        try{
-        return ResponseEntity.status(200).body(accountService.getAllCustomerAccounts());
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
     @GetMapping("/{userId}/details")
     @PreAuthorize("hasAnyRole('CUSTOMER')")
     public ResponseEntity<Object> getAccountDetails(@PathVariable Long userId) {
@@ -85,6 +68,25 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @GetMapping(value = "/customers")
+    public ResponseEntity<Object> getAllCustomerAccounts() {
+        try{
+            return ResponseEntity.status(200).body(accountService.getAllCustomerAccounts());
+        }
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();}
+        }
+    }
+
 
     @GetMapping("/savings/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
