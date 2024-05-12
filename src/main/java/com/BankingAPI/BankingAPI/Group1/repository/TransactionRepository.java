@@ -16,28 +16,16 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     List<Transaction> findByUserId(@Param("userId") Long userId);
 
     //Find all transactions initialized by the customers
-    @Query("SELECT t FROM Transaction t WHERE t.user.userType = ROLE_CUSTOMER")
+    @Query("SELECT t FROM Transaction t WHERE t.user.userType = ROLE_CUSTOMER ")
     List<Transaction> findByUserTypeCustomer();
 
     //Find all transactions initialized by the employees
     @Query("SELECT t FROM Transaction t WHERE t.user.userType = 'ROLE_EMPLOYEE'")
     List<Transaction> findByUserTypeEmployee();
 
-    //Find only the transactions initialized by a customer
-    @Query("SELECT t FROM Transaction t WHERE t.user.userType = 'ROLE_CUSTOMER' AND t.user.id = :userId")
-    List<Transaction> findTransactionsInitializedByCustomer(@Param("userId") long userId);
-
-    //Find only the transactions initialized by an employee
-    @Query("SELECT t FROM Transaction t WHERE t.user.userType = 'ROLE_EMPLOYEE' AND t.user.id = :userId")
-    List<Transaction> findTransactionsInitializedByEmployee(@Param("userId") long userId);
-
     //Find all ATM transactions
     @Query("SELECT t FROM Transaction t WHERE t.fromAccount LIKE 'ATM' OR t.toAccount LIKE 'ATM'")
     List<Transaction> findATMTransactions();
-
-    //Find all transactions made online
-    @Query("SELECT t FROM Transaction t WHERE t.fromAccount NOT LIKE 'ATM' AND t.toAccount NOT LIKE 'ATM'")
-    List<Transaction> findOnlineTransactions();
 
     //Find all ATM transactions for a specific user by user ID
     //Refactored query to use the 'user' field of Transaction table instead of the field userId after refactoring the Transaction model
@@ -51,6 +39,25 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     //Find ATM deposits for a specific user by user id
     @Query("SELECT t FROM Transaction t WHERE t.toAccount LIKE 'ATM' AND t.user.id = :userId")
     List<Transaction> findATMDepositsByUserId(@Param("userId") long userId);
+
+    //Find all transactions made online
+    @Query("SELECT t FROM Transaction t WHERE t.fromAccount NOT LIKE 'ATM' AND t.toAccount NOT LIKE 'ATM'")
+    List<Transaction> findOnlineTransactions();
+
+    //Find all transactions made online by a customer
+    @Query("SELECT t FROM Transaction t WHERE t.fromAccount NOT LIKE 'ATM' AND t.toAccount NOT LIKE 'ATM' AND t.user.userType = 'ROLE_CUSTOMER'")
+    List<Transaction> findOnlineTransactionsByCustomers();
+
+    //Find all transactions made online by an employee
+    @Query("SELECT t FROM Transaction t WHERE t.fromAccount NOT LIKE 'ATM' AND t.toAccount NOT LIKE 'ATM' AND t.user.userType = 'ROLE_EMPLOYEE'")
+    List<Transaction> findOnlineTransactionsByEmployees();
+
+    //Find online transactions by user id
+    @Query("SELECT t FROM Transaction t WHERE t.fromAccount NOT LIKE 'ATM' AND t.toAccount NOT LIKE 'ATM' AND t.user.id = :userId")
+    List<Transaction> findOnlineTransactionsByUserId(@Param("userId") long userId);
+
+
+
 
 
 }

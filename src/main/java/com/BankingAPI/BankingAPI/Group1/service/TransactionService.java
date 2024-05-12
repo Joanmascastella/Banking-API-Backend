@@ -227,7 +227,7 @@ public class TransactionService {
 
 
     public List<TransactionGETPOSTResponseDTO> allTransactions() throws Exception {
-        beanFactory.validateAuthentication();
+      //  beanFactory.validateAuthentication();
         List<Transaction> transactions = transactionRepository.findAll();
             return transactions.stream()
                     .map(transaction -> new TransactionGETPOSTResponseDTO(
@@ -241,7 +241,7 @@ public class TransactionService {
     }
 
     public List<TransactionGETPOSTResponseDTO> findTransactionsInitializedByCustomers() throws Exception {
-        beanFactory.validateAuthentication();
+        //beanFactory.validateAuthentication();
         List<Transaction> transactions = transactionRepository.findByUserTypeCustomer();
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
@@ -255,7 +255,7 @@ public class TransactionService {
     }
 
     public List<TransactionGETPOSTResponseDTO> findTransactionsInitializedByEmployees() throws Exception {
-        beanFactory.validateAuthentication();
+        //beanFactory.validateAuthentication();
         List<Transaction> transactions = transactionRepository.findByUserTypeEmployee();
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
@@ -269,36 +269,9 @@ public class TransactionService {
     }
 
 
-    public List<TransactionGETPOSTResponseDTO> findTransactionsInitializedByCustomer(long idOfUser) throws Exception{
-        beanFactory.validateAuthentication();
-        List<Transaction> transactions = transactionRepository.findTransactionsInitializedByCustomer(idOfUser);
-        return transactions.stream()
-                .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getFromAccount(),
-                        transaction.getToAccount(),
-                        transaction.getAmount(),
-                        transaction.getDate(),
-                        transaction.getUser().getId()
-                ))
-                .collect(Collectors.toList());
-    }
-
-    public List<TransactionGETPOSTResponseDTO> findTransactionsInitializedByEmployee(long idOfUser) throws Exception {
-        beanFactory.validateAuthentication();
-        List<Transaction> transactions = transactionRepository.findTransactionsInitializedByEmployee(idOfUser);
-        return transactions.stream()
-                .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getFromAccount(),
-                        transaction.getToAccount(),
-                        transaction.getAmount(),
-                        transaction.getDate(),
-                        transaction.getUser().getId()
-                ))
-                .collect(Collectors.toList());
-    }
 
     public List<TransactionGETPOSTResponseDTO> findATMTransactions() throws Exception {
-        beanFactory.validateAuthentication();
+        //beanFactory.validateAuthentication();
         List<Transaction> transactions = transactionRepository.findATMTransactions();
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
@@ -311,19 +284,6 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
-    public List<TransactionGETPOSTResponseDTO> findOnlineTransactions() throws Exception {
-        beanFactory.validateAuthentication();
-        List<Transaction> transactions = transactionRepository.findOnlineTransactions();
-        return transactions.stream()
-                .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getFromAccount(),
-                        transaction.getToAccount(),
-                        transaction.getAmount(),
-                        transaction.getDate(),
-                        transaction.getUser().getId()
-                ))
-                .collect(Collectors.toList());
-    }
 
 
     public List<TransactionGETPOSTResponseDTO> findATMTransactionsByUserId(long idOfUser) throws Exception {
@@ -367,5 +327,64 @@ public class TransactionService {
                 ))
                 .collect(Collectors.toList());
     }
+
+
+    public List<TransactionGETPOSTResponseDTO> findOnlineTransactions() throws Exception {
+        //beanFactory.validateAuthentication();
+        List<Transaction> transactions = transactionRepository.findOnlineTransactions();
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getUser().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<TransactionGETPOSTResponseDTO> findOnlineTransactionsByEmployees() throws Exception {
+        //beanFactory.validateAuthentication();
+        List<Transaction> transactions = transactionRepository.findOnlineTransactionsByEmployees();
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getUser().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<TransactionGETPOSTResponseDTO> findOnlineTransactionsByCustomers() throws Exception {
+        //beanFactory.validateAuthentication();
+        List<Transaction> transactions = transactionRepository.findOnlineTransactionsByCustomers();
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getUser().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<TransactionGETPOSTResponseDTO> findOnlineTransactionsByUserId(long idOfUser) throws Exception {
+        //beanFactory.validateAuthentication();
+        List<Transaction> transactions = transactionRepository.findOnlineTransactionsByUserId(idOfUser);
+        return transactions.stream()
+                .map(transaction -> new TransactionGETPOSTResponseDTO(
+                        transaction.getFromAccount(),
+                        transaction.getToAccount(),
+                        transaction.getAmount(),
+                        transaction.getDate(),
+                        transaction.getUser().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
 
 }
