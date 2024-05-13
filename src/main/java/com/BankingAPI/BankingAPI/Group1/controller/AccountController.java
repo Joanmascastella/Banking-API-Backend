@@ -128,10 +128,9 @@ public class AccountController {
 
     @GetMapping("/byAbsoluteLimit")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getAccountsByAbsoluteLimit(@RequestParam(required = true) double absoluteLimit) {
+    public ResponseEntity<Object> getAccountsByAbsoluteLimit(@RequestParam(required = true) double absoluteLimit) {
         try {
-            List<Object> accounts = Collections.singletonList(accountService.findByAbsoluteLimit(absoluteLimit));
-            return ResponseEntity.status(HttpStatus.OK).body(accounts);
+            return ResponseEntity.status(HttpStatus.OK).body(accountService.findByAbsoluteLimit(absoluteLimit));
         }
         catch (Exception exception) {
             if (exception instanceof BadCredentialsException){
