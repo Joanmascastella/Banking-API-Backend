@@ -1,4 +1,4 @@
-Feature: users
+Feature: RegisterUsers
 
   Scenario: Successful registration of a new user
     Given the following user details:
