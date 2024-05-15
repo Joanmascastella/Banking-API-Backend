@@ -1,6 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.cucumber.steps;
 
-import com.BankingAPI.BankingAPI.Group1.config.SSLUtils;
+import com.BankingAPI.BankingAPI.Group1.config.TestConfig;
 import com.BankingAPI.BankingAPI.Group1.cucumber.BaseStepDefinitions;
 import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
@@ -15,7 +15,6 @@ import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,22 +23,22 @@ import org.springframework.http.ResponseEntity;
 @Log
 public class LoginUserStepsDef extends BaseStepDefinitions {
 
-    private static final String LOGIN_ENDPOINT = "/login";
+    private String LOGIN_ENDPOINT;
     private LoginDTO loginDTO;
     private String token;
     private final HttpHeaders httpHeaders = new HttpHeaders();
     private ResponseEntity<String> response;
 
     @Autowired
-    private TestRestTemplate restTemplate;
-    @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private TestConfig testConfig;
 
     @SneakyThrows
     @Before
     public void init() {
-        SSLUtils.turnOffSslChecking();
-        log.info("Turned off SSL checking");
+        LOGIN_ENDPOINT = testConfig.getBaseUrl() + "/login";
+        log.info("Initialization before each scenario");
     }
 
     @Given("I have a valid login object with valid user and valid password")
@@ -50,7 +49,7 @@ public class LoginUserStepsDef extends BaseStepDefinitions {
     @When("I call the application login endpoint")
     public void iCallTheApplicationLoginEndpoint() throws JsonProcessingException {
         httpHeaders.add("Content-Type", "application/json");
-        response = restTemplate.exchange(
+        response = testRestTemplate.exchange(
                 LOGIN_ENDPOINT,
                 HttpMethod.POST,
                 new HttpEntity<>(objectMapper.writeValueAsString(loginDTO), httpHeaders),

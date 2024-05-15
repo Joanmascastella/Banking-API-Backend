@@ -1,11 +1,14 @@
 package com.BankingAPI.BankingAPI.Group1.cucumber.steps;
 
+import com.BankingAPI.BankingAPI.Group1.config.TestConfig;
 import com.BankingAPI.BankingAPI.Group1.cucumber.BaseStepDefinitions;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -24,8 +27,18 @@ public class RegisterUserStepsDef extends BaseStepDefinitions {
     @Autowired
     private TestRestTemplate testRestTemplate;
 
+    @Autowired
+    private TestConfig testConfig;
+
     private ResponseEntity<String> response;
     private UserPOSTResponseDTO userDTO;
+    private String REGISTER_ENDPOINT;
+
+    @SneakyThrows
+    @Before
+    public void init() {
+        REGISTER_ENDPOINT = testConfig.getBaseUrl() + "/register";
+    }
 
     @Given("the following user details:")
     public void givenTheFollowingUserDetails(DataTable dataTable) {
@@ -46,7 +59,7 @@ public class RegisterUserStepsDef extends BaseStepDefinitions {
     public void whenIRegisterTheUser() {
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<UserPOSTResponseDTO> request = new HttpEntity<>(userDTO, headers);
-        response = testRestTemplate.exchange("/register", HttpMethod.POST, request, String.class);
+        response = testRestTemplate.exchange(REGISTER_ENDPOINT, HttpMethod.POST, request, String.class);
     }
 
     @Then("the user should be successfully created")

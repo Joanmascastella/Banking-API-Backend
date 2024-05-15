@@ -16,7 +16,7 @@ Feature: Authentication and registration
   Scenario: Registration with an existing email
     Given the following user details:
       | username    | testuser2      |
-      | email       | test@example.com |
+      | email       | john.doe@example.com |
       | firstName   | Test2          |
       | lastName    | User2          |
       | BSN         | 987654321      |
