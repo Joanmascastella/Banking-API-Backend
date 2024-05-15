@@ -76,4 +76,17 @@ public class Transaction {
     public void setUser(Users user) {
         this.user = user;
     }
+
+    public boolean isFromAccountDifferentThanToAccount() {
+        return !this.fromAccount.equals(this.toAccount);
+    }
+
+    public boolean isAmountPositive() {
+        return this.amount > 0;
+    }
+
+    public boolean isAmountNegative() {
+        return this.amount < 0;
+    }
+
 }
