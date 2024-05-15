@@ -1,6 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
+import com.BankingAPI.BankingAPI.Group1.exception.CustomAuthenticationException;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
@@ -111,13 +112,13 @@ public class UserService {
                 .orElse(null);
     }
 
-    public String login(String username, String password) throws Exception {
+    public String login(String username, String password) throws CustomAuthenticationException {
         Users user = this.userRepository.findMemberByUsername(username)
-                .orElseThrow(() -> new AuthenticationException("User not found"));
+                .orElseThrow(() -> new CustomAuthenticationException("User not found"));
         if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
             return jwtTokenProvider.createToken(user.getId(), user.getUserType(), user.isApproved());
         } else {
-            throw new AuthenticationException("Invalid username/password");
+            throw new CustomAuthenticationException("Invalid username/password");
         }
     }
 
