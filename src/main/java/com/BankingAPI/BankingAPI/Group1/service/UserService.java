@@ -85,6 +85,7 @@ public class UserService {
         );
         return userRepository.save(newUser);
     }
+
     public boolean checkAndUpdateDailyLimit(Users user, double amount) {
         double updatedAmount = user.getDailyLimit() - amount;
         if (updatedAmount < 0) {
