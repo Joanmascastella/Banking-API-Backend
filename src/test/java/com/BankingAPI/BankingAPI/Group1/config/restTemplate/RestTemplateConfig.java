@@ -1,4 +1,4 @@
-package com.BankingAPI.BankingAPI.Group1.config;
+package com.BankingAPI.BankingAPI.Group1.config.restTemplate;
 
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -27,7 +27,7 @@ public class RestTemplateConfig {
 
                     @Override
                     public void handleError(ClientHttpResponse response) throws IOException {
-                        // Custom error handling
+
                     }
                 })
         );
@@ -45,7 +45,7 @@ public class RestTemplateConfig {
 
                     @Override
                     public void handleError(ClientHttpResponse response) throws IOException {
-                        // Custom error handling
+
                     }
                 })
                 .build();
