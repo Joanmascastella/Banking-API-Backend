@@ -112,6 +112,7 @@ public class UserService {
                 .orElse(null);
     }
 
+
     public String login(String username, String password) throws CustomAuthenticationException {
         Users user = this.userRepository.findMemberByUsername(username)
                 .orElseThrow(() -> new CustomAuthenticationException("User not found"));
