@@ -2,6 +2,8 @@ package com.BankingAPI.BankingAPI.Group1.controller;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.ATMLoginDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
@@ -26,19 +28,12 @@ public class ATMController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/login")
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
-    public ResponseEntity<String> login(@RequestBody ATMLoginDTO loginDTO) {
-        try {
-            Users user = userService.findByEmail(loginDTO.email());
-            if (user != null && user.getPassword().equals(loginDTO.password())) {
-                return ResponseEntity.ok("Login successful");
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Login request failed: " + e.getMessage());
-        }
+
+    @PostMapping(value = "/login")
+    public Object login(@RequestBody ATMLoginDTO dto) throws Exception {
+        return new TokenDTO(
+                userService.atmLogin(dto.email(), dto.password())
+        );
     }
 
     @PostMapping("/withdrawals")
