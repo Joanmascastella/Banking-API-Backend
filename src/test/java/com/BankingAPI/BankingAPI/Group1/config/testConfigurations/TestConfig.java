@@ -1,4 +1,4 @@
-package com.BankingAPI.BankingAPI.Group1.config;
+package com.BankingAPI.BankingAPI.Group1.config.testConfigurations;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

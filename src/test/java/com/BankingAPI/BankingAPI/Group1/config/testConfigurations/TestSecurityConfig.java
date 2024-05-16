@@ -1,5 +1,5 @@
 // TestSecurityConfig.java
-package com.BankingAPI.BankingAPI.Group1.config;
+package com.BankingAPI.BankingAPI.Group1.config.testConfigurations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

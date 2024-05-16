@@ -1,6 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.cucumber.steps;
 
-import com.BankingAPI.BankingAPI.Group1.config.TestConfig;
+import com.BankingAPI.BankingAPI.Group1.config.testConfigurations.TestConfig;
 import com.BankingAPI.BankingAPI.Group1.cucumber.BaseStepDefinitions;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
 import io.cucumber.datatable.DataTable;

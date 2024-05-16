@@ -1,7 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
 import com.BankingAPI.BankingAPI.Group1.config.ApiTestConfiguration;
-import com.BankingAPI.BankingAPI.Group1.config.TestSecurityConfig;
+import com.BankingAPI.BankingAPI.Group1.config.testConfigurations.TestSecurityConfig;
 import com.BankingAPI.BankingAPI.Group1.exception.CustomAuthenticationException;
 import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
