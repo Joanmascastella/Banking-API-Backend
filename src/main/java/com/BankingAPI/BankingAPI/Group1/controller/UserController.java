@@ -60,8 +60,6 @@ public class UserController {
     }
 
 
-
-
     @GetMapping("/iban")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<Object> getIbanByFirstNameLastName(
@@ -73,12 +71,14 @@ public class UserController {
             if (iban != null) {
                 return ResponseEntity.ok(iban);
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("IBAN not found for given name.");
             }
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/noncustomers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")

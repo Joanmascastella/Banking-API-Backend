@@ -10,4 +10,10 @@ public class TestConfig {
 
     @Value("${test.base.url}")
     private String baseUrl;
+
+    @Value("${test.username}")
+    private String username;
+
+    @Value("${test.password}")
+    private String password;
 }
