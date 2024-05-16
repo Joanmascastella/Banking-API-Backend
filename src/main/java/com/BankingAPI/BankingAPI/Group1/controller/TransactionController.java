@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.naming.AuthenticationException;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,19 +36,27 @@ public class TransactionController {
     public ResponseEntity<Object> transferToOtherCustomer(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
             TransactionGETPOSTResponseDTO result = transactionService.transferToOtherCustomer(transactionDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Transfer successful");
+            response.put("transaction", result);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            if (e.getMessage().contains("not found")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            } else if (e.getMessage().contains("Insufficient funds") || e.getMessage().contains("exceeds daily limit")) {
-                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
-            } else if (e.getMessage().contains("CHECKING accounts")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Both accounts must be of type CHECKING.");
+            String errorMessage = e.getMessage();
+            if (errorMessage.contains("not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", errorMessage));
+            } else if (errorMessage.contains("Insufficient funds") || errorMessage.contains("exceeds daily limit")) {
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("message", errorMessage));
+            } else if (errorMessage.contains("CHECKING accounts") || errorMessage.contains("Cannot transfer money between savings accounts.")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", errorMessage));
+            } else if (errorMessage.contains("Both accounts cannot belong to the same user for this operation.")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", errorMessage));
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", errorMessage));
             }
         }
     }
+
+
 
     @GetMapping("/{userId}/history")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")

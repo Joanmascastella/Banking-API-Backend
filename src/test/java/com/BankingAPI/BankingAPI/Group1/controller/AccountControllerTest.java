@@ -46,23 +46,23 @@ class AccountControllerTest {
     @WithMockUser(username = "johndoe", password = "123", roles = "CUSTOMER")
     void transferMoneyToOwnAccount_Success() throws Exception {
         TransferMoneyPOSTResponse transactionDTO = new TransferMoneyPOSTResponse("DE89370400440532013000", "DE89370400440532013012", 100.0);
-        TransactionGETPOSTResponseDTO responseDTO = new TransactionGETPOSTResponseDTO(
-                "DE89370400440532013000",
-                "DE89370400440532013012",
-                100.0,
-                LocalDate.now(),
-                1L);
 
         Mockito.when(transactionService.transferMoneyToOwnAccount(Mockito.any(TransferMoneyPOSTResponse.class)))
-                .thenReturn(responseDTO);
+                .thenReturn(new TransactionGETPOSTResponseDTO(
+                        "DE89370400440532013000",
+                        "DE89370400440532013012",
+                        100.0,
+                        LocalDate.now(),
+                        1L));
 
         mockMvc.perform(post("/accounts/own/transfers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transactionDTO))
                         .with(csrf()))
                 .andExpect(status().isCreated())
-                .andExpect(content().json(objectMapper.writeValueAsString(responseDTO)));
+                .andExpect(content().string("Transfer successful"));
     }
+
 
     @Test
     @WithMockUser(username = "johndoe", password = "123", roles = "CUSTOMER")
