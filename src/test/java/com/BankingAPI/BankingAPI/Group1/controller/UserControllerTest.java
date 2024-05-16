@@ -104,4 +104,6 @@ class UserControllerTest {
                 .andExpect(content().string("An internal error occurred: Unexpected error"));
     }
 
+
+
 }
