@@ -42,8 +42,8 @@ public class AccountController {
     @PreAuthorize("hasAnyRole('CUSTOMER')")
     public ResponseEntity<Object> transferMoneyToOwnAccount(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
-            Object result = transactionService.transferMoneyToOwnAccount(transactionDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+            transactionService.transferMoneyToOwnAccount(transactionDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Transfer successful");
         } catch (Exception e) {
             if (e.getMessage().contains("not found")) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -52,9 +52,9 @@ public class AccountController {
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
             }
-
         }
     }
+
 
     @PutMapping("/customers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
