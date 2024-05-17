@@ -1,13 +1,11 @@
 package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
+import com.BankingAPI.BankingAPI.Group1.exception.CustomAuthenticationException;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
-import com.BankingAPI.BankingAPI.Group1.model.dto.FindIbanResponseDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.UserApprovalDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.UserPOSTResponseDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.UserGETResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.UserRepository;
 import com.BankingAPI.BankingAPI.Group1.util.JwtTokenProvider;
@@ -16,14 +14,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService {
     private final AccountRepository accountRepository;
-    private UserRepository userRepository;
-    private AccountService accountService;
+    private final UserRepository userRepository;
+    private final AccountService accountService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final BeanFactory beanFactory;
@@ -86,6 +86,7 @@ public class UserService {
         );
         return userRepository.save(newUser);
     }
+
     public boolean checkAndUpdateDailyLimit(Users user, double amount) {
         double updatedAmount = user.getDailyLimit() - amount;
         if (updatedAmount < 0) {
@@ -100,24 +101,25 @@ public class UserService {
         return userRepository.findUserByEmail(email).isPresent();
     }
 
-    public FindIbanResponseDTO getIbanByFirstNameLastName(String firstName, String lastName) {
+    public FindIbanResponseDTO getIbanByFirstNameLastName(FindIbanRequestDTO request) {
         try {
             beanFactory.validateAuthentication();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return accountRepository.findIbanByNames(firstName, lastName)
-                .map(iban -> new FindIbanResponseDTO(iban))
+        return accountRepository.findIbanByNames(request.firstName(), request.lastName())
+                .map(FindIbanResponseDTO::new)
                 .orElse(null);
     }
 
-    public String login(String username, String password) throws Exception {
+
+    public String login(String username, String password) throws CustomAuthenticationException {
         Users user = this.userRepository.findMemberByUsername(username)
-                .orElseThrow(() -> new AuthenticationException("User not found"));
+                .orElseThrow(() -> new CustomAuthenticationException("User not found"));
         if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
             return jwtTokenProvider.createToken(user.getId(), user.getUserType(), user.isApproved());
         } else {
-            throw new AuthenticationException("Invalid username/password");
+            throw new CustomAuthenticationException("Invalid username/password");
         }
     }
 
@@ -145,6 +147,31 @@ public class UserService {
         }
     }
 
+    public List<AccountDetailsGETResponse> getAccountDetailsForCurrentUser() {
+        Users currentUser = beanFactory.getCurrentUser();
+        List<Account> accounts = accountRepository.findAccountsByUserId(currentUser.getId());
+
+        if (accounts.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return accounts.stream().map(account -> new AccountDetailsGETResponse(
+                currentUser.getUsername(),
+                currentUser.getEmail(),
+                currentUser.getFirstName(),
+                currentUser.getLastName(),
+                currentUser.getBSN(),
+                currentUser.getPhoneNumber(),
+                currentUser.getBirthDate(),
+                account.getIBAN(),
+                account.getCurrency(),
+                account.getAccountType(),
+                account.getBalance(),
+                account.getAbsoluteLimit()
+        )).collect(Collectors.toList());
+    }
+
+
     public void approveUser(long userId, UserApprovalDTO approvalDTO) throws EntityNotFoundException{
         try {
             Users currentUser = userRepository.findById(userId)
@@ -167,5 +194,11 @@ public class UserService {
         } catch (RuntimeException e) {
             throw new RuntimeException("Failed to update daily limit: " + e.getMessage(), e);
         }
+    }
+
+
+    public UserGetOneRESPONSE getUserDetails() {
+        Users currentUser = beanFactory.getCurrentUser();
+        return new UserGetOneRESPONSE(currentUser.getFirstName(), currentUser.getLastName());
     }
 }

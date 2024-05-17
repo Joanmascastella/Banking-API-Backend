@@ -9,11 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -22,23 +24,60 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> getAllUsers() {
-    return ResponseEntity.status(200).body(userService.getAllUsers());
+        try {
+            return ResponseEntity.status(200).body(userService.getAllUsers());
+        } catch (Exception ex) {
+            return ResponseEntity.status(404).body("User not found.");
+        }
     }
+
+    @GetMapping(value = "/details")
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
+    public ResponseEntity<Object> getUserDetails(){
+        try {
+            List<AccountDetailsGETResponse> details = userService.getAccountDetailsForCurrentUser();
+            if (details.isEmpty()) {
+                return ResponseEntity.status(404).body("No accounts found for user.");
+            }
+            return ResponseEntity.ok(details);
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body("An internal error occurred: " + ex.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/getOne")
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
+    public ResponseEntity<Object> getUser(){
+        try {
+            UserGetOneRESPONSE details = userService.getUserDetails();
+            if (details == null) {
+                return ResponseEntity.status(404).body("No Such User");
+            }
+            return ResponseEntity.ok(details);
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body("An internal error occurred: " + ex.getMessage());
+        }
+    }
+
 
     @GetMapping("/iban")
     @PreAuthorize("hasAnyRole('CUSTOMER','EMPLOYEE')")
     public ResponseEntity<Object> getIbanByFirstNameLastName(@RequestParam String firstName, @RequestParam String lastName) {
+
         try {
-            FindIbanResponseDTO iban = userService.getIbanByFirstNameLastName(firstName, lastName);
+            FindIbanRequestDTO findIban = new FindIbanRequestDTO(firstName, lastName);
+            FindIbanResponseDTO iban = userService.getIbanByFirstNameLastName(findIban);
             if (iban != null) {
                 return ResponseEntity.ok(iban);
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("IBAN not found for given name.");
             }
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/noncustomers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")

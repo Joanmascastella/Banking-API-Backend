@@ -1,8 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
-import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
@@ -28,23 +27,6 @@ public class AccountController {
         this.transactionService = transactionService;
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
-    @GetMapping(value = "/customers")
-    public ResponseEntity<Object> getAllCustomerAccounts() {
-        try{
-        return ResponseEntity.status(200).body(accountService.getAllCustomerAccounts());
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
     @GetMapping("/{userId}/details")
     @PreAuthorize("hasAnyRole('CUSTOMER')")
     public ResponseEntity<Object> getAccountDetails(@PathVariable Long userId) {
@@ -58,10 +40,10 @@ public class AccountController {
 
     @PostMapping("/own/transfers")
     @PreAuthorize("hasAnyRole('CUSTOMER')")
-    public ResponseEntity<Object> transferMoneyToOwnAccount(@RequestBody TransactionGETPOSTResponseDTO transactionDTO) {
+    public ResponseEntity<Object> transferMoneyToOwnAccount(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
-            Object result = transactionService.transferMoneyToOwnAccount(transactionDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+            transactionService.transferMoneyToOwnAccount(transactionDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Transfer successful");
         } catch (Exception e) {
             if (e.getMessage().contains("not found")) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -70,9 +52,9 @@ public class AccountController {
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
             }
-
         }
     }
+
 
     @PutMapping("/customers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
@@ -86,6 +68,25 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @GetMapping(value = "/customers")
+    public ResponseEntity<Object> getAllCustomerAccounts() {
+        try{
+            return ResponseEntity.status(200).body(accountService.getAllCustomerAccounts());
+        }
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();}
+        }
+    }
+
 
     @GetMapping("/savings/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
@@ -127,10 +128,9 @@ public class AccountController {
 
     @GetMapping("/byAbsoluteLimit")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getAccountsByAbsoluteLimit(@RequestParam(required = true) double absoluteLimit) {
+    public ResponseEntity<Object> getAccountsByAbsoluteLimit(@RequestParam(required = true) double absoluteLimit) {
         try {
-            List<Object> accounts = Collections.singletonList(accountService.findByAbsoluteLimit(absoluteLimit));
-            return ResponseEntity.status(HttpStatus.OK).body(accounts);
+            return ResponseEntity.status(HttpStatus.OK).body(accountService.findByAbsoluteLimit(absoluteLimit));
         }
         catch (Exception exception) {
             if (exception instanceof BadCredentialsException){

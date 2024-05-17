@@ -36,16 +36,26 @@ public class DatabaseInitializer implements ApplicationRunner {
     private void initDatabase() {
         Users newUsers = new Users("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("123"));
         Users newUser = new Users("janedoe", "jane@doe.com", "Jane", "Doe", "123789456", "0987654321", LocalDate.of(1998, 4, 14), 0, 0, false, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("user"));
+        Users joan = new Users("joan", "joan.doe@example.com", "Joan", "Doe", "12345673", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("joan"));
         Users newEmployee = new Users("Employee", "employee@example.com", "Em", "Yee", "1234567893", "01234567891", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, UserType.ROLE_EMPLOYEE, bCryptPasswordEncoder.encode("employee"));
         userRepository.save(newUsers);
         userRepository.save(newUser);
+        userRepository.save(joan);
         userRepository.save(newEmployee);
 
         Transaction newTransaction = new Transaction(newUsers, "123456789", "123456789", 2000.0, LocalDate.now());
         transactionRepository.save(newTransaction);
 
-        Account newAccount = new Account(newUsers, "DE89INHO0044053200", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
+        Account newAccount = new Account(newUsers, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
+        Account newAccounts = new Account(newUsers, "NL89INHO0044053201", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
+
+        Account joanAccount = new Account(joan, "NL89INHO0044053201", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
+        Account joanAccounts = new Account(joan, "NL89INHO0044053201", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
+
+        accountRepository.save(joanAccount);
+        accountRepository.save(joanAccounts);
         accountRepository.save(newAccount);
+        accountRepository.save(newAccounts);
     }
 
 

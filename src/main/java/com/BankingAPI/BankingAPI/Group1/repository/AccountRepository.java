@@ -12,9 +12,10 @@ import java.util.Optional;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Optional<Account> findByUserId(Long userId);
+
     Optional<Account> findByIBAN(String iban);
 
-    @Query("SELECT a.IBAN FROM Account a JOIN a.user u WHERE u.firstName = :firstName AND u.lastName = :lastName")
+    @Query("SELECT a.IBAN FROM Account a JOIN a.user u WHERE u.firstName = :firstName AND u.lastName = :lastName AND a.accountType LIKE 'CHECKING'")
     Optional<String> findIbanByNames(String firstName, String lastName);
 
     boolean existsByIBAN(String iban);
