@@ -105,9 +105,9 @@ public class AccountService {
             }
             String firstDigits = String.format("%02d", new Random().nextInt(100));
 
-            String lastDigits = String.format("%010d", new Random().nextInt(1000000000));
+            String lastDigits = String.format("%09d", new Random().nextInt(1000000000));
 
-            iban = "NL" + firstDigits + "INH00" + lastDigits;
+            iban = "NL" + firstDigits + "INHO0" + lastDigits;
 
         } while(ibanExists(iban));
 
