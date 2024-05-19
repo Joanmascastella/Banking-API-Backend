@@ -61,10 +61,9 @@ public class UserController {
 
 
     @GetMapping("/iban")
-    @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<Object> getIbanByFirstNameLastName(
-            @RequestParam String firstName,
-            @RequestParam String lastName) {
+    @PreAuthorize("hasAnyRole('CUSTOMER','EMPLOYEE')")
+    public ResponseEntity<Object> getIbanByFirstNameLastName(@RequestParam String firstName, @RequestParam String lastName) {
+
         try {
             FindIbanRequestDTO findIban = new FindIbanRequestDTO(firstName, lastName);
             FindIbanResponseDTO iban = userService.getIbanByFirstNameLastName(findIban);
