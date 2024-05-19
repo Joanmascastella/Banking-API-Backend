@@ -3,6 +3,7 @@ package com.BankingAPI.BankingAPI.Group1.service;
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
+import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
@@ -12,6 +13,7 @@ import com.BankingAPI.BankingAPI.Group1.repository.TransactionRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.specification.TransactionSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -39,6 +41,18 @@ public class TransactionService {
         Users user = beanFactory.getCurrentUser();
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
+
+        // Check user role
+        if (user.getUserType() == UserType.ROLE_CUSTOMER) {
+            // Ensure fromAccount belongs to current user
+            if (fromAccount.getUser().getId() != user.getId()) {
+                throw new Exception("Customer can only transfer money from their own account.");
+            }
+            // Ensure toAccount is a checking account
+            if (toAccount.getAccountType() != AccountType.CHECKING && fromAccount.getAccountType() != AccountType.CHECKING) {
+                throw new Exception("Customer can only transfer money to a checking account.");
+            }
+        }
 
         if (fromAccount.getAccountType() == AccountType.SAVINGS && toAccount.getAccountType() == AccountType.SAVINGS) {
             throw new Exception("Cannot transfer money between savings accounts.");
