@@ -212,8 +212,24 @@ public class TransactionService {
         if (startDate != null && endDate != null) {
             spec = spec.and(TransactionSpecification.isBetweenDates(startDate, endDate));
         }
+        if (startDate != null) {
+            spec = spec.and(TransactionSpecification.isAfterDate(startDate));
+        }
+        if (endDate != null) {
+            spec = spec.and(TransactionSpecification.isBeforeDate(endDate));
+        }
+        System.out.println("Filtering transactions with parameters:");
+        System.out.println("IBAN: " + IBAN);
+        System.out.println("Amount: " + amount);
+        System.out.println("Amount Greater: " + amountGreater);
+        System.out.println("Amount Less: " + amountLess);
+        System.out.println("Start Date: " + startDate);
+        System.out.println("End Date: " + endDate);
 
-        return transactionRepository.findAll(spec);
+        List<Transaction> transactions = transactionRepository.findAll(spec);
+
+        System.out.println("Found transactions: " + transactions.size());
+        return transactions;
     }
     public void save(Transaction transaction) {
         transactionRepository.save(transaction);

@@ -28,4 +28,11 @@ public class TransactionSpecification {
     public static Specification<Transaction> isBetweenDates(LocalDate start, LocalDate end) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.between(root.get("date"), start, end);
     }
+    public static Specification<Transaction> isAfterDate(LocalDate startDate) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("date"), startDate);
+    }
+
+    public static Specification<Transaction> isBeforeDate(LocalDate endDate) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("date"), endDate);
+    }
 }
