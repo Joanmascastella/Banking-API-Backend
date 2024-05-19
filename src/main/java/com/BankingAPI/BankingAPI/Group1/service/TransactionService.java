@@ -142,60 +142,54 @@ public class TransactionService {
 
 
 
-    public TransactionGETPOSTResponseDTO processWithdrawal(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException, IllegalStateException {
+    public TransactionGETPOSTResponseDTO processWithdrawal(TransferMoneyPOSTResponse transactionDTO) throws Exception {
         Users user = beanFactory.getCurrentUser();
-        Account account = validateAccount(transactionDTO.userId());
+        Account account = getAccount(transactionDTO.fromAccount());
 
         checkAndUpdateDailyLimit(user, transactionDTO.amount());
         updateAccountBalance(account, -transactionDTO.amount());
 
-        Transaction transaction = new Transaction(user, account.getIBAN(), "ATM", transactionDTO.amount(), transactionDTO.date());
+        Transaction transaction = new Transaction(user, account.getIBAN(), "ATM", transactionDTO.amount(), LocalDate.now());
         transactionRepository.save(transaction);
 
         return new TransactionGETPOSTResponseDTO(
-                account.getIBAN(),
-                "ATM",
-                transactionDTO.amount(),
-                transactionDTO.date(),
+                transaction.getFromAccount(),
+                transaction.getToAccount(),
+                transaction.getAmount(),
+                transaction.getDate(),
                 user.getId()
         );
     }
 
-    private void updateAccountBalance(Account account, double amountChange) throws IllegalStateException {
+    private void updateAccountBalance(Account account, double amountChange) throws Exception {
         double newBalance = account.getBalance() + amountChange;
         if (newBalance < account.getAbsoluteLimit()) {
-            throw new IllegalStateException("Withdrawal exceeds absolute limit");
+            throw new Exception("Withdrawal exceeds absolute limit");
         }
         account.setBalance(newBalance);
         accountService.save(account);
     }
-    private Account validateAccount(Long userId) throws IllegalArgumentException {
-        Account account = accountService.findById(userId);
-        if (account == null) {
-            throw new IllegalArgumentException("Account not found");
-        }
-        return account;
-    }
+
     private void checkAndUpdateDailyLimit(Users user, double amount) throws IllegalStateException {
         if (!userService.checkAndUpdateDailyLimit(user, amount)) {
             throw new IllegalStateException("Daily limit exceeded");
         }
     }
 
-    public TransactionGETPOSTResponseDTO processDeposit(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException {
+    public TransactionGETPOSTResponseDTO processDeposit(TransferMoneyPOSTResponse transactionDTO) throws Exception {
         Users user = beanFactory.getCurrentUser();
-        Account account = validateAccount(transactionDTO.userId());
+        Account account = getAccount(transactionDTO.toAccount());
 
         updateAccountBalance(account, transactionDTO.amount());
 
-        Transaction transaction = new Transaction(user, "ATM", account.getIBAN(), transactionDTO.amount(), transactionDTO.date());
+        Transaction transaction = new Transaction(user, "ATM", account.getIBAN(), transactionDTO.amount(), LocalDate.now());
         transactionRepository.save(transaction);
 
         return new TransactionGETPOSTResponseDTO(
-                "ATM",
-                account.getIBAN(),
-                transactionDTO.amount(),
-                transactionDTO.date(),
+                transaction.getFromAccount(),
+                transaction.getToAccount(),
+                transaction.getAmount(),
+                transaction.getDate(),
                 user.getId()
         );
     }
