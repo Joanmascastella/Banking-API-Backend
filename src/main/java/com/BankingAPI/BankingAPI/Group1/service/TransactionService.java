@@ -164,15 +164,15 @@ public class TransactionService {
     private void updateAccountBalance(Account account, double amountChange) throws Exception {
         double newBalance = account.getBalance() + amountChange;
         if (newBalance < account.getAbsoluteLimit()) {
-            throw new Exception("Withdrawal exceeds absolute limit");
+            throw new Exception("Transaction exceeds absolute limit");
         }
         account.setBalance(newBalance);
         accountService.save(account);
     }
 
-    private void checkAndUpdateDailyLimit(Users user, double amount) throws IllegalStateException {
+    private void checkAndUpdateDailyLimit(Users user, double amount) throws Exception {
         if (!userService.checkAndUpdateDailyLimit(user, amount)) {
-            throw new IllegalStateException("Daily limit exceeded");
+            throw new Exception("Daily limit exceeded");
         }
     }
 

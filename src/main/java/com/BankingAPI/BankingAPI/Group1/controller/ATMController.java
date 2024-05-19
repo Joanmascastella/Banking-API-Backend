@@ -51,16 +51,18 @@ public class ATMController {
     }
     @PostMapping("/deposits")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
-    public ResponseEntity<TransactionGETPOSTResponseDTO> deposit(@RequestBody TransferMoneyPOSTResponse transaction) {
+    public ResponseEntity<Object> deposit(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
-            TransactionGETPOSTResponseDTO completedTransaction = transactionService.processDeposit(transaction);
-            return ResponseEntity.status(201).body(completedTransaction);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(422).body(null);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(null);
+            TransactionGETPOSTResponseDTO result = transactionService.processDeposit(transactionDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            } else if (e.getMessage().contains("daily limit") || e.getMessage().contains("exceeds absolute limit")) {
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            }
         }
     }
 }
