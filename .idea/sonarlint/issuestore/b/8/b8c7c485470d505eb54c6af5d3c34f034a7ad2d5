@@ -1,0 +1,14 @@
+
+œ	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(ƒÛÞ®8óò‚‰ø1J$ce083394-0ea1-419f-b99d-d2102d3be64f
+…
+java:S6813"BRemove this field injection and use constructor injection instead.(êæÄÞ8ÿò‚‰ø1J$1872bb91-c9c9-48ef-929e-20f4e2b7dabe
+…
+java:S6813"BRemove this field injection and use constructor injection instead.(êæÄÞ8ÿò‚‰ø1J$05331b35-f106-484e-81e9-b935fcb236de
+’
+java:S1128"ORemove this unused import 'com.BankingAPI.BankingAPI.Group1.model.Transaction'.(àÎ™ˆ8¼¿”Žù1J$5027bf93-df6b-41f3-9f6b-ce936b6104ba
+‘
+java:S1128"IRemove this unused import 'com.BankingAPI.BankingAPI.Group1.model.Users'.(ß‚™Óþÿÿÿÿ8¼¿”Žù1J$9fd85fa3-2b4a-412a-b5c7-2fd51d6eebdd
+—
+java:S1128"TRemove this unused import 'com.BankingAPI.BankingAPI.Group1.service.AccountService'.(ý¦„ò8¼¿”Žù1J$6b08e498-781c-4c23-91f4-5e304f2831ea
+}
+java:S1128"5Remove this unused import 'jakarta.validation.Valid'.(ÀãÅ”ûÿÿÿÿ8¼¿”Žù1J$6b9081ed-e287-4420-9269-f23905d60a72

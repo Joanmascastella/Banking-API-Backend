@@ -1,0 +1,7 @@
+
+ˆ
+java:S1192"GDefine a constant instead of duplicating this literal "amount" 3 times.(ˆÿ‡õüÿÿÿÿJ$c03ca6d5-f0c7-4d34-adb0-fa271042eb5d
+Œ	java:S117	"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ü–…§J$65ece235-c418-470d-a8fb-f35792dc6a5b
+•	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(ÙõùÒJ$ca50a2af-10f1-4096-a19c-be36d26a92ef
+{
+java:S1118":Add a private constructor to hide the implicit public one.(¼¢£ÛøÿÿÿÿJ$543fd239-811c-4ff7-8565-f4564351db2c
