@@ -146,7 +146,7 @@ public class AccountService {
 
     public List<AccountGETPOSTResponseDTO> getAllCustomerAccounts() throws Exception{
 
-       // beanFactory.validateAuthentication(); //I commented it out because it led to a bad request error
+        beanFactory.validateAuthentication(); //I commented it out because it led to a bad request error
 
         List<Account> accounts = accountRepository.findAll();
         return accounts.stream()
@@ -199,7 +199,7 @@ public class AccountService {
 
 
     public List<AccountGETPOSTResponseDTO> findByAbsoluteLimit(double absoluteLimit) throws Exception {
-      //  beanFactory.validateAuthentication();
+        beanFactory.validateAuthentication();
         List<Account> accounts = accountRepository.findByAbsoluteLimit(absoluteLimit);
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(
