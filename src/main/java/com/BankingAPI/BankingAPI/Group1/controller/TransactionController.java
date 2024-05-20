@@ -4,7 +4,6 @@ import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +90,7 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<Object> getAllTransactions() {
         try {
-            return ResponseEntity.status(200).body(transactionService.allTransactions());
+            return ResponseEntity.status(200).body(transactionService.findAllTransactions());
         }
         catch (Exception exception) {
             if (exception instanceof BadCredentialsException){
@@ -106,10 +104,10 @@ public class TransactionController {
     }
 
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<Object> getTransactionsOfCustomerByEmployee(@PathVariable long customerId) {
+    @GetMapping("/customer/{userId}")
+    public ResponseEntity<Object> getTransactionsOfCustomerByEmployee(@PathVariable("userId") long userId) {
         try {
-            return ResponseEntity.status(200).body(transactionService.getTransactionsByUserId(customerId));
+            return ResponseEntity.status(200).body(transactionService.getTransactionsByUserId(userId));
         }
         catch (Exception exception) {
             if (exception instanceof BadCredentialsException){
