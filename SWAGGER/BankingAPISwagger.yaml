@@ -674,43 +674,6 @@ paths:
       security:
         - bearerAuth: []
         
-
-        
-  /transactions/ATM/{userId}:
-    get:
-      tags:
-        - Employee
-      summary: Get all transactions from the ATM by user ID
-      description: This can only be done by the employee.
-      operationId: getATMTransactionsByUserId
-      parameters:
-        - name: userId
-          in: path
-          description: ID of user which initialized the transactions
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Transaction"
-        '404':
-          description: User not found
-        '403':
-          description: User must be of role employee
-        '401':
-          description: User is not authorized
-        "400":
-          description: Invalid status value.
-      security:
-        - bearerAuth: []
-        
         
   
   /transactions/ATM/withdrawals/{userId}:
@@ -947,15 +910,17 @@ paths:
 
 
 
-  /transactions/customer/{customerId}:
+  /transactions/customer/{userId}:
     get:
       tags:
         - Employee
-      summary: Get transaction history for a specific customer
-      description: Retrieve transaction history for a specified customer. Access restricted to employees.
+      summary: Get detailed transaction history for a specific customer 
+      description: Retrieve detailed transaction history for a specified customer. Access restricted to employees.
+      operationId: getTransactionsOfCustomerByEmployee
+
       parameters:
         - in: path
-          name: customerId
+          name: userId
           required: true
           schema:
             type: string
