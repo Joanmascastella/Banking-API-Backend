@@ -251,7 +251,7 @@ public class TransactionService {
     }
 
 
-    public List<TransactionGETPOSTResponseDTO> allTransactions() throws Exception {
+    public List<TransactionGETPOSTResponseDTO> findAllTransactions() throws Exception {
         beanFactory.validateAuthentication();
         List<Transaction> transactions = transactionRepository.findAll();
             return transactions.stream()
