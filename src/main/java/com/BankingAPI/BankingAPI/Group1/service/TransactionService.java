@@ -156,60 +156,54 @@ public class TransactionService {
 
 
 
-    public TransactionGETPOSTResponseDTO processWithdrawal(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException, IllegalStateException {
+    public TransactionGETPOSTResponseDTO processWithdrawal(TransferMoneyPOSTResponse transactionDTO) throws Exception {
         Users user = beanFactory.getCurrentUser();
-        Account account = validateAccount(transactionDTO.userId());
+        Account account = getAccount(transactionDTO.fromAccount());
 
         checkAndUpdateDailyLimit(user, transactionDTO.amount());
         updateAccountBalance(account, -transactionDTO.amount());
 
-        Transaction transaction = new Transaction(user, account.getIBAN(), "ATM", transactionDTO.amount(), transactionDTO.date());
+        Transaction transaction = new Transaction(user, account.getIBAN(), "ATM", transactionDTO.amount(), LocalDate.now());
         transactionRepository.save(transaction);
 
         return new TransactionGETPOSTResponseDTO(
-                account.getIBAN(),
-                "ATM",
-                transactionDTO.amount(),
-                transactionDTO.date(),
+                transaction.getFromAccount(),
+                transaction.getToAccount(),
+                transaction.getAmount(),
+                transaction.getDate(),
                 user.getId()
         );
     }
 
-    private void updateAccountBalance(Account account, double amountChange) throws IllegalStateException {
+    private void updateAccountBalance(Account account, double amountChange) throws Exception {
         double newBalance = account.getBalance() + amountChange;
         if (newBalance < account.getAbsoluteLimit()) {
-            throw new IllegalStateException("Withdrawal exceeds absolute limit");
+            throw new Exception("Transaction exceeds absolute limit");
         }
         account.setBalance(newBalance);
         accountService.save(account);
     }
-    private Account validateAccount(Long userId) throws IllegalArgumentException {
-        Account account = accountService.findById(userId);
-        if (account == null) {
-            throw new IllegalArgumentException("Account not found");
-        }
-        return account;
-    }
-    private void checkAndUpdateDailyLimit(Users user, double amount) throws IllegalStateException {
+
+    private void checkAndUpdateDailyLimit(Users user, double amount) throws Exception {
         if (!userService.checkAndUpdateDailyLimit(user, amount)) {
-            throw new IllegalStateException("Daily limit exceeded");
+            throw new Exception("Daily limit exceeded");
         }
     }
 
-    public TransactionGETPOSTResponseDTO processDeposit(TransactionGETPOSTResponseDTO transactionDTO) throws IllegalArgumentException {
+    public TransactionGETPOSTResponseDTO processDeposit(TransferMoneyPOSTResponse transactionDTO) throws Exception {
         Users user = beanFactory.getCurrentUser();
-        Account account = validateAccount(transactionDTO.userId());
+        Account account = getAccount(transactionDTO.toAccount());
 
         updateAccountBalance(account, transactionDTO.amount());
 
-        Transaction transaction = new Transaction(user, "ATM", account.getIBAN(), transactionDTO.amount(), transactionDTO.date());
+        Transaction transaction = new Transaction(user, "ATM", account.getIBAN(), transactionDTO.amount(), LocalDate.now());
         transactionRepository.save(transaction);
 
         return new TransactionGETPOSTResponseDTO(
-                "ATM",
-                account.getIBAN(),
-                transactionDTO.amount(),
-                transactionDTO.date(),
+                transaction.getFromAccount(),
+                transaction.getToAccount(),
+                transaction.getAmount(),
+                transaction.getDate(),
                 user.getId()
         );
     }
@@ -232,8 +226,24 @@ public class TransactionService {
         if (startDate != null && endDate != null) {
             spec = spec.and(TransactionSpecification.isBetweenDates(startDate, endDate));
         }
+        if (startDate != null) {
+            spec = spec.and(TransactionSpecification.isAfterDate(startDate));
+        }
+        if (endDate != null) {
+            spec = spec.and(TransactionSpecification.isBeforeDate(endDate));
+        }
+        System.out.println("Filtering transactions with parameters:");
+        System.out.println("IBAN: " + IBAN);
+        System.out.println("Amount: " + amount);
+        System.out.println("Amount Greater: " + amountGreater);
+        System.out.println("Amount Less: " + amountLess);
+        System.out.println("Start Date: " + startDate);
+        System.out.println("End Date: " + endDate);
 
-        return transactionRepository.findAll(spec);
+        List<Transaction> transactions = transactionRepository.findAll(spec);
+
+        System.out.println("Found transactions: " + transactions.size());
+        return transactions;
     }
     public void save(Transaction transaction) {
         transactionRepository.save(transaction);

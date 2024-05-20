@@ -62,7 +62,7 @@ public class UserService {
     }
 
     public  Users findByEmail(String email) {
-        return userRepository.findUserByEmail(email).orElse(null);
+        return userRepository.findMemberByEmail(email).orElse(null);
     }
 
 
@@ -98,7 +98,7 @@ public class UserService {
 
 
     public boolean emailExists(String email) {
-        return userRepository.findUserByEmail(email).isPresent();
+        return userRepository.findMemberByEmail(email).isPresent();
     }
 
     public FindIbanResponseDTO getIbanByFirstNameLastName(FindIbanRequestDTO request) {
@@ -120,6 +120,15 @@ public class UserService {
             return jwtTokenProvider.createToken(user.getId(), user.getUserType(), user.isApproved());
         } else {
             throw new CustomAuthenticationException("Invalid username/password");
+        }
+    }
+    public String atmLogin(String email, String password) throws Exception {
+        Users user = this.userRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new AuthenticationException("User not found"));
+        if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
+            return jwtTokenProvider.createToken(user.getId(), user.getUserType(), user.isApproved());
+        } else {
+            throw new AuthenticationException("Invalid username/password");
         }
     }
 

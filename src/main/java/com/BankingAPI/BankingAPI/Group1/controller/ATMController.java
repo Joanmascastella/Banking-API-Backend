@@ -1,8 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
-import com.BankingAPI.BankingAPI.Group1.model.dto.ATMLoginDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
@@ -26,47 +25,44 @@ public class ATMController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/login")
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
-    public ResponseEntity<String> login(@RequestBody ATMLoginDTO loginDTO) {
-        try {
-            Users user = userService.findByEmail(loginDTO.email());
-            if (user != null && user.getPassword().equals(loginDTO.password())) {
-                return ResponseEntity.ok("Login successful");
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Login request failed: " + e.getMessage());
-        }
+
+    @PostMapping(value = "/login")
+    public Object login(@RequestBody ATMLoginDTO dto) throws Exception {
+        return new TokenDTO(
+                userService.atmLogin(dto.email(), dto.password())
+        );
     }
 
     @PostMapping("/withdrawals")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
-    public ResponseEntity<TransactionGETPOSTResponseDTO> withdraw(@Valid @RequestBody TransactionGETPOSTResponseDTO transaction) {
+    public ResponseEntity<Object> withdraw(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
-            TransactionGETPOSTResponseDTO completedTransaction = transactionService.processWithdrawal(transaction);
-            return ResponseEntity.status(201).body(completedTransaction);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(422).body(null);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(null);
+            TransactionGETPOSTResponseDTO result = transactionService.processWithdrawal(transactionDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            } else if (e.getMessage().contains("daily limit") || e.getMessage().contains("exceeds absolute limit")) {
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            }
         }
     }
     @PostMapping("/deposits")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
-    public ResponseEntity<TransactionGETPOSTResponseDTO> deposit(@RequestBody TransactionGETPOSTResponseDTO transaction) {
+    public ResponseEntity<Object> deposit(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
-            TransactionGETPOSTResponseDTO completedTransaction = transactionService.processDeposit(transaction);
-            return ResponseEntity.status(201).body(completedTransaction);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(422).body(null);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(null);
+            TransactionGETPOSTResponseDTO result = transactionService.processDeposit(transactionDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            } else if (e.getMessage().contains("daily limit") || e.getMessage().contains("exceeds absolute limit")) {
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            }
         }
     }
 }
