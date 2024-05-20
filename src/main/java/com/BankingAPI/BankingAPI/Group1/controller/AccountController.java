@@ -13,8 +13,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
-import java.util.Collections;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/accounts")
@@ -87,45 +85,6 @@ public class AccountController {
         }
     }
 
-
-    @GetMapping("/savings/{userId}")
-    @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getSavingsAccountsOfUser(@PathVariable long userId) {
-        try {
-            List<Object> accounts = Collections.singletonList(accountService.findSavingsAccountsByUserId(userId));
-            return ResponseEntity.status(HttpStatus.OK).body(accounts);
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            } else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            } else if (exception instanceof IllegalArgumentException) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-    @GetMapping("/checking/{userId}")
-    @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getCheckingAccountsOfUser(@PathVariable long userId) {
-        try {
-            List<Object> accounts = Collections.singletonList(accountService.findCheckingAccountsByUserId(userId));
-            return ResponseEntity.status(HttpStatus.OK).body(accounts);
-        }
-         catch (Exception exception) {
-                if (exception instanceof BadCredentialsException) {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-                } else if (exception instanceof AuthenticationException) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-                } else if (exception instanceof IllegalArgumentException) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-                }
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
-    }
-
     @GetMapping("/byAbsoluteLimit")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> getAccountsByAbsoluteLimit(@RequestParam(required = true) double absoluteLimit) {
@@ -147,8 +106,7 @@ public class AccountController {
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity getInactiveAccounts() {
         try {
-            List<Object> accounts = Collections.singletonList(accountService.findByInactiveTag());
-            return ResponseEntity.status(HttpStatus.OK).body(accounts);
+            return ResponseEntity.status(HttpStatus.OK).body(accountService.findByInactiveTag());
         }
         catch (Exception exception) {
             if (exception instanceof BadCredentialsException){

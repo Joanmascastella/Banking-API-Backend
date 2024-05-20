@@ -17,16 +17,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Query("SELECT a.IBAN FROM Account a JOIN a.user u WHERE u.firstName = :firstName AND u.lastName = :lastName AND a.accountType LIKE 'CHECKING'")
     Optional<String> findIbanByNames(String firstName, String lastName);
-
     boolean existsByIBAN(String iban);
-
-    //Find all savings accounts of a user which are linked to its user id
-    @Query("SELECT a FROM Account a WHERE a.user.id = :userId AND a.accountType LIKE 'SAVINGS'")
-    List<Account> findSavingsAccountsByUserId(@Param("userId") long userId);
-
-    //Find all checking accounts of a user which are linked to its user id
-    @Query("SELECT a FROM Account a WHERE a.user.id = :userId AND a.accountType LIKE 'CHECKING'")
-    List<Account> findCheckingAccountsByUserId(@Param("userId") long userId);
 
     //Find all accounts with an absolute limit less than or equal to a specific limit
     @Query("SELECT a FROM Account a  WHERE a.absoluteLimit <= :absoluteLimit")
