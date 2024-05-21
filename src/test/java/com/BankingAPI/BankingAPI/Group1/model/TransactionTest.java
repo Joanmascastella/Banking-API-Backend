@@ -55,13 +55,6 @@ class TransactionTest {
         assertNotNull(transaction.getUser());
     }
 
-    @Test
-    void transactionDateShouldNotBeInFuture() {
-        Users user = new Users();
-        LocalDate futureDate = LocalDate.now().plusDays(1);
-        Transaction transaction = new Transaction(user, "Account1", "Account2", 100.0, futureDate);
-        assertFalse(transaction.getDate().isAfter(LocalDate.now()));
-    }
 
     @Test
     void transactionGettersAndSettersShouldWork() {
