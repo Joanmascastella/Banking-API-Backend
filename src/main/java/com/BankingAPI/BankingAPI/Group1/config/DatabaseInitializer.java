@@ -46,11 +46,11 @@ public class DatabaseInitializer implements ApplicationRunner {
         Transaction newTransaction = new Transaction(newUsers, "123456789", "123456789", 2000.0, LocalDate.now());
         transactionRepository.save(newTransaction);
 
-        Account newAccount = new Account(newUsers, "DE89370400440532013000", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
-        Account newAccounts = new Account(newUsers, "DE89370400440532013012", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
+        Account newAccount = new Account(newUsers, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
+        Account newAccounts = new Account(newUsers, "NL89INHO0044053203", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
 
-        Account joanAccount = new Account(joan, "DE89370400440532013022", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
-        Account joanAccounts = new Account(joan, "DE89370400440532013042", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
+        Account joanAccount = new Account(joan, "NL89INHO0044053201", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
+        Account joanAccounts = new Account(joan, "NL89INHO004523271", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
 
         accountRepository.save(joanAccount);
         accountRepository.save(joanAccounts);

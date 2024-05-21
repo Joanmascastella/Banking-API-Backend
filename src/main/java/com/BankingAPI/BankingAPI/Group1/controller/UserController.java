@@ -60,25 +60,24 @@ public class UserController {
     }
 
 
-
-
     @GetMapping("/iban")
-    @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<Object> getIbanByFirstNameLastName(
-            @RequestParam String firstName,
-            @RequestParam String lastName) {
+    @PreAuthorize("hasAnyRole('CUSTOMER','EMPLOYEE')")
+    public ResponseEntity<Object> getIbanByFirstNameLastName(@RequestParam String firstName, @RequestParam String lastName) {
+
         try {
             FindIbanRequestDTO findIban = new FindIbanRequestDTO(firstName, lastName);
             FindIbanResponseDTO iban = userService.getIbanByFirstNameLastName(findIban);
             if (iban != null) {
                 return ResponseEntity.ok(iban);
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("IBAN not found for given name.");
             }
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/noncustomers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")

@@ -4,7 +4,6 @@ import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,22 +34,31 @@ public class TransactionController {
     public ResponseEntity<Object> transferToOtherCustomer(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
             TransactionGETPOSTResponseDTO result = transactionService.transferToOtherCustomer(transactionDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Transfer successful");
+            response.put("transaction", result);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            if (e.getMessage().contains("not found")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            } else if (e.getMessage().contains("Insufficient funds") || e.getMessage().contains("exceeds daily limit")) {
-                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
-            } else if (e.getMessage().contains("CHECKING accounts")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Both accounts must be of type CHECKING.");
+            String errorMessage = e.getMessage();
+            if (errorMessage.contains("not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", errorMessage));
+            } else if (errorMessage.contains("Insufficient funds") || errorMessage.contains("exceeds daily limit")) {
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("message", errorMessage));
+            } else if (errorMessage.contains("CHECKING accounts") || errorMessage.contains("Cannot transfer money between savings accounts.")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", errorMessage));
+            } else if (errorMessage.contains("Both accounts cannot belong to the same user for this operation.")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", errorMessage));
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", errorMessage));
             }
         }
     }
 
+
+
     @GetMapping("/{userId}/history")
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
+    //@PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')") I commented it out because I had to do the detail view for employee
     public ResponseEntity<Object> getTransactionsByUserId(@PathVariable Long userId) {
         try {
             return ResponseEntity.ok(transactionService.getTransactionsByUserId(userId));
@@ -57,6 +66,8 @@ public class TransactionController {
             return ResponseEntity.badRequest().body("Error retrieving transactions for user: " + userId);
         }
     }
+
+
     @GetMapping("/search")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<List<TransactionGETPOSTResponseDTO>> searchTransactions(
@@ -79,7 +90,7 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<Object> getAllTransactions() {
         try {
-            return ResponseEntity.status(200).body(transactionService.allTransactions());
+            return ResponseEntity.status(200).body(transactionService.findAllTransactions());
         }
         catch (Exception exception) {
             if (exception instanceof BadCredentialsException){
@@ -91,6 +102,24 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    @GetMapping("/customer/{userId}")
+    public ResponseEntity<Object> getTransactionsOfCustomerByEmployee(@PathVariable("userId") long userId) {
+        try {
+            return ResponseEntity.status(200).body(transactionService.getTransactionsByUserId(userId));
+        }
+        catch (Exception exception) {
+            if (exception instanceof BadCredentialsException){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            else if (exception instanceof AuthenticationException) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
 
 
     @GetMapping("/byCustomers")
@@ -148,33 +177,12 @@ public class TransactionController {
 
 
 
-    @GetMapping("/ATM/{userId}")
-    @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getATMTransactionsByUserId(@PathVariable long userId) {
-        try {
-            List<Object> transactions = Collections.singletonList(transactionService.findATMTransactionsByUserId(userId));
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            } else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            } else if (exception instanceof IllegalArgumentException) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-
 
     @GetMapping("/ATM/withdrawals/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getATMWithdrawalsByUserId(@PathVariable long userId) {
+    public ResponseEntity<Object> getATMWithdrawalsByUserId(@PathVariable long userId) {
         try {
-            List<Object> transactions = Collections.singletonList(transactionService.findATMWithdrawalsByUserId(userId));
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findATMWithdrawalsByUserId(userId));
         }
         catch (Exception exception) {
             if (exception instanceof BadCredentialsException) {
@@ -187,14 +195,14 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
 
 
     @GetMapping("/ATM/deposits/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getATMDepositsByUserId(@PathVariable long userId) {
+    public ResponseEntity<Object> getATMDepositsByUserId(@PathVariable long userId) {
         try {
-            List<Object> transactions = Collections.singletonList(transactionService.findATMDepositsByUserId(userId));
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findATMDepositsByUserId(userId));
         }
         catch (Exception exception) {
             if (exception instanceof BadCredentialsException) {
@@ -262,10 +270,9 @@ public class TransactionController {
 
     @GetMapping("/online/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getOnlineTransactionsByUserId(@PathVariable long userId) {
+    public ResponseEntity<Object> getOnlineTransactionsByUserId(@PathVariable long userId) {
         try {
-            List<Object> transactions = Collections.singletonList(transactionService.findOnlineTransactionsByUserId(userId));
-            return ResponseEntity.status(HttpStatus.OK).body(transactions);
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactionsByUserId(userId));
         }
         catch (Exception exception) {
             if (exception instanceof BadCredentialsException) {

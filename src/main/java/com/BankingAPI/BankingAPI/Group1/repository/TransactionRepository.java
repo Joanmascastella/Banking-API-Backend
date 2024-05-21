@@ -27,10 +27,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     @Query("SELECT t FROM Transaction t WHERE t.fromAccount LIKE 'ATM' OR t.toAccount LIKE 'ATM'")
     List<Transaction> findATMTransactions();
 
-    //Find all ATM transactions for a specific user by user ID
-    //Refactored query to use the 'user' field of Transaction table instead of the field userId after refactoring the Transaction model
-    @Query("SELECT t FROM Transaction t WHERE t.fromAccount LIKE 'ATM' OR t.toAccount LIKE 'ATM' AND t.user.id = :userId")
-    List<Transaction> findATMTransactionsByUserId(@Param("userId") long userId);
 
     //Find ATM withdrawals for a specific user by user ID
     @Query("SELECT t FROM Transaction t WHERE t.fromAccount LIKE 'ATM' AND t.user.id = :userId")

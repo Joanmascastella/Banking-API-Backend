@@ -105,9 +105,9 @@ public class AccountService {
             }
             String firstDigits = String.format("%02d", new Random().nextInt(100));
 
-            String lastDigits = String.format("%010d", new Random().nextInt(1000000000));
+            String lastDigits = String.format("%09d", new Random().nextInt(1000000000));
 
-            iban = "NL" + firstDigits + "INH00" + lastDigits;
+            iban = "NL" + firstDigits + "INHO0" + lastDigits;
 
         } while(ibanExists(iban));
 
@@ -145,9 +145,7 @@ public class AccountService {
     }
 
     public List<AccountGETPOSTResponseDTO> getAllCustomerAccounts() throws Exception{
-
-       // beanFactory.validateAuthentication(); //I commented it out because it led to a bad request error
-
+        beanFactory.validateAuthentication(); //I commented it out because it led to a bad request error
         List<Account> accounts = accountRepository.findAll();
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(
@@ -163,43 +161,8 @@ public class AccountService {
     }
 
 
-    public List<AccountGETPOSTResponseDTO> findSavingsAccountsByUserId(long userId) throws Exception {
-        beanFactory.validateAuthentication();
-        List<Account> accounts = accountRepository.findSavingsAccountsByUserId(userId);
-        return accounts.stream()
-                .map(account -> new AccountGETPOSTResponseDTO(
-                        account.getUser().getId(),
-                        account.getIBAN(),
-                        account.getCurrency(),
-                        account.getAccountType(),
-                        account.isActive(),
-                        account.getBalance(),
-                        account.getAbsoluteLimit()
-                ))
-                .collect(Collectors.toList());
-    }
-
-
-
-    public List<AccountGETPOSTResponseDTO> findCheckingAccountsByUserId(long userId) throws Exception {
-        beanFactory.validateAuthentication();
-        List<Account> accounts = accountRepository.findCheckingAccountsByUserId(userId);
-        return accounts.stream()
-                .map(account -> new AccountGETPOSTResponseDTO(
-                        account.getUser().getId(),
-                        account.getIBAN(),
-                        account.getCurrency(),
-                        account.getAccountType(),
-                        account.isActive(),
-                        account.getBalance(),
-                        account.getAbsoluteLimit()
-                ))
-                .collect(Collectors.toList());
-    }
-
-
     public List<AccountGETPOSTResponseDTO> findByAbsoluteLimit(double absoluteLimit) throws Exception {
-      //  beanFactory.validateAuthentication();
+        beanFactory.validateAuthentication();
         List<Account> accounts = accountRepository.findByAbsoluteLimit(absoluteLimit);
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(
