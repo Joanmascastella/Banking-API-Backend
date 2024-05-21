@@ -119,13 +119,13 @@ public class UserService {
             throw new AuthenticationException("Invalid username/password");
         }
     }
-    public String atmLogin(String email, String password) throws Exception {
+    public String atmLogin(String email, String password) throws CustomAuthenticationException {
         Users user = this.userRepository.findMemberByEmail(email)
-                .orElseThrow(() -> new AuthenticationException("User not found"));
+                .orElseThrow(() -> new CustomAuthenticationException("User not found"));
         if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
             return jwtTokenProvider.createToken(user.getId(), user.getUserType(), user.isApproved());
         } else {
-            throw new AuthenticationException("Invalid username/password");
+            throw new CustomAuthenticationException("Invalid email/password");
         }
     }
 

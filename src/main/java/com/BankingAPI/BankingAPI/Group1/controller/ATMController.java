@@ -1,4 +1,5 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
+import com.BankingAPI.BankingAPI.Group1.exception.CustomAuthenticationException;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.*;
@@ -27,10 +28,13 @@ public class ATMController {
 
 
     @PostMapping(value = "/login")
-    public Object login(@RequestBody ATMLoginDTO dto) throws Exception {
-        return new TokenDTO(
-                userService.atmLogin(dto.email(), dto.password())
-        );
+    public ResponseEntity<Object> login(@RequestBody ATMLoginDTO dto) {
+        try {
+            String token = userService.atmLogin(dto.email(), dto.password());
+            return ResponseEntity.ok(new TokenDTO(token));
+        } catch (CustomAuthenticationException e) {
+            return ResponseEntity.status(401).body(e.getMessage());
+        }
     }
 
     @PostMapping("/withdrawals")
