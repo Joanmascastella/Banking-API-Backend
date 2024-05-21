@@ -18,6 +18,5 @@ RUN ./mvnw clean install -U
 
 # Expose the application port
 EXPOSE 8080
-
 # Run the Spring Boot application
 ENTRYPOINT ["./mvnw", "spring-boot:run"]
