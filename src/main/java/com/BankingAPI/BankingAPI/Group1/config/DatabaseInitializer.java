@@ -55,16 +55,16 @@ public class DatabaseInitializer implements ApplicationRunner {
         accountRepository.save(newAccount);
         accountRepository.save(newAccounts);
 
-        Transaction ATMDeposit = new Transaction(newUsers, newAccount.getId().toString(), "ATM", 2000.0, LocalDate.now());
+        Transaction ATMDeposit = new Transaction(newUsers, newAccount.getIBAN().toString(), "ATM", 2000.0, LocalDate.now());
         transactionRepository.save(ATMDeposit);
 
-        Transaction ATMWithdrawal = new Transaction(newUsers, "ATM", newAccount.getId().toString(), 2800.0, LocalDate.now());
+        Transaction ATMWithdrawal = new Transaction(newUsers, "ATM", newAccount.getIBAN().toString(), 2800.0, LocalDate.now());
         transactionRepository.save(ATMWithdrawal);
 
-        Transaction onlineTransferByCustomer = new Transaction(newUsers, newAccount.getId().toString(), newAccounts.getId().toString(), 2800.0, LocalDate.now());
+        Transaction onlineTransferByCustomer = new Transaction(newUsers, newAccount.getIBAN().toString(), newAccounts.getIBAN().toString(), 2800.0, LocalDate.now());
         transactionRepository.save(onlineTransferByCustomer);
 
-        Transaction onlineTransferByEmployee = new Transaction(newEmployee, newAccount.getId().toString(), joanAccount.getId().toString(), 5000.0, LocalDate.now());
+        Transaction onlineTransferByEmployee = new Transaction(newEmployee, newAccount.getIBAN().toString(), joanAccount.getIBAN().toString(), 5000.0, LocalDate.now());
         transactionRepository.save(onlineTransferByEmployee);
 
     }
