@@ -30,7 +30,8 @@ public class DatabaseInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-      this.initDatabase();
+        this.initDatabase();
+
     }
 
     private void initDatabase() {
@@ -43,9 +44,6 @@ public class DatabaseInitializer implements ApplicationRunner {
         userRepository.save(joan);
         userRepository.save(newEmployee);
 
-        Transaction newTransaction = new Transaction(newUsers, "123456789", "123456789", 2000.0, LocalDate.now());
-        transactionRepository.save(newTransaction);
-
         Account newAccount = new Account(newUsers, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
         Account newAccounts = new Account(newUsers, "NL89INHO0044053203", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
 
@@ -56,6 +54,19 @@ public class DatabaseInitializer implements ApplicationRunner {
         accountRepository.save(joanAccounts);
         accountRepository.save(newAccount);
         accountRepository.save(newAccounts);
+
+        Transaction ATMDeposit = new Transaction(newUsers, newAccount.getId().toString(), "ATM", 2000.0, LocalDate.now());
+        transactionRepository.save(ATMDeposit);
+
+        Transaction ATMWithdrawal = new Transaction(newUsers, "ATM", newAccount.getId().toString(), 2800.0, LocalDate.now());
+        transactionRepository.save(ATMWithdrawal);
+
+        Transaction onlineTransferByCustomer = new Transaction(newUsers, newAccount.getId().toString(), newAccounts.getId().toString(), 2800.0, LocalDate.now());
+        transactionRepository.save(onlineTransferByCustomer);
+
+        Transaction onlineTransferByEmployee = new Transaction(newEmployee, newAccount.getId().toString(), joanAccount.getId().toString(), 5000.0, LocalDate.now());
+        transactionRepository.save(onlineTransferByEmployee);
+
     }
 
 
