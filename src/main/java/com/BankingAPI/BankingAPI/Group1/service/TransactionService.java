@@ -63,9 +63,11 @@ public class TransactionService {
         }
 
         validateTransactionLimits(fromAccount, transactionDTO.amount());
-        performTransfer(fromAccount, toAccount, transactionDTO.amount());
 
         Transaction newTransaction = createAndSaveTransaction(user, fromAccount.getIBAN(), toAccount.getIBAN(), transactionDTO.amount());
+
+        performTransfer(fromAccount, toAccount, transactionDTO.amount());
+
         return mapToTransactionResponse(newTransaction);
     }
 
@@ -80,11 +82,13 @@ public class TransactionService {
         validateAccountOwnership(fromAccount, toAccount);
         validateTransactionLimits(fromAccount, transactionDTO.amount());
 
-        performTransfer(fromAccount, toAccount, transactionDTO.amount());
+
         Transaction newTransaction = createAndSaveTransaction(user, fromAccount.getIBAN(), toAccount.getIBAN(), transactionDTO.amount());
+        performTransfer(fromAccount, toAccount, transactionDTO.amount());
 
         return mapToTransactionResponse(newTransaction);
     }
+
     private Account getAccount(String iban) throws Exception {
         Account account = accountRepository.findByIBAN(iban)
                 .orElseThrow(() -> new Exception("Account with IBAN: " + iban + " not found"));
