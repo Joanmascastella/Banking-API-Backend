@@ -214,13 +214,15 @@ public class UserService {
         return new UserGetOneRESPONSE(currentUser.getFirstName(), currentUser.getLastName());
     }
 
-    public void closeAccount(long userId) throws EntityNotFoundException{
+    public void closeAccount(long userId) throws Exception {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        if(user != null && user.isActive()) {
+        if(user.getUserType() == UserType.ROLE_CUSTOMER && user.isActive()) {
             user.setActive(false);
             accountService.closeAccounts(userId);
             userRepository.save(user);
+        } else {
+            throw new Exception("This account can't be closed.");
         }
     }
 }
