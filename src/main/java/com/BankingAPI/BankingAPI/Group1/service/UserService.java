@@ -53,6 +53,7 @@ public class UserService {
                         user.getTotalBalance(),
                         user.getDailyLimit(),
                         user.isApproved(),
+                        user.isActive(),
                         user.getUserType()))
                 .collect(Collectors.toList());
     }
@@ -81,6 +82,7 @@ public class UserService {
                 0.0,
                 0.0,
                 false,
+                true,
                 UserType.ROLE_CUSTOMER,
                 bCryptPasswordEncoder.encode(userDTO.password())
         );
@@ -149,6 +151,7 @@ public class UserService {
                             user.getTotalBalance(),
                             user.getDailyLimit(),
                             user.isApproved(),
+                            user.isActive(),
                             user.getUserType()))
                     .collect(Collectors.toList());
         } catch (Exception e) {
@@ -209,5 +212,15 @@ public class UserService {
     public UserGetOneRESPONSE getUserDetails() {
         Users currentUser = beanFactory.getCurrentUser();
         return new UserGetOneRESPONSE(currentUser.getFirstName(), currentUser.getLastName());
+    }
+
+    public void closeAccount(long userId) throws EntityNotFoundException{
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        if(user != null && user.isActive()) {
+            user.setActive(false);
+            accountService.closeAccounts(userId);
+            userRepository.save(user);
+        }
     }
 }
