@@ -45,9 +45,9 @@ public class DatabaseInitializer implements ApplicationRunner {
         userRepository.save(newEmployee);
 
         Account newAccount = new Account(newUsers, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
-        Account newAccounts = new Account(newUsers, "NL89INHO0044053203", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
+        Account newAccounts = new Account(newUsers, "NL89INHO0044053203", "EUR", AccountType.SAVINGS, true, 8100.0, 0.00);
 
-        Account joanAccount = new Account(joan, "NL89INHO0044053201", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
+        Account joanAccount = new Account(joan, "NL89INHO0044053201", "EUR", AccountType.CHECKING, true, 7800.0, 0.00);
         Account joanAccounts = new Account(joan, "NL89INHO004523271", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
 
         Account janeAccount =  new Account(newUser, "NL89INHO0044053282", "EUR", AccountType.CHECKING, true, 2800.0, 3000.0);
@@ -63,17 +63,29 @@ public class DatabaseInitializer implements ApplicationRunner {
 
 
 
-        Transaction ATMDeposit = new Transaction(newUsers, newAccount.getIBAN().toString(), "ATM", 2000.0, LocalDate.now());
+        Transaction ATMDeposit = new Transaction(newUsers, newAccount.getIBAN().toString(), "ATM", 9500.0, LocalDate.now());
         transactionRepository.save(ATMDeposit);
+
+        Transaction newATMDeposit = new Transaction(newUsers, newAccount.getIBAN().toString(), "ATM", 100, LocalDate.now());
+        transactionRepository.save(newATMDeposit);
 
         Transaction ATMWithdrawal = new Transaction(newUsers, "ATM", newAccount.getIBAN().toString(), 2800.0, LocalDate.now());
         transactionRepository.save(ATMWithdrawal);
 
+        Transaction newATMWithdrawal = new Transaction(newUsers, "ATM", newAccount.getIBAN().toString(), 900.0, LocalDate.now());
+        transactionRepository.save(newATMWithdrawal);
+
         Transaction onlineTransferByCustomer = new Transaction(newUsers, newAccount.getIBAN().toString(), newAccounts.getIBAN().toString(), 2800.0, LocalDate.now());
         transactionRepository.save(onlineTransferByCustomer);
 
-        Transaction onlineTransferByEmployee = new Transaction(newEmployee, newAccount.getIBAN().toString(), joanAccount.getIBAN().toString(), 5000.0, LocalDate.now());
+        Transaction newOnlineTransferByCustomer = new Transaction(newUsers, newAccount.getIBAN().toString(), newAccounts.getIBAN().toString(), 300.0, LocalDate.now());
+        transactionRepository.save(newOnlineTransferByCustomer);
+
+        Transaction onlineTransferByEmployee = new Transaction(newEmployee, newAccount.getIBAN().toString(), joanAccount.getIBAN().toString(), 1000.0, LocalDate.now());
         transactionRepository.save(onlineTransferByEmployee);
+
+        Transaction newOnlineTransferByEmployee = new Transaction(newEmployee, newAccount.getIBAN().toString(), joanAccount.getIBAN().toString(), 1800.0, LocalDate.now());
+        transactionRepository.save(newOnlineTransferByEmployee);
 
     }
 
