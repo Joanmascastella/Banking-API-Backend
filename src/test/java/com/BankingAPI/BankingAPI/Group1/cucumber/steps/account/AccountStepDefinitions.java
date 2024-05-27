@@ -98,7 +98,7 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
         Assertions.assertTrue(actualMessage.contains(message), "Expected message: " + message + ", but got: " + actualMessage);
     }
 
-    @Given("The endpoint {string} is available for method {string}")
+    @Given("The endpoint for accounts {string} is available for method {string}")
     public void theEndpointForIsAvailableForMethod(String endpoint, String method) {
 
         response = restTemplate
@@ -114,6 +114,14 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
         Assertions.assertTrue(options.contains(method.toUpperCase()));
     }
 
+    @Given("I log in as user with role employee")
+    public void iLogInAsUserWithRoleEmployee() throws JsonProcessingException {
+        httpHeaders.clear();
+        httpHeaders.add("Content-Type", "application/json");
+        LoginDTO loginDTO = new LoginDTO(VALID_EMPLOYEE, VALID_EMPLOYEE_PASSWORD);
+        token = getToken(loginDTO);
+    }
+
     @When("I retrieve all accounts")
     public void iRetrieveAllAccounts() throws JsonProcessingException {
 
@@ -125,7 +133,7 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
     }
 
 
-    @Then("I receive http status {int} for get request")
+    @Then("I receive http status {int} for accounts get request")
     public void iGetHttpStatus(int status) {
         int actual = response.getStatusCode().value();
         Assertions.assertEquals(status, actual);
