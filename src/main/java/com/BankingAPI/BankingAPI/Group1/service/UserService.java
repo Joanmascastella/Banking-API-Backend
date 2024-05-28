@@ -38,24 +38,28 @@ public class UserService {
         this.beanFactory = beanFactory;
     }
 
-    public List<UserGETResponseDTO> getAllUsers() {
-        List<Users> users = userRepository.findAll();
-        return users.stream()
-                .map(user -> new UserGETResponseDTO(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getFirstName(),
-                        user.getLastName(),
-                        user.getBSN(),
-                        user.getPhoneNumber(),
-                        user.getBirthDate(),
-                        user.getTotalBalance(),
-                        user.getDailyLimit(),
-                        user.isApproved(),
-                        user.isActive(),
-                        user.getUserType()))
-                .collect(Collectors.toList());
+    public List<UserGETResponseDTO> getAllUsers() throws Exception {
+        try {
+            List<Users> users = userRepository.findAll();
+            return users.stream()
+                    .map(user -> new UserGETResponseDTO(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getEmail(),
+                            user.getFirstName(),
+                            user.getLastName(),
+                            user.getBSN(),
+                            user.getPhoneNumber(),
+                            user.getBirthDate(),
+                            user.getTotalBalance(),
+                            user.getDailyLimit(),
+                            user.isApproved(),
+                            user.isActive(),
+                            user.getUserType()))
+                    .collect(Collectors.toList());
+        } catch( Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 
     public  Users findById(Long userId) {
@@ -197,15 +201,12 @@ public class UserService {
         }
     }
 
-    public void updateDailyLimit(Users user) throws EntityNotFoundException, RuntimeException{
-        try {
-            Users currentUser = userRepository.findById(user.getId())
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
-            currentUser.setDailyLimit(user.getDailyLimit());
-            userRepository.save(currentUser);
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Failed to update daily limit: " + e.getMessage(), e);
-        }
+    public void updateDailyLimit(Users user) throws EntityNotFoundException {
+        Users currentUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
+
+        currentUser.setDailyLimit(user.getDailyLimit());
+        userRepository.save(currentUser);
     }
 
 

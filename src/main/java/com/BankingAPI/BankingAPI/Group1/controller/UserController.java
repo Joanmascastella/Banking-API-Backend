@@ -27,7 +27,7 @@ public class UserController {
         try {
             return ResponseEntity.status(200).body(userService.getAllUsers());
         } catch (Exception ex) {
-            return ResponseEntity.status(404).body("User not found.");
+            return ResponseEntity.status(404).body("Users not found.");
         }
     }
 
@@ -109,8 +109,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 

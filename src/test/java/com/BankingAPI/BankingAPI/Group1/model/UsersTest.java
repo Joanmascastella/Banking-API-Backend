@@ -28,6 +28,7 @@ class UsersTest {
                 1000.0,
                 500.0,
                 true,
+                true,
                 UserType.ROLE_CUSTOMER,
                 "password"
         );
