@@ -1,6 +1,8 @@
 package com.BankingAPI.BankingAPI.Group1.model;
 
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
+import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -92,5 +94,23 @@ class AccountTest {
         Account account = new Account();
         account.setAccountType(AccountType.SAVINGS);
         assertNotNull(account.getAccountType());
+    }
+
+    @Test
+    public void whenConvertAccountEntityToAccountDTO_thenCorrect() {
+
+        ObjectMapper mapper = JsonMapperFactory.createObjectMapper();
+
+        Users user = new Users();
+        Account account = new Account(user, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
+
+        AccountGETPOSTResponseDTO accountDTO = mapper.convertValue(account, AccountGETPOSTResponseDTO.class);
+        assertEquals(account.getId(), accountDTO.id());
+        assertEquals(account.getIBAN(), accountDTO.IBAN());
+        assertEquals(account.getCurrency(), accountDTO.currency());
+        assertEquals(account.getAccountType(), accountDTO.accountType());
+        assertEquals(account.isActive(), accountDTO.isActive());
+        assertEquals(account.getBalance(), accountDTO.balance());
+        assertEquals(account.getAbsoluteLimit(), accountDTO.absoluteLimit());
     }
 }
