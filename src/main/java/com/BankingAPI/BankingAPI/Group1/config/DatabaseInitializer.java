@@ -36,10 +36,12 @@ public class DatabaseInitializer implements ApplicationRunner {
 
     private void initDatabase() {
         Users newUsers = new Users("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("123"));
+        Users noAccount = new Users("janedoae", "jane@doe.com", "Janea", "Doe", "123789456", "0987654321", LocalDate.of(1998, 4, 14), 0, 0, false, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("user"));
         Users newUser = new Users("janedoe", "jane@doe.com", "Jane", "Doe", "123789456", "0987654321", LocalDate.of(1998, 4, 14), 0, 0, false, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("user"));
         Users joan = new Users("joan", "joan.doe@example.com", "Joan", "Doe", "12345673", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("joan"));
         Users newEmployee = new Users("Employee", "employee@example.com", "Em", "Yee", "1234567893", "01234567891", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, UserType.ROLE_EMPLOYEE, bCryptPasswordEncoder.encode("employee"));
         userRepository.save(newUsers);
+        userRepository.save(noAccount);
         userRepository.save(newUser);
         userRepository.save(joan);
         userRepository.save(newEmployee);
