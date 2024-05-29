@@ -156,7 +156,6 @@ public class AccountService {
         List<Account> accounts = accountRepository.findAll();
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(
-                        account.getId(),
                         account.getUser().getId(),
                         account.getIBAN(),
                         account.getCurrency(),
@@ -174,7 +173,6 @@ public class AccountService {
         List<Account> accounts = accountRepository.findByAbsoluteLimit(absoluteLimit);
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(
-                        account.getId(),
                         account.getUser().getId(),
                         account.getIBAN(),
                         account.getCurrency(),
@@ -191,7 +189,6 @@ public class AccountService {
         List<Account> accounts = accountRepository.findByInactiveTag();
         return accounts.stream()
                 .map(account -> new AccountGETPOSTResponseDTO(
-                        account.getId(),
                         account.getUser().getId(),
                         account.getIBAN(),
                         account.getCurrency(),

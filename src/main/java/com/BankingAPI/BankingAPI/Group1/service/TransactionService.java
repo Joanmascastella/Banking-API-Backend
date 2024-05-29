@@ -256,7 +256,6 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findAll();
             return transactions.stream()
                     .map(transaction -> new TransactionGETPOSTResponseDTO(
-                            transaction.getId(),
                             transaction.getFromAccount(),
                             transaction.getToAccount(),
                             transaction.getAmount(),
@@ -271,7 +270,6 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findByUserTypeCustomer();
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getId(),
                         transaction.getFromAccount(),
                         transaction.getToAccount(),
                         transaction.getAmount(),
@@ -286,7 +284,6 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findByUserTypeEmployee();
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getId(),
                         transaction.getFromAccount(),
                         transaction.getToAccount(),
                         transaction.getAmount(),
@@ -303,7 +300,6 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findATMTransactions();
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getId(),
                         transaction.getFromAccount(),
                         transaction.getToAccount(),
                         transaction.getAmount(),
@@ -320,7 +316,6 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findATMWithdrawalsByUserId(idOfUser);
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getId(),
                         transaction.getFromAccount(),
                         transaction.getToAccount(),
                         transaction.getAmount(),
@@ -335,7 +330,6 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findATMDepositsByUserId(idOfUser);
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getId(),
                         transaction.getFromAccount(),
                         transaction.getToAccount(),
                         transaction.getAmount(),
@@ -351,7 +345,6 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findOnlineTransactions();
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getId(),
                         transaction.getFromAccount(),
                         transaction.getToAccount(),
                         transaction.getAmount(),
@@ -366,7 +359,6 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findOnlineTransactionsByEmployees();
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getId(),
                         transaction.getFromAccount(),
                         transaction.getToAccount(),
                         transaction.getAmount(),
@@ -381,7 +373,6 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findOnlineTransactionsByCustomers();
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getId(),
                         transaction.getFromAccount(),
                         transaction.getToAccount(),
                         transaction.getAmount(),
@@ -396,7 +387,6 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findOnlineTransactionsByUserId(idOfUser);
         return transactions.stream()
                 .map(transaction -> new TransactionGETPOSTResponseDTO(
-                        transaction.getId(),
                         transaction.getFromAccount(),
                         transaction.getToAccount(),
                         transaction.getAmount(),

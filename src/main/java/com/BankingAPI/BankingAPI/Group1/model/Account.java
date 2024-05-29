@@ -1,7 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.model;
 
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty("id")
     private Long id;
 
     @ManyToOne
@@ -19,21 +17,12 @@ public class Account {
     private Users user;  // Relationship to Users class
 
     @Column(unique = true)
-    @JsonProperty("IBAN")
     private String IBAN;
-
-    @JsonProperty("currency")
     private String currency;
-    @JsonProperty("accountType")
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
-
-    @JsonProperty("isActive")
     private boolean isActive;
-    @JsonProperty("balance")
     private double balance;
-
-    @JsonProperty("absoluteLimit")
     private double absoluteLimit;
 
     public Account(Users user, String IBAN, String currency, AccountType accountType, boolean isActive, double balance, double absoluteLimit) {
