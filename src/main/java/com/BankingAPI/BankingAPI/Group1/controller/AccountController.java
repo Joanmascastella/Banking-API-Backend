@@ -45,13 +45,15 @@ public class AccountController {
         } catch (Exception e) {
             if (e.getMessage().contains("not found")) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            } else if (e.getMessage().contains("Insufficient funds") || e.getMessage().contains("exceeds daily limit")) {
+            } else if (e.getMessage().contains("Insufficient funds") || e.getMessage().contains("Transaction exceeds daily limit")) {
                 return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
             }
         }
     }
+
+
 
 
     @PutMapping("/customers")

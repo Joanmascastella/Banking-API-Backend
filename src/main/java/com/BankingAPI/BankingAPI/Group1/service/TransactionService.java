@@ -42,6 +42,10 @@ public class TransactionService {
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
 
+        if (fromAccount.getAccountType() == AccountType.SAVINGS && toAccount.getAccountType() == AccountType.SAVINGS) {
+            throw new Exception("Cannot transfer money between savings accounts.");
+        }
+
         // Check user role
         if (user.getUserType() == UserType.ROLE_CUSTOMER) {
             // Ensure fromAccount belongs to current user
@@ -52,10 +56,6 @@ public class TransactionService {
             if (toAccount.getAccountType() != AccountType.CHECKING && fromAccount.getAccountType() != AccountType.CHECKING) {
                 throw new Exception("Customer can only transfer money to a checking account.");
             }
-        }
-
-        if (fromAccount.getAccountType() == AccountType.SAVINGS && toAccount.getAccountType() == AccountType.SAVINGS) {
-            throw new Exception("Cannot transfer money between savings accounts.");
         }
 
         if (fromAccount.getUser().getId() == toAccount.getUser().getId()) {
@@ -70,6 +70,7 @@ public class TransactionService {
 
         return mapToTransactionResponse(newTransaction);
     }
+
 
 
     public TransactionGETPOSTResponseDTO transferMoneyToOwnAccount(TransferMoneyPOSTResponse transactionDTO) throws Exception {

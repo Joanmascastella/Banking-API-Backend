@@ -44,15 +44,16 @@ public class TransactionController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", errorMessage));
             } else if (errorMessage.contains("Insufficient funds") || errorMessage.contains("exceeds daily limit")) {
                 return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("message", errorMessage));
-            } else if (errorMessage.contains("CHECKING accounts") || errorMessage.contains("Cannot transfer money between savings accounts.")) {
+            } else if (errorMessage.contains("Cannot transfer money between savings accounts.") || errorMessage.contains("Customer can only transfer money to a checking account.")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", errorMessage));
-            } else if (errorMessage.contains("Both accounts cannot belong to the same user for this operation.")) {
+            } else if (errorMessage.contains("Both accounts cannot belong to the same user for this operation.") || errorMessage.contains("Customer can only transfer money from their own account.")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", errorMessage));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", errorMessage));
             }
         }
     }
+
 
 
 
