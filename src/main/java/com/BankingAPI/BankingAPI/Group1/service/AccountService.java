@@ -1,6 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
+import com.BankingAPI.BankingAPI.Group1.exception.IBANGenerationException;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
 
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
@@ -10,6 +11,7 @@ import com.BankingAPI.BankingAPI.Group1.model.dto.UserApprovalDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -63,24 +65,26 @@ public class AccountService {
         }
     }
 
-    public void createAccountsForUser(Users user, UserApprovalDTO approvalDTO) throws RuntimeException{
+    public void createAccountsForUser(Users user, UserApprovalDTO approvalDTO) throws DataAccessException, IBANGenerationException{
         try {
             createCheckingAccount(user, approvalDTO.absoluteCheckingLimit());
             createSavingsAccount(user, approvalDTO.absoluteSavingLimit());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create accounts for user: " + user.getId(), e);
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (IBANGenerationException e) {
+            throw new IBANGenerationException(e.getMessage());
         }
     }
 
-    private void createSavingsAccount(Users user, Double absoluteSavingLimit) throws RuntimeException {
+    private void createSavingsAccount(Users user, Double absoluteSavingLimit) throws DataAccessException, IBANGenerationException {
         createAccount(user, AccountType.SAVINGS, absoluteSavingLimit);
     }
 
-    private void createCheckingAccount(Users user, Double absoluteCheckingLimit) throws RuntimeException {
+    private void createCheckingAccount(Users user, Double absoluteCheckingLimit) throws DataAccessException, IBANGenerationException {
         createAccount(user, AccountType.CHECKING, absoluteCheckingLimit);
     }
 
-    private void createAccount(Users user, AccountType accountType, Double absoluteLimit) throws RuntimeException {
+    private void createAccount(Users user, AccountType accountType, Double absoluteLimit) throws DataAccessException, IBANGenerationException {
         try {
             Account account = new Account();
             account.setUser(user);
@@ -91,17 +95,19 @@ public class AccountService {
             account.setBalance(0.00);
             account.setAbsoluteLimit(absoluteLimit);
             accountRepository.save(account);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create account: " + e.getMessage(), e);
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (IBANGenerationException e) {
+            throw new IBANGenerationException(e.getMessage());
         }
     }
-    private String generateIBAN() throws RuntimeException{
+    private String generateIBAN() throws IBANGenerationException{
         int generationAttempts = 0;
         String iban;
         do{
             generationAttempts++;
             if(generationAttempts > 100) {
-                throw new RuntimeException("Failed to generate a unique IBAN.");
+                throw new IBANGenerationException("Failed to generate a unique IBAN.");
             }
             String firstDigits = String.format("%02d", new Random().nextInt(100));
 

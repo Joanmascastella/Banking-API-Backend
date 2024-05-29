@@ -62,7 +62,7 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }

@@ -1,5 +1,9 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
+import com.BankingAPI.BankingAPI.Group1.exception.IBANGenerationException;
+import com.BankingAPI.BankingAPI.Group1.exception.InactiveUserException;
+import com.BankingAPI.BankingAPI.Group1.exception.InvalidDailyLimitException;
+import com.BankingAPI.BankingAPI.Group1.exception.UnauthorizedException;
 import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
@@ -97,8 +101,10 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (InvalidDailyLimitException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+        } catch (IBANGenerationException | RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
     @PutMapping
@@ -108,7 +114,9 @@ public class UserController {
             userService.updateDailyLimit(user);
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (InvalidDailyLimitException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
         }
     }
 
@@ -120,8 +128,10 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (InactiveUserException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 }

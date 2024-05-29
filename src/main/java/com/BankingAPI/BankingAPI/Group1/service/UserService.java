@@ -1,7 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
-import com.BankingAPI.BankingAPI.Group1.exception.CustomAuthenticationException;
+import com.BankingAPI.BankingAPI.Group1.exception.*;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
@@ -13,10 +13,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.naming.AuthenticationException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -188,23 +186,25 @@ public class UserService {
     }
 
 
-    public void approveUser(long userId, UserApprovalDTO approvalDTO) throws EntityNotFoundException{
-        try {
-            Users currentUser = userRepository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-            currentUser.setApproved(true);
-            currentUser.setDailyLimit(approvalDTO.dailyLimit());
-            accountService.createAccountsForUser(currentUser, approvalDTO);
-            userRepository.save(currentUser);
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Failed to approve user: " + e.getMessage(), e);
+    public void approveUser(long userId, UserApprovalDTO approvalDTO) throws EntityNotFoundException, InvalidDailyLimitException, IBANGenerationException {
+        Users currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        currentUser.setApproved(true);
+        if(approvalDTO.dailyLimit() < 0) {
+            throw new InvalidDailyLimitException("The daily limit can't be set to a negative amount.");
         }
+        currentUser.setDailyLimit(approvalDTO.dailyLimit());
+        accountService.createAccountsForUser(currentUser, approvalDTO);
+        userRepository.save(currentUser);
     }
 
-    public void updateDailyLimit(Users user) throws EntityNotFoundException {
+    public void updateDailyLimit(Users user) throws EntityNotFoundException, InvalidDailyLimitException {
         Users currentUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
 
+        if (user.getDailyLimit() < 0){
+            throw new InvalidDailyLimitException("The daily limit can't be set to a negative amount.");
+        }
         currentUser.setDailyLimit(user.getDailyLimit());
         userRepository.save(currentUser);
     }
@@ -215,15 +215,16 @@ public class UserService {
         return new UserGetOneRESPONSE(currentUser.getFirstName(), currentUser.getLastName());
     }
 
-    public void closeAccount(long userId) throws Exception {
+    public void closeAccount(long userId) throws EntityNotFoundException, UnauthorizedException, InactiveUserException {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        if(user.getUserType() == UserType.ROLE_CUSTOMER && user.isActive()) {
-            user.setActive(false);
-            accountService.closeAccounts(userId);
-            userRepository.save(user);
-        } else {
-            throw new Exception("This account can't be closed.");
+        if(user.getUserType() == UserType.ROLE_CUSTOMER) {
+            throw new UnauthorizedException("Employee accounts cannot be closed.");
+        } else if(!user.isActive() || !user.isApproved()){
+            throw new InactiveUserException("This account can't be closed.");
         }
+        user.setActive(false);
+        accountService.closeAccounts(userId);
+        userRepository.save(user);
     }
 }

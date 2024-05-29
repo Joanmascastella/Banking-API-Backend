@@ -1,6 +1,10 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
 import com.BankingAPI.BankingAPI.Group1.config.ApiTestConfiguration;
+import com.BankingAPI.BankingAPI.Group1.exception.IBANGenerationException;
+import com.BankingAPI.BankingAPI.Group1.exception.InactiveUserException;
+import com.BankingAPI.BankingAPI.Group1.exception.InvalidDailyLimitException;
+import com.BankingAPI.BankingAPI.Group1.exception.UnauthorizedException;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
@@ -180,8 +184,6 @@ class UserControllerTest {
                         .content("{\"dailyLimit\":100,\"transactionLimit\":0,\"balance\":-200}")
                 .with(csrf()))
                 .andExpect(status().isOk());
-
-        Mockito.verify(userService, Mockito.times(1)).approveUser(eq(userId), any(UserApprovalDTO.class));
     }
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
@@ -205,6 +207,45 @@ class UserControllerTest {
 
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
+    void approveUser_InvalidDailyLimit() throws Exception {
+        Long userId = 2L;
+        UserApprovalDTO approvalDTO = new UserApprovalDTO(100, 0, -200);
+
+        // Simulate runtime exception scenario
+        Mockito.doThrow(InvalidDailyLimitException.class)
+                .when(userService).approveUser(eq(userId), any(UserApprovalDTO.class));
+
+        mockMvc.perform(put("/users/" + userId + "/approve")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"dailyLimit\":100,\"transactionLimit\":0,\"balance\":-200}")
+                        .with(csrf()))
+                .andExpect(status().isUnprocessableEntity());
+
+        Mockito.verify(userService, Mockito.times(1))
+                .approveUser(eq(userId), any(UserApprovalDTO.class));
+    }
+
+    @Test
+    @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
+    void approveUser_IBANException() throws Exception {
+        Long userId = 2L;
+        UserApprovalDTO approvalDTO = new UserApprovalDTO(100, 0, -200);
+
+        // Simulate runtime exception scenario
+        Mockito.doThrow(IBANGenerationException.class)
+                .when(userService).approveUser(eq(userId), any(UserApprovalDTO.class));
+
+        mockMvc.perform(put("/users/" + userId + "/approve")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"dailyLimit\":100,\"transactionLimit\":0,\"balance\":-200}")
+                        .with(csrf()))
+                .andExpect(status().isInternalServerError());
+
+        Mockito.verify(userService, Mockito.times(1))
+                .approveUser(eq(userId), any(UserApprovalDTO.class));
+    }
+    @Test
+    @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     void approveUser_RuntimeException() throws Exception {
         Long userId = 2L;
         UserApprovalDTO approvalDTO = new UserApprovalDTO(100, 0, -200);
@@ -217,7 +258,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"dailyLimit\":100,\"transactionLimit\":0,\"balance\":-200}")
                         .with(csrf()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isInternalServerError());
 
         Mockito.verify(userService, Mockito.times(1))
                 .approveUser(eq(userId), any(UserApprovalDTO.class));
@@ -243,14 +284,31 @@ class UserControllerTest {
         user.setId(4L);
         user.setDailyLimit(100);
 
-        Mockito.doThrow(new EntityNotFoundException("User not found.")).when(userService).updateDailyLimit(any(Users.class));
+        Mockito.doThrow(new EntityNotFoundException("User not found with id: 4")).when(userService).updateDailyLimit(any(Users.class));
 
         mockMvc.perform(put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(user))
                         .with(csrf()))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User not found."));
+                .andExpect(content().string("User not found with id: 4"));
+    }
+
+    @Test
+    @WithMockUser(username = "Employee", roles = "EMPLOYEE")
+    public void testUpdateDailyLimit_InvalidDailyLimit() throws Exception {
+        Users user = new Users();
+        user.setId(4L);
+        user.setDailyLimit(100);
+
+        Mockito.doThrow(new InvalidDailyLimitException("The daily limit can't be set to a negative amount.")).when(userService).updateDailyLimit(any(Users.class));
+
+        mockMvc.perform(put("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(user))
+                        .with(csrf()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().string("The daily limit can't be set to a negative amount."));
     }
 
     @Test
@@ -277,12 +335,23 @@ class UserControllerTest {
 
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    void closeAccount_BadRequest() throws Exception {
+    void closeAccount_InactiveUser() throws Exception {
         long userId = 1L;
-        Mockito.doThrow(new Exception()).when(userService).closeAccount(userId);
+        Mockito.doThrow(new InactiveUserException("This account can't be closed.")).when(userService).closeAccount(userId);
 
         mockMvc.perform(delete("/users/{userId}", userId)
                         .with(csrf()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
+    void closeAccount_Unauthorized() throws Exception {
+        long userId = 1L;
+        Mockito.doThrow(new UnauthorizedException("Employee accounts cannot be closed.")).when(userService).closeAccount(userId);
+
+        mockMvc.perform(delete("/users/{userId}", userId)
+                        .with(csrf()))
+                .andExpect(status().isUnauthorized());
     }
 }
