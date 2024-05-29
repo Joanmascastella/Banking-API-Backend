@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
@@ -12,10 +13,19 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty("id")
     private Long id;
+
+    @JsonProperty("fromAccount")
     private String fromAccount;
+
+    @JsonProperty("toAccount")
     private String toAccount;
+
+    @JsonProperty("Amount")
     private double amount;
+
+    @JsonProperty("date")
     private LocalDate date;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

@@ -2,12 +2,18 @@ package com.BankingAPI.BankingAPI.Group1.cucumber.steps.account;
 
 import com.BankingAPI.BankingAPI.Group1.config.testConfigurations.TestConfig;
 import com.BankingAPI.BankingAPI.Group1.cucumber.BaseStepDefinitions;
+import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -20,8 +26,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Map;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Log
 public class AccountStepDefinitions extends BaseStepDefinitions {
@@ -88,4 +97,117 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
         String actualMessage = response.getBody();
         Assertions.assertTrue(actualMessage.contains(message), "Expected message: " + message + ", but got: " + actualMessage);
     }
+
+    @Given("The endpoint for accounts {string} is available for method {string}")
+    public void theEndpointForIsAvailableForMethod(String endpoint, String method) {
+
+        response = restTemplate
+                .exchange(testConfig.getBaseUrl() + endpoint,
+                        HttpMethod.OPTIONS,
+                        new HttpEntity<>(null, httpHeaders),
+                        String.class);
+        List<String> options = Arrays.stream(response.getHeaders()
+                        .get("Allow")
+                        .get(0)
+                        .split(","))
+                .toList();
+        Assertions.assertTrue(options.contains(method.toUpperCase()));
+    }
+
+    @Given("I log in as user with role employee")
+    public void iLogInAsUserWithRoleEmployee() throws JsonProcessingException {
+        httpHeaders.clear();
+        httpHeaders.add("Content-Type", "application/json");
+        LoginDTO loginDTO = new LoginDTO(VALID_EMPLOYEE, VALID_EMPLOYEE_PASSWORD);
+        token = getToken(loginDTO);
+    }
+
+    @When("I retrieve all accounts")
+    public void iRetrieveAllAccounts() throws JsonProcessingException {
+
+        httpHeaders.clear();
+        httpHeaders.add("Authorization", "Bearer " + token);
+        httpHeaders.add("Content-Type", "application/json");
+
+        response = restTemplate.exchange(testConfig.getBaseUrl() + "/accounts/customers", HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
+    }
+
+
+    @Then("I receive http status {int} for accounts get request")
+    public void iGetHttpStatus(int status) {
+        int actual = response.getStatusCode().value();
+        Assertions.assertEquals(status, actual);
+    }
+
+    @And("I should receive all accounts as a list of size {int}")
+    public void iShouldReceiveAllAccounts(int count) {
+        int actual = JsonPath.read(response.getBody(), "$.size()");
+        Assertions.assertEquals(count, actual);
+
+    }
+
+    @When("I retrieve accounts by absolute limit {int}")
+    public void iRetrieveAccountsByAbsoluteLimit(int limit) throws JsonProcessingException {
+
+        httpHeaders.clear();
+        httpHeaders.add("Authorization", "Bearer " + token);
+        httpHeaders.add("Content-Type", "application/json");
+        response = restTemplate.exchange(UriComponentsBuilder
+                    .fromUriString(testConfig.getBaseUrl() + "/accounts/byAbsoluteLimit")
+                    .queryParam("absoluteLimit", String.valueOf(limit))
+                    .toUriString(),
+                    HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
+    }
+
+    @And("I should receive the accounts with absolute limit as a list of size {int}")
+    public void iShouldReceiveAccountsWithLimit(int count) {
+        int actual = JsonPath.read(response.getBody(), "$.size()");
+        Assertions.assertEquals(count, actual);
+
+    }
+
+    @And("The absolute limit of the accounts is less than or equal to {int}")
+    public void iShouldReceiveAccountsWithLimitLessThanOrEqualTo(int limit) throws IOException {
+        JsonNode res = mapper.readTree(response.getBody());
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<AccountGETPOSTResponseDTO>>() {});
+        List<AccountGETPOSTResponseDTO> retrievedData = reader.readValue(res);
+
+        Boolean filteredData = retrievedData.stream().allMatch(item -> item.absoluteLimit() <= limit);
+
+        Assertions.assertTrue(filteredData);
+
+
+    }
+
+    @When("I retrieve inactive accounts")
+    public void iRetrieveInactiveAccounts() throws JsonProcessingException {
+
+        httpHeaders.clear();
+        httpHeaders.add("Authorization", "Bearer " + token);
+        httpHeaders.add("Content-Type", "application/json");
+
+        response = restTemplate.exchange(testConfig.getBaseUrl() + "/accounts/inactive", HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
+    }
+
+
+    @And("I should receive the inactive accounts as a list of size {int}")
+    public void iShouldReceiveInactiveAccounts(int count) {
+        int actual = JsonPath.read(response.getBody(), "$.size()");
+        Assertions.assertEquals(count, actual);
+
+    }
+
+    @And("Each account has inactive status")
+    public void iShouldReceiveAccountsWithStatusInactive() throws IOException {
+        JsonNode res = mapper.readTree(response.getBody());
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<AccountGETPOSTResponseDTO>>() {});
+        List<AccountGETPOSTResponseDTO> retrievedData = reader.readValue(res);
+
+        Boolean filteredData = retrievedData.stream().allMatch(item -> item.isActive() == false);
+
+        Assertions.assertTrue(filteredData);
+
+    }
+
+
 }
