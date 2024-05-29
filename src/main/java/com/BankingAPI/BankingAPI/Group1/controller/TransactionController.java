@@ -58,7 +58,6 @@ public class TransactionController {
 
     @GetMapping("/{userId}/history")
     @PreAuthorize("hasAnyRole('CUSTOMER')")
-    //@PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')") I commented it out because I had to do the detail view for employee
     public ResponseEntity<Object> getTransactionsByUserId(@PathVariable Long userId) {
         try {
             return ResponseEntity.ok(transactionService.getTransactionsByUserId(userId));

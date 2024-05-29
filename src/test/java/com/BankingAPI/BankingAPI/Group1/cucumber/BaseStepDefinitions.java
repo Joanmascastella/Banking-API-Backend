@@ -14,6 +14,7 @@ public class BaseStepDefinitions {
     protected TestRestTemplate testRestTemplate;
 
     public static final String VALID_USER = "johndoe";
+    public static final String VALID_USER_EMAIL = "john.doe@example.com";
     public static final String VALID_EMPLOYEE = "Employee";
     public static final String VALID_USER_PASSWORD = "123";
     public static final String VALID_EMPLOYEE_PASSWORD = "employee";
