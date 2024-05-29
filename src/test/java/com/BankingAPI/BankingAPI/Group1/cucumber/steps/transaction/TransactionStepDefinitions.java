@@ -51,16 +51,6 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
         log.info("Initialized step definitions");
     }
 
-    private String getToken(LoginDTO loginDTO) throws JsonProcessingException {
-        response = restTemplate.exchange(
-                testConfig.getBaseUrl() + "/login",
-                HttpMethod.POST,
-                new HttpEntity<>(mapper.writeValueAsString(loginDTO), httpHeaders),
-                String.class);
-        TokenDTO tokenDTO = mapper.readValue(response.getBody(), TokenDTO.class);
-        return tokenDTO.token();
-    }
-
     @Given("I log in as user with valid accounts for transactions")
     public void iLogInAsUserWithValidAccountsForTransactions() throws JsonProcessingException {
         httpHeaders.clear();

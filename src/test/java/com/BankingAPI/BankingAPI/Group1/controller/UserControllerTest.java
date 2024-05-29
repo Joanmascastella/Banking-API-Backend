@@ -1,10 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
 import com.BankingAPI.BankingAPI.Group1.config.ApiTestConfiguration;
-import com.BankingAPI.BankingAPI.Group1.exception.IBANGenerationException;
-import com.BankingAPI.BankingAPI.Group1.exception.InactiveUserException;
-import com.BankingAPI.BankingAPI.Group1.exception.InvalidDailyLimitException;
-import com.BankingAPI.BankingAPI.Group1.exception.UnauthorizedException;
+import com.BankingAPI.BankingAPI.Group1.exception.*;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
@@ -26,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -133,13 +131,13 @@ class UserControllerTest {
 
     @Test
     @WithMockUser(username = "employee", roles = "EMPLOYEE")
-    void getAllUsers_ShouldReturn404() throws Exception {
+    void getAllUsers_NoneFound() throws Exception {
         Mockito.when(userService.getAllUsers())
-                .thenThrow(new EntityNotFoundException("Users not found."));
+                .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/users"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Users not found."));
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
     }
 
     @Test
@@ -163,12 +161,12 @@ class UserControllerTest {
 
     @Test
     @WithMockUser(username = "employee", roles = "EMPLOYEE")
-    void getUnapprovedUsers_ShouldReturn404() throws Exception {
-        Mockito.when(userService.getUnapprovedUsers()).thenThrow(new RuntimeException("Failed to get unapproved users: "));
+    void getUnapprovedUsers_NoneFound() throws Exception {
+        Mockito.when(userService.getUnapprovedUsers()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/users/noncustomers"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Failed to get unapproved users: "));
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
     }
 
     @Test
@@ -220,6 +218,26 @@ class UserControllerTest {
                         .content("{\"dailyLimit\":100,\"transactionLimit\":0,\"balance\":-200}")
                         .with(csrf()))
                 .andExpect(status().isUnprocessableEntity());
+
+        Mockito.verify(userService, Mockito.times(1))
+                .approveUser(eq(userId), any(UserApprovalDTO.class));
+    }
+
+    @Test
+    @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
+    void approveUser_AlreadyApproved() throws Exception {
+        Long userId = 2L;
+        UserApprovalDTO approvalDTO = new UserApprovalDTO(100, 0, -200);
+
+        // Simulate runtime exception scenario
+        Mockito.doThrow(UserAlreadyApprovedException.class)
+                .when(userService).approveUser(eq(userId), any(UserApprovalDTO.class));
+
+        mockMvc.perform(put("/users/" + userId + "/approve")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"dailyLimit\":100,\"transactionLimit\":0,\"balance\":-200}")
+                        .with(csrf()))
+                .andExpect(status().isConflict());
 
         Mockito.verify(userService, Mockito.times(1))
                 .approveUser(eq(userId), any(UserApprovalDTO.class));

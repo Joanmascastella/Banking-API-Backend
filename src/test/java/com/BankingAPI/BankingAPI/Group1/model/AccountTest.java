@@ -18,10 +18,10 @@ class AccountTest {
     @Test
     void newAccountShouldHaveCorrectValues() {
         Users user = new Users();
-        Account account = new Account(user, "NL91ABNA0417164300", "EUR", AccountType.CHECKING, true, 1000.0, 0.0);
+        Account account = new Account(user, "NL91INHO0041716400", "EUR", AccountType.CHECKING, true, 1000.0, 0.0);
 
         assertEquals(user, account.getUser());
-        assertEquals("NL91ABNA0417164300", account.getIBAN());
+        assertEquals("NL91INHO0041716400", account.getIBAN());
         assertEquals("EUR", account.getCurrency());
         assertEquals(AccountType.CHECKING, account.getAccountType());
         assertTrue(account.isActive());

@@ -186,9 +186,12 @@ public class UserService {
     }
 
 
-    public void approveUser(long userId, UserApprovalDTO approvalDTO) throws EntityNotFoundException, InvalidDailyLimitException, IBANGenerationException {
+    public void approveUser(long userId, UserApprovalDTO approvalDTO) throws EntityNotFoundException, InvalidDailyLimitException, IBANGenerationException, UserAlreadyApprovedException {
         Users currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        if(currentUser.isApproved()){
+            throw new UserAlreadyApprovedException("The user is already approved.");
+        }
         currentUser.setApproved(true);
         if(approvalDTO.dailyLimit() < 0) {
             throw new InvalidDailyLimitException("The daily limit can't be set to a negative amount.");
@@ -218,7 +221,7 @@ public class UserService {
     public void closeAccount(long userId) throws EntityNotFoundException, UnauthorizedException, InactiveUserException {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        if(user.getUserType() == UserType.ROLE_CUSTOMER) {
+        if(user.getUserType() != UserType.ROLE_CUSTOMER) {
             throw new UnauthorizedException("Employee accounts cannot be closed.");
         } else if(!user.isActive() || !user.isApproved()){
             throw new InactiveUserException("This account can't be closed.");

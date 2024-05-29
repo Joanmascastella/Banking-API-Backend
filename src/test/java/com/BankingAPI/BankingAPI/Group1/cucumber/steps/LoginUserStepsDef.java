@@ -49,7 +49,7 @@ public class LoginUserStepsDef extends BaseStepDefinitions {
     @When("I call the application login endpoint")
     public void iCallTheApplicationLoginEndpoint() throws JsonProcessingException {
         httpHeaders.add("Content-Type", "application/json");
-        response = testRestTemplate.exchange(
+        response = restTemplate.exchange(
                 LOGIN_ENDPOINT,
                 HttpMethod.POST,
                 new HttpEntity<>(objectMapper.writeValueAsString(loginDTO), httpHeaders),
