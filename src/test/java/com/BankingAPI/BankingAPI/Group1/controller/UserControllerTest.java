@@ -6,10 +6,10 @@ import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
+import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -235,19 +235,22 @@ class UserControllerTest {
                 .with(csrf()))
                 .andExpect(status().isOk());
     }
+
     @Test
     @WithMockUser(username = "Employee", roles = "EMPLOYEE")
-    void updateDailyLimit_UserNotFound() throws Exception {
-        Users user = new Users("joan", "joan.doe@example.com", "Joan", "Doe", "12345673", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, true, UserType.ROLE_CUSTOMER,"1234");
-        user.setId(5);
-        Mockito.doThrow(EntityNotFoundException.class).when(userService).updateDailyLimit(user);
+    public void testUpdateDailyLimit_UserNotFound() throws Exception {
+        Users user = new Users();
+        user.setId(4L);
+        user.setDailyLimit(100);
+
+        Mockito.doThrow(new EntityNotFoundException("User not found.")).when(userService).updateDailyLimit(any(Users.class));
 
         mockMvc.perform(put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"id\":5,\"username\":\"joan\",\"email\":\"joan.doe@example.com\",\"firstName\":\"Joan\",\"lastName\":\"Doe\",\"BSN\":\"12345673\",\"phoneNumber\":\"0123456789\",\"dateOfBirth\":\"1990-01-01\",\"balance\":5000.0,\"dailyLimit\":1000.0,\"isApproved\":true,\"isActive\":true,\"userType\":\"ROLE_CUSTOMER\"}")
+                        .content(new ObjectMapper().writeValueAsString(user))
                         .with(csrf()))
-                .andExpect(status().isNotFound());
-
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("User not found."));
     }
 
     @Test
