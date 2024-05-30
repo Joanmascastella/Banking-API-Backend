@@ -31,11 +31,12 @@ Feature: Authentication and registration
     When I call the application login endpoint
     Then I receive a token
 
+# This fails due to dependency
   Scenario: Login with valid username but invalid password
     Given I have a valid username but invalid password
     When I call the application login endpoint
     Then I receive http status 403
-
+# This fails due to dependency
   Scenario: Login with invalid username and valid password
     Given I have an invalid username and valid password
     When I call the application login endpoint

@@ -23,6 +23,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -91,6 +92,64 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
         } catch (JsonProcessingException e) {
             Assertions.assertTrue(responseBody.contains(expectedMessage), "Expected message: " + expectedMessage + ", but got: " + responseBody);
         }
+    }
+    @When("I retrieve transaction history for user {long}")
+    public void iRetrieveTransactionHistory(long userId) throws JsonProcessingException {
+        httpHeaders.clear();
+        httpHeaders.add("Authorization", "Bearer " + token);
+        httpHeaders.add("Content-Type", "application/json");
+
+        response = restTemplate.exchange(
+                testConfig.getBaseUrl() + "/transactions/" + userId + "/history",
+                HttpMethod.GET,
+                new HttpEntity<>(null, httpHeaders),
+                String.class
+        );
+    }
+    @Then("I receive transaction history http status {int}")
+    public void iReceiveTransactionHistoryHttpStatus(int status) {
+        int actual = response.getStatusCode().value();
+        Assertions.assertEquals(status, actual);
+    }
+
+    @And("I should receive transaction history as a list of size {int}")
+    public void iShouldReceiveTransactionHistory(int count) {
+        int actual = JsonPath.read(response.getBody(), "$.size()");
+        Assertions.assertEquals(count, actual);
+    }
+
+    @When("I search transactions with criteria IBAN {string}, amount {double}, amountGreater {double}, amountLess {double}, startDate {string}, endDate {string}")
+    public void iSearchTransactions(String IBAN, Double amount, Double amountGreater, Double amountLess, String startDate, String endDate) throws JsonProcessingException {
+        httpHeaders.clear();
+        httpHeaders.add("Authorization", "Bearer " + token);
+        httpHeaders.add("Content-Type", "application/json");
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(testConfig.getBaseUrl() + "/transactions/search")
+                .queryParam("IBAN", IBAN)
+                .queryParam("amount", amount)
+                .queryParam("amountGreater", amountGreater)
+                .queryParam("amountLess", amountLess)
+                .queryParam("startDate", startDate)
+                .queryParam("endDate", endDate);
+
+        response = restTemplate.exchange(
+                uriBuilder.toUriString(),
+                HttpMethod.GET,
+                new HttpEntity<>(null, httpHeaders),
+                String.class
+        );
+    }
+
+    @Then("I receive search transactions http status {int}")
+    public void iReceiveSearchTransactionsHttpStatus(int status) {
+        int actual = response.getStatusCode().value();
+        Assertions.assertEquals(status, actual);
+    }
+
+    @And("I should receive search results as a list of size {int}")
+    public void iShouldReceiveSearchResults(int count) {
+        int actual = JsonPath.read(response.getBody(), "$.size()");
+        Assertions.assertEquals(count, actual);
     }
 
 

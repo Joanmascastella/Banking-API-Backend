@@ -2,6 +2,7 @@ package com.BankingAPI.BankingAPI.Group1.controller;
 
 import com.BankingAPI.BankingAPI.Group1.config.ApiTestConfiguration;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
+import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
@@ -200,6 +202,61 @@ class TransactionControllerTest {
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)));
+    }
+    @Test
+    @WithMockUser(username = "johndoe", roles = {"CUSTOMER"})
+    void getTransactionsByUserId_ShouldReturnTransactions() throws Exception {
+        Long userId = 1L;
+        given(transactionService.getTransactionsByUserId(userId)).willReturn(transactions);
+
+        this.mockMvc.perform(get("/transactions/{userId}/history", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(transactions.size())))
+                .andExpect(jsonPath("$[0].amount").value(transactions.get(0).amount()))
+                .andExpect(jsonPath("$[1].amount").value(transactions.get(1).amount()));
+    }
+
+    @Test
+    @WithMockUser(username = "johndoe", roles = {"CUSTOMER"})
+    void getTransactionsByUserId_ShouldReturnBadRequestOnError() throws Exception {
+        Long userId = 1L;
+        String errorMessage = "Error retrieving transactions for user: " + userId;
+        given(transactionService.getTransactionsByUserId(userId)).willThrow(new RuntimeException(errorMessage));
+
+        this.mockMvc.perform(get("/transactions/{userId}/history", userId))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(errorMessage));
+    }
+    @Test
+    @WithMockUser(username = "johndoe", roles = {"CUSTOMER"})
+    void searchTransactions_ShouldReturnFilteredTransactions() throws Exception {
+        String IBAN = "123456789";
+        Double amount = 100.0;
+        LocalDate startDate = LocalDate.of(2023, 1, 1);
+        LocalDate endDate = LocalDate.of(2023, 12, 31);
+        Double amountGreater = 50.0;
+        Double amountLess = 200.0;
+
+        List<Transaction> filteredTransactions = Arrays.asList(
+                new Transaction(customer, "123456789", "987654321", 100.0, LocalDate.of(2023, 5, 1))
+        );
+
+        List<TransactionGETPOSTResponseDTO> transactionDto = filteredTransactions.stream()
+                .map(t -> new TransactionGETPOSTResponseDTO(t.getFromAccount(), t.getToAccount(), t.getAmount(), t.getDate(), t.getUser().getId()))
+                .collect(Collectors.toList());
+
+        given(transactionService.filterTransactions(IBAN, amount, amountGreater, amountLess, startDate, endDate)).willReturn(filteredTransactions);
+
+        this.mockMvc.perform(get("/transactions/search")
+                        .param("IBAN", IBAN)
+                        .param("amount", amount.toString())
+                        .param("startDate", startDate.toString())
+                        .param("endDate", endDate.toString())
+                        .param("amountGreater", amountGreater.toString())
+                        .param("amountLess", amountLess.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(transactionDto.size())))
+                .andExpect(jsonPath("$[0].amount").value(transactionDto.get(0).amount()));
     }
 
     @Test

@@ -92,11 +92,12 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
         Assertions.assertEquals(status, actual);
     }
 
-    @Then("I get transfer message {string}")
+@Then("I get transfer message {string}")
     public void iGetTransferMessage(String message) {
         String actualMessage = response.getBody();
         Assertions.assertTrue(actualMessage.contains(message), "Expected message: " + message + ", but got: " + actualMessage);
     }
+
 
     @Given("The endpoint for accounts {string} is available for method {string}")
     public void theEndpointForIsAvailableForMethod(String endpoint, String method) {

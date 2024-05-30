@@ -31,10 +31,11 @@ public class BaseStepDefinitions {
     private TestConfig testConfig;
 
     public static final String VALID_USER = "johndoe";
+    public static final String VALID_USER_EMAIL = "john.doe@example.com";
     public static final String VALID_EMPLOYEE = "Employee";
     public static final String VALID_USER_PASSWORD = "123";
     public static final String VALID_EMPLOYEE_PASSWORD = "employee";
-    public static final String VALID_USER_NO_ACCOUNTS_USERNAME = "janedoe";
+    public static final String VALID_USER_NO_ACCOUNTS_USERNAME = "janedoae";
     public static final String VALID_USER_NO_ACCOUNTS_PASSWORD = "user";
     public static final String INVALID_USERNAME = "bla";
     public static final String INVALID_PASSWORD = "invalid";

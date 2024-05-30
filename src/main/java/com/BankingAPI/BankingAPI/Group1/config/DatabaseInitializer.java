@@ -35,11 +35,15 @@ public class DatabaseInitializer implements ApplicationRunner {
     }
 
     private void initDatabase() {
-        Users newUsers = new Users("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("123"));
+
+        Users newUsers = new Users("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 100.0, true, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("123"));
+        Users noAccount = new Users("janedoae", "jane@doe.com", "Janea", "Doe", "123789456", "0987654321", LocalDate.of(1998, 4, 14), 0, 0, false, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("user"));
         Users newUser = new Users("janedoe", "jane@doe.com", "Jane", "Doe", "123789456", "0987654321", LocalDate.of(1998, 4, 14), 0, 0, false, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("user"));
         Users joan = new Users("joan", "joan.doe@example.com", "Joan", "Doe", "12345673", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("joan"));
         Users newEmployee = new Users("Employee", "employee@example.com", "Em", "Yee", "1234567893", "01234567891", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, true, UserType.ROLE_EMPLOYEE, bCryptPasswordEncoder.encode("employee"));
+
         userRepository.save(newUsers);
+        userRepository.save(noAccount);
         userRepository.save(newUser);
         userRepository.save(joan);
         userRepository.save(newEmployee);
@@ -50,17 +54,16 @@ public class DatabaseInitializer implements ApplicationRunner {
         Account joanAccount = new Account(joan, "NL89INHO0044053201", "EUR", AccountType.CHECKING, true, 7800.0, 0.00);
         Account joanAccounts = new Account(joan, "NL89INHO004523271", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
 
-        //jane should not have accounts since she is not approved yet
-       /* Account janeAccount =  new Account(newUser, "NL89INHO0044053282", "EUR", AccountType.CHECKING, true, 2800.0, 3000.0);
-        Account janeAccounts =  new Account(newUser, "NL89INHO0044053283", "EUR", AccountType.SAVINGS, false, 200.0, 0.00);*/
+        Account janeAccount =  new Account(newUser, "NL89INHO0044053282", "EUR", AccountType.CHECKING, true, 2800.0, 3000.0);
+        Account janeAccounts =  new Account(newUser, "NL89INHO0044053283", "EUR", AccountType.SAVINGS, false, 200.0, 0.00);
 
 
         accountRepository.save(joanAccount);
         accountRepository.save(joanAccounts);
         accountRepository.save(newAccount);
         accountRepository.save(newAccounts);
-        /*accountRepository.save(janeAccount);
-        accountRepository.save(janeAccounts);*/
+        accountRepository.save(janeAccount);
+        accountRepository.save(janeAccounts);
 
 
 

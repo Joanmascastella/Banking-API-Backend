@@ -42,6 +42,10 @@ public class TransactionService {
         Account fromAccount = getAccount(transactionDTO.fromAccount());
         Account toAccount = getAccount(transactionDTO.toAccount());
 
+        if (fromAccount.getAccountType() == AccountType.SAVINGS && toAccount.getAccountType() == AccountType.SAVINGS) {
+            throw new Exception("Cannot transfer money between savings accounts.");
+        }
+
         // Check user role
         if (user.getUserType() == UserType.ROLE_CUSTOMER) {
             // Ensure fromAccount belongs to current user
@@ -54,20 +58,19 @@ public class TransactionService {
             }
         }
 
-        if (fromAccount.getAccountType() == AccountType.SAVINGS && toAccount.getAccountType() == AccountType.SAVINGS) {
-            throw new Exception("Cannot transfer money between savings accounts.");
-        }
-
         if (fromAccount.getUser().getId() == toAccount.getUser().getId()) {
             throw new Exception("Both accounts cannot belong to the same user for this operation.");
         }
 
         validateTransactionLimits(fromAccount, transactionDTO.amount());
-        performTransfer(fromAccount, toAccount, transactionDTO.amount());
 
         Transaction newTransaction = createAndSaveTransaction(user, fromAccount.getIBAN(), toAccount.getIBAN(), transactionDTO.amount());
+
+        performTransfer(fromAccount, toAccount, transactionDTO.amount());
+
         return mapToTransactionResponse(newTransaction);
     }
+
 
 
     public TransactionGETPOSTResponseDTO transferMoneyToOwnAccount(TransferMoneyPOSTResponse transactionDTO) throws Exception {
@@ -80,11 +83,13 @@ public class TransactionService {
         validateAccountOwnership(fromAccount, toAccount);
         validateTransactionLimits(fromAccount, transactionDTO.amount());
 
-        performTransfer(fromAccount, toAccount, transactionDTO.amount());
+
         Transaction newTransaction = createAndSaveTransaction(user, fromAccount.getIBAN(), toAccount.getIBAN(), transactionDTO.amount());
+        performTransfer(fromAccount, toAccount, transactionDTO.amount());
 
         return mapToTransactionResponse(newTransaction);
     }
+
     private Account getAccount(String iban) throws Exception {
         Account account = accountRepository.findByIBAN(iban)
                 .orElseThrow(() -> new Exception("Account with IBAN: " + iban + " not found"));
