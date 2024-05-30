@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
+import com.BankingAPI.BankingAPI.Group1.exception.*;
 import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
@@ -27,7 +28,7 @@ public class UserController {
         try {
             return ResponseEntity.status(200).body(userService.getAllUsers());
         } catch (Exception ex) {
-            return ResponseEntity.status(404).body("User not found.");
+            return ResponseEntity.status(500).body("An unexpected error occurred. Please try again later.");
         }
     }
 
@@ -63,7 +64,6 @@ public class UserController {
     @GetMapping("/iban")
     @PreAuthorize("hasAnyRole('CUSTOMER','EMPLOYEE')")
     public ResponseEntity<Object> getIbanByFirstNameLastName(@RequestParam String firstName, @RequestParam String lastName) {
-
         try {
             FindIbanRequestDTO findIban = new FindIbanRequestDTO(firstName, lastName);
             FindIbanResponseDTO iban = userService.getIbanByFirstNameLastName(findIban);
@@ -85,7 +85,7 @@ public class UserController {
         try{
             return ResponseEntity.status(200).body(userService.getUnapprovedUsers());
         } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
@@ -97,8 +97,13 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (InvalidDailyLimitException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+        }catch (UserAlreadyApprovedException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+        catch (IBANGenerationException | RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
     @PutMapping
@@ -108,9 +113,24 @@ public class UserController {
             userService.updateDailyLimit(user);
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (InvalidDailyLimitException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{userId}")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity<Object> closeAccount(@PathVariable long userId) {
+        try {
+            userService.closeAccount(userId);
+            return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (InactiveUserException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 }

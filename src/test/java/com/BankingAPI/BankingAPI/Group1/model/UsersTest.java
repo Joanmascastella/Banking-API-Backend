@@ -28,6 +28,7 @@ class UsersTest {
                 1000.0,
                 500.0,
                 true,
+                true,
                 UserType.ROLE_CUSTOMER,
                 "password"
         );
@@ -42,6 +43,7 @@ class UsersTest {
         assertEquals(1000.0, user.getTotalBalance());
         assertEquals(500.0, user.getDailyLimit());
         assertTrue(user.isApproved());
+        assertTrue(user.isActive());
         assertEquals(UserType.ROLE_CUSTOMER, user.getUserType());
         assertEquals("password", user.getPassword());
     }
@@ -60,6 +62,7 @@ class UsersTest {
         user.setTotalBalance(2000.0);
         user.setDailyLimit(1000.0);
         user.setApproved(false);
+        user.setActive(true);
         user.setUserType(UserType.ROLE_EMPLOYEE);
         user.setPassword("newpassword");
 
@@ -73,6 +76,7 @@ class UsersTest {
         assertEquals(2000.0, user.getTotalBalance());
         assertEquals(1000.0, user.getDailyLimit());
         assertFalse(user.isApproved());
+        assertTrue(user.isActive());
         assertEquals(UserType.ROLE_EMPLOYEE, user.getUserType());
         assertEquals("newpassword", user.getPassword());
     }

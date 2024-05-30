@@ -70,8 +70,8 @@ class TransactionControllerTest {
 
     @BeforeEach
     public void setup() {
-        customer = new Users("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("123"));
-        employee = new Users("Employee", "employee@example.com", "Em", "Yee", "1234567893", "01234567891", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, UserType.ROLE_EMPLOYEE, bCryptPasswordEncoder.encode("employee"));
+        customer = new Users("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("123"));
+        employee = new Users("Employee", "employee@example.com", "Em", "Yee", "1234567893", "01234567891", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, true, UserType.ROLE_EMPLOYEE, bCryptPasswordEncoder.encode("employee"));
         ATMDeposit = new TransactionGETPOSTResponseDTO("123456789", "ATM", 1500.0, LocalDate.now(), customer.getId());
         ATMWithdrawal= new TransactionGETPOSTResponseDTO("ATM", "123456789", 2000.0, LocalDate.now(), customer.getId());
         onlineTransferByCustomer = new TransactionGETPOSTResponseDTO("123456789", "123456817", 2800.0, LocalDate.now(), customer.getId());

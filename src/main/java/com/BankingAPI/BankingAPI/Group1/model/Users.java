@@ -23,12 +23,13 @@ public class Users {
     private double totalBalance;
     private double dailyLimit;
     private boolean isApproved;
+    private boolean isActive;
 
     @Enumerated(EnumType.STRING)
     private UserType userType;
     private String password;
 
-    public Users(String username, String email, String firstName, String lastName, String BSN, String phoneNumber, LocalDate birthDate, double totalBalance, double dailyLimit, boolean isApproved, UserType userType, String password) {
+    public Users(String username, String email, String firstName, String lastName, String BSN, String phoneNumber, LocalDate birthDate, double totalBalance, double dailyLimit, boolean isApproved, boolean isActive, UserType userType, String password) {
         this.username = username;
         this.email = email;
         this.firstName = firstName;
@@ -39,6 +40,7 @@ public class Users {
         this.totalBalance = totalBalance;
         this.dailyLimit = dailyLimit;
         this.isApproved = isApproved;
+        this.isActive = isActive;
         this.userType = userType;
         this.password = password;
     }
@@ -129,6 +131,14 @@ public class Users {
 
     public void setApproved(boolean approved) {
         isApproved = approved;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public UserType getUserType() {

@@ -49,6 +49,17 @@ Feature: Account API tests
     And I should receive the inactive accounts as a list of size 1
     And Each account has inactive status
 
+  Scenario: Successfully update an account
+    Given The endpoint for accounts "/accounts/customers" is available for method "PUT"
+    And I log in as user with role employee
+    When I update the absolute limit of the account with IBAN "NL89INHO0044053200" to -200.0
+    Then I get transfer http status 200
+    And I get an empty account response body
+    And the absolute limit of account with IBAN "NL89INHO0044053200" is updated to -200.0
 
-
-
+  Scenario: Try to update an account that doesn't exist
+    Given The endpoint for accounts "/accounts/customers" is available for method "PUT"
+    And I log in as user with role employee
+    When I update the absolute limit of the account with IBAN "NL38INHO0000000000" to -200.0
+    Then I get transfer http status 404
+    And I get transfer message "Account not found by IBAN: NL38INHO0000000000"
