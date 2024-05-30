@@ -34,9 +34,9 @@ public class Account {
     private double balance;
 
     @JsonProperty("absoluteLimit")
-    private double absoluteLimit;
+    private Double absoluteLimit;
 
-    public Account(Users user, String IBAN, String currency, AccountType accountType, boolean isActive, double balance, double absoluteLimit) {
+    public Account(Users user, String IBAN, String currency, AccountType accountType, boolean isActive, double balance, Double absoluteLimit) {
         this.user = user;
         this.IBAN = IBAN;
         this.currency = currency;
@@ -103,11 +103,11 @@ public class Account {
         this.balance = balance;
     }
 
-    public double getAbsoluteLimit() {
+    public Double getAbsoluteLimit() {
         return absoluteLimit;
     }
 
-    public void setAbsoluteLimit(double absoluteLimit) {
+    public void setAbsoluteLimit(Double absoluteLimit) {
         this.absoluteLimit = absoluteLimit;
     }
 }

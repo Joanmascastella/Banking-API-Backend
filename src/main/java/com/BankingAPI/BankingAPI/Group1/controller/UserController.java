@@ -97,12 +97,11 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (InvalidDailyLimitException e) {
+        } catch (InvalidLimitException e) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
         }catch (UserAlreadyApprovedException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
-        catch (IBANGenerationException | RuntimeException e) {
+        }catch (IBANGenerationException | RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
@@ -114,7 +113,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (InvalidDailyLimitException e) {
+        } catch (InvalidLimitException e) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
         }
     }

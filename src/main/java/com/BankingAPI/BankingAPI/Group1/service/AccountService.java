@@ -2,6 +2,7 @@ package com.BankingAPI.BankingAPI.Group1.service;
 
 import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.exception.IBANGenerationException;
+import com.BankingAPI.BankingAPI.Group1.exception.InvalidLimitException;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
 
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
@@ -124,9 +125,12 @@ public class AccountService {
         return accountRepository.existsByIBAN(iban);
     }
 
-    public void updateAccount(AccountGETPOSTResponseDTO account) throws EntityNotFoundException {
+    public void updateAccount(AccountGETPOSTResponseDTO account) throws EntityNotFoundException, InvalidLimitException {
         Account currentAccount = accountRepository.findByIBAN(account.IBAN())
                 .orElseThrow(() -> new EntityNotFoundException("Account not found by IBAN: " + account.IBAN()));
+        if (account.absoluteLimit() == null){
+            throw new InvalidLimitException("Can't leave absolute limit empty. Please enter a valid amount.");
+        }
         currentAccount.setAbsoluteLimit(account.absoluteLimit());
         accountRepository.save(currentAccount);
     }

@@ -192,7 +192,7 @@ class AccountControllerTest {
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     public void updateAccount() throws Exception {
-        AccountGETPOSTResponseDTO account = new AccountGETPOSTResponseDTO(1L, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 2500, -200);
+        AccountGETPOSTResponseDTO account = new AccountGETPOSTResponseDTO(1L, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 2500, -200.0);
         Mockito.doNothing().when(accountService).updateAccount(any(AccountGETPOSTResponseDTO.class));
 
         mockMvc.perform(put("/accounts/customers")
@@ -206,7 +206,7 @@ class AccountControllerTest {
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     public void updateAccount_AccountNotFound() throws Exception {
-        AccountGETPOSTResponseDTO account = new AccountGETPOSTResponseDTO(1L, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 2500, -200);
+        AccountGETPOSTResponseDTO account = new AccountGETPOSTResponseDTO(1L, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 2500, -200.0);
         Mockito.doThrow(new EntityNotFoundException("Account not found.")).when(accountService).updateAccount(any(AccountGETPOSTResponseDTO.class));
 
         mockMvc.perform(put("/accounts/customers")
@@ -220,7 +220,7 @@ class AccountControllerTest {
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     public void updateAccount_GeneralException() throws Exception {
-        AccountGETPOSTResponseDTO account = new AccountGETPOSTResponseDTO(1L, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 2500, -200);
+        AccountGETPOSTResponseDTO account = new AccountGETPOSTResponseDTO(1L, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 2500, -200.0);
         Mockito.doThrow(new RuntimeException("Unexpected error.")).when(accountService).updateAccount(any(AccountGETPOSTResponseDTO.class));
 
         mockMvc.perform(put("/accounts/customers")

@@ -173,7 +173,7 @@ class UserControllerTest {
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     void approveUser() throws Exception {
         Long userId = 2L;
-        UserApprovalDTO approvalDTO = new UserApprovalDTO(100, 0, -200);
+        UserApprovalDTO approvalDTO = new UserApprovalDTO(100.0, 0.0, -200.0);
 
         Mockito.doNothing().when(userService).approveUser(eq(userId), any(UserApprovalDTO.class));
 
@@ -187,7 +187,7 @@ class UserControllerTest {
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     void approveUser_UserNotFound() throws Exception {
         Long userId = 2L;
-        UserApprovalDTO approvalDTO = new UserApprovalDTO(100, 0, -200);
+        UserApprovalDTO approvalDTO = new UserApprovalDTO(100.0, 0.0, -200.0);
 
         // Simulate user not found scenario
         Mockito.doThrow(EntityNotFoundException.class)
@@ -207,10 +207,10 @@ class UserControllerTest {
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     void approveUser_InvalidDailyLimit() throws Exception {
         Long userId = 2L;
-        UserApprovalDTO approvalDTO = new UserApprovalDTO(100, 0, -200);
+        UserApprovalDTO approvalDTO = new UserApprovalDTO(100.0, 0.0, -200.0);
 
         // Simulate runtime exception scenario
-        Mockito.doThrow(InvalidDailyLimitException.class)
+        Mockito.doThrow(InvalidLimitException.class)
                 .when(userService).approveUser(eq(userId), any(UserApprovalDTO.class));
 
         mockMvc.perform(put("/users/" + userId + "/approve")
@@ -227,7 +227,7 @@ class UserControllerTest {
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     void approveUser_AlreadyApproved() throws Exception {
         Long userId = 2L;
-        UserApprovalDTO approvalDTO = new UserApprovalDTO(100, 0, -200);
+        UserApprovalDTO approvalDTO = new UserApprovalDTO(100.0, 0.0, -200.0);
 
         // Simulate runtime exception scenario
         Mockito.doThrow(UserAlreadyApprovedException.class)
@@ -247,7 +247,7 @@ class UserControllerTest {
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     void approveUser_IBANException() throws Exception {
         Long userId = 2L;
-        UserApprovalDTO approvalDTO = new UserApprovalDTO(100, 0, -200);
+        UserApprovalDTO approvalDTO = new UserApprovalDTO(100.0, 0.0, -200.0);
 
         // Simulate runtime exception scenario
         Mockito.doThrow(IBANGenerationException.class)
@@ -266,7 +266,7 @@ class UserControllerTest {
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     void approveUser_RuntimeException() throws Exception {
         Long userId = 2L;
-        UserApprovalDTO approvalDTO = new UserApprovalDTO(100, 0, -200);
+        UserApprovalDTO approvalDTO = new UserApprovalDTO(100.0, 0.0, -200.0);
 
         // Simulate runtime exception scenario
         Mockito.doThrow(RuntimeException.class)
@@ -300,7 +300,7 @@ class UserControllerTest {
     public void testUpdateDailyLimit_UserNotFound() throws Exception {
         Users user = new Users();
         user.setId(4L);
-        user.setDailyLimit(100);
+        user.setDailyLimit(100.0);
 
         Mockito.doThrow(new EntityNotFoundException("User not found with id: 4")).when(userService).updateDailyLimit(any(Users.class));
 
@@ -317,9 +317,9 @@ class UserControllerTest {
     public void testUpdateDailyLimit_InvalidDailyLimit() throws Exception {
         Users user = new Users();
         user.setId(4L);
-        user.setDailyLimit(100);
+        user.setDailyLimit(100.0);
 
-        Mockito.doThrow(new InvalidDailyLimitException("The daily limit can't be set to a negative amount.")).when(userService).updateDailyLimit(any(Users.class));
+        Mockito.doThrow(new InvalidLimitException("The daily limit can't be set to a negative amount.")).when(userService).updateDailyLimit(any(Users.class));
 
         mockMvc.perform(put("/users")
                         .contentType(MediaType.APPLICATION_JSON)

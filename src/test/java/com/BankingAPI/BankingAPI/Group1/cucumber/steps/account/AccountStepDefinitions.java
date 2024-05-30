@@ -263,4 +263,22 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
         String responseBody = response.getBody().toString();
         Assertions.assertEquals("[]", responseBody, "Response body should be an empty list");
     }
+
+    @When("I update the absolute limit of the account with IBAN {string} to null")
+    public void iUpdateTheAbsoluteLimitOfTheAccountWithIBANToNull(String IBAN) {
+        httpHeaders.clear();
+        httpHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json");
+        httpHeaders.add("Authorization", "Bearer " + token);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("IBAN", IBAN);
+        requestBody.put("absoluteLimit", null);
+
+        HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+
+        response = restTemplate.exchange(testConfig.getBaseUrl() + "/accounts/customers",
+                HttpMethod.PUT,
+                requestEntity,
+                String.class);
+    }
 }

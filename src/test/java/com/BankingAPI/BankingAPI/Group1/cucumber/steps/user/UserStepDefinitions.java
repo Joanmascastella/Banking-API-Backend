@@ -191,15 +191,15 @@ public class UserStepDefinitions extends BaseStepDefinitions {
         Assertions.assertFalse(users.isEmpty(), "The users list should not be empty");
     }
 
-    @When("I approve the user with userId {int} and set the dailyLimit to {double}, the absoluteSavingsLimit to {double}, and the absoluteCheckingLimit to {double}")
-    public void iApproveTheUserWithUserIdAndSetTheDailyLimitToTheAbsoluteSavingsLimitToAndTheAbsoluteCheckingLimitTo(int userId, Double dailyLimit, Double absoluteSavingsLimit, Double absoluteCheckingLimit) {
+    @When("I approve the user with userId {long} and set the dailyLimit to {double}, the absoluteSavingLimit to {double}, and the absoluteCheckingLimit to {double}")
+    public void iApproveTheUserWithUserIdAndSetTheDailyLimitToTheAbsoluteSavingLimitToAndTheAbsoluteCheckingLimitTo(long userId, double dailyLimit, double absoluteSavingLimit, double absoluteCheckingLimit) {
         httpHeaders.clear();
         httpHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json");
         httpHeaders.add("Authorization", "Bearer " + token);
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("dailyLimit", dailyLimit);
-        requestBody.put("absoluteSavingsLimit", absoluteSavingsLimit);
+        requestBody.put("absoluteSavingLimit", absoluteSavingLimit);
         requestBody.put("absoluteCheckingLimit", absoluteCheckingLimit);
 
         HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
@@ -273,5 +273,24 @@ public class UserStepDefinitions extends BaseStepDefinitions {
         Assertions.assertTrue(userOptional.isPresent(), "User not found");
         Users user = userOptional.get();
         Assertions.assertFalse(user.isActive(), "Account should be inactive");
+    }
+
+    @When("I approve the user with userId {long} and set the dailyLimit to null, the absoluteSavingsLimit to {double}, and the absoluteCheckingLimit to {double}")
+    public void iApproveTheUserWithUserIdAndSetTheDailyLimitToNullTheAbsoluteSavingsLimitToAndTheAbsoluteCheckingLimitTo(long userId, double absoluteSavingsLimit, double absoluteCheckingLimit) {
+        httpHeaders.clear();
+        httpHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json");
+        httpHeaders.add("Authorization", "Bearer " + token);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("dailyLimit", null);
+        requestBody.put("absoluteSavingsLimit", absoluteSavingsLimit);
+        requestBody.put("absoluteCheckingLimit", absoluteCheckingLimit);
+
+        HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+
+        response = restTemplate.exchange(testConfig.getBaseUrl() + "/users/" + userId + "/approve",
+                HttpMethod.PUT,
+                requestEntity,
+                String.class);
     }
 }

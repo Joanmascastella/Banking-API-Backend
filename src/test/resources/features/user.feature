@@ -45,32 +45,37 @@ Feature: User API tests
   Scenario: Approving an unapproved user
     Given The endpoint for "/users/2/approve" is available for method "PUT"
     And I log in as employee
-    When I approve the user with userId 2 and set the dailyLimit to 100.0, the absoluteSavingsLimit to 0.0, and the absoluteCheckingLimit to -200.0
+    When I approve the user with userId 2 and set the dailyLimit to 100.0, the absoluteSavingLimit to 0.0, and the absoluteCheckingLimit to -200.0
     Then I get http status 200
     And I get an empty response body
     And the user with id 2 is approved
     And two bank accounts are created for the user with id 2
 
-
-
   Scenario: user to be approved not found
     Given The endpoint for "/users/99/approve" is available for method "PUT"
     And I log in as employee
-    When I approve the user with userId 99 and set the dailyLimit to 100.0, the absoluteSavingsLimit to 0.0, and the absoluteCheckingLimit to -200.0
+    When I approve the user with userId 99 and set the dailyLimit to 100.0, the absoluteSavingLimit to 0.0, and the absoluteCheckingLimit to -200.0
     Then I get http status 404
     And I get message "User not found with id: 99"
 
   Scenario: daily limit is negative
     Given The endpoint for "/users/3/approve" is available for method "PUT"
     And I log in as employee
-    When I approve the user with userId 3 and set the dailyLimit to -100.0, the absoluteSavingsLimit to 0.0, and the absoluteCheckingLimit to -200.0
+    When I approve the user with userId 3 and set the dailyLimit to -100.0, the absoluteSavingLimit to 0.0, and the absoluteCheckingLimit to -200.0
     Then I get http status 422
-    And I get message "The daily limit can't be set to a negative amount."
+    And I get message "The daily limit can't be set to a negative amount or be left empty."
+
+  Scenario: daily limit is empty
+    Given The endpoint for "/users/3/approve" is available for method "PUT"
+    And I log in as employee
+    When I approve the user with userId 3 and set the dailyLimit to null, the absoluteSavingsLimit to 0.0, and the absoluteCheckingLimit to -200.0
+    Then I get http status 422
+    And I get message "The daily limit can't be set to a negative amount or be left empty."
 
   Scenario: user is already approved
    Given The endpoint for "/users/1/approve" is available for method "PUT"
    And I log in as employee
-   When I approve the user with userId 1 and set the dailyLimit to 100.0, the absoluteSavingsLimit to 0.0, and the absoluteCheckingLimit to -200.0
+   When I approve the user with userId 1 and set the dailyLimit to 100.0, the absoluteSavingLimit to 0.0, and the absoluteCheckingLimit to -200.0
    Then I get http status 409
    And I get message "The user is already approved."
 
@@ -87,7 +92,7 @@ Feature: User API tests
     And I log in as employee
     When I update the daily limit for user with id 1 to -500.0
     Then I get http status 422
-    And I get message "The daily limit can't be set to a negative amount."
+    And I get message "The daily limit can't be set to a negative amount or be left empty."
 
   Scenario: Updating limit for non existent user
     Given The endpoint for "/users" is available for method "PUT"

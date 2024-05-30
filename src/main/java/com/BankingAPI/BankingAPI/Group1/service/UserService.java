@@ -186,27 +186,29 @@ public class UserService {
     }
 
 
-    public void approveUser(long userId, UserApprovalDTO approvalDTO) throws EntityNotFoundException, InvalidDailyLimitException, IBANGenerationException, UserAlreadyApprovedException {
+    public void approveUser(long userId, UserApprovalDTO approvalDTO) throws EntityNotFoundException, InvalidLimitException, IBANGenerationException, UserAlreadyApprovedException {
         Users currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
         if(currentUser.isApproved()){
             throw new UserAlreadyApprovedException("The user is already approved.");
         }
         currentUser.setApproved(true);
-        if(approvalDTO.dailyLimit() < 0) {
-            throw new InvalidDailyLimitException("The daily limit can't be set to a negative amount.");
+        if( approvalDTO.dailyLimit() == null || approvalDTO.dailyLimit() < 0.0 ) {
+            throw new InvalidLimitException("The daily limit can't be set to a negative amount or be left empty.");
+        } else if (approvalDTO.absoluteCheckingLimit() == null || approvalDTO.absoluteSavingLimit() == null) {
+            throw new InvalidLimitException("The absolute limit can't be left empty.");
         }
         currentUser.setDailyLimit(approvalDTO.dailyLimit());
         accountService.createAccountsForUser(currentUser, approvalDTO);
         userRepository.save(currentUser);
     }
 
-    public void updateDailyLimit(Users user) throws EntityNotFoundException, InvalidDailyLimitException {
+    public void updateDailyLimit(Users user) throws EntityNotFoundException, InvalidLimitException {
         Users currentUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
 
-        if (user.getDailyLimit() < 0){
-            throw new InvalidDailyLimitException("The daily limit can't be set to a negative amount.");
+        if (user.getDailyLimit() == null || user.getDailyLimit() < 0.0){
+            throw new InvalidLimitException("The daily limit can't be set to a negative amount or be left empty.");
         }
         currentUser.setDailyLimit(user.getDailyLimit());
         userRepository.save(currentUser);

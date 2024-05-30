@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
+import com.BankingAPI.BankingAPI.Group1.exception.InvalidLimitException;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
@@ -64,7 +65,9 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (RuntimeException e) {
+        }catch(InvalidLimitException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+        }catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }

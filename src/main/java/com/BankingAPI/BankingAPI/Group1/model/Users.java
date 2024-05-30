@@ -2,6 +2,7 @@ package com.BankingAPI.BankingAPI.Group1.model;
 
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -21,7 +22,7 @@ public class Users {
     private String phoneNumber;
     private LocalDate birthDate;
     private double totalBalance;
-    private double dailyLimit;
+    private Double dailyLimit;
     private boolean isApproved;
     private boolean isActive;
 
@@ -117,11 +118,11 @@ public class Users {
         this.totalBalance = totalBalance;
     }
 
-    public double getDailyLimit() {
+    public Double getDailyLimit() {
         return dailyLimit;
     }
 
-    public void setDailyLimit(double dailyLimit) {
+    public void setDailyLimit(Double dailyLimit) {
         this.dailyLimit = dailyLimit;
     }
 

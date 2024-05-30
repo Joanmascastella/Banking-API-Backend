@@ -63,3 +63,10 @@ Feature: Account API tests
     When I update the absolute limit of the account with IBAN "NL38INHO0000000000" to -200.0
     Then I get transfer http status 404
     And I get transfer message "Account not found by IBAN: NL38INHO0000000000"
+
+  Scenario: Try to update an account with invalid limit
+    Given The endpoint for accounts "/accounts/customers" is available for method "PUT"
+    And I log in as user with role employee
+    When I update the absolute limit of the account with IBAN "NL89INHO0044053200" to null
+    Then I get transfer http status 422
+    And I get transfer message "Can't leave absolute limit empty. Please enter a valid amount."
