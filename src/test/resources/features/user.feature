@@ -49,8 +49,10 @@ Feature: User API tests
     Then I get http status 200
     And I get an empty response body
     And the user with id 2 is approved
+    And two bank accounts are created for the user with id 2
 
-    
+
+
   Scenario: user to be approved not found
     Given The endpoint for "/users/99/approve" is available for method "PUT"
     And I log in as employee
@@ -100,6 +102,7 @@ Feature: User API tests
     When I close the account for a user with id 1
     Then I get http status 200
     And the account with userId 1 is closed
+    And all bank account of userId 1 are closed
     
   Scenario: Closing account of non-existent user
     Given The endpoint for "/users/99" is available for method "DELETE"   

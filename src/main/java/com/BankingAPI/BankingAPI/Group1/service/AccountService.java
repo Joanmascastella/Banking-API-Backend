@@ -202,4 +202,8 @@ public class AccountService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    public List<Account> getAccountsByUserId(long userId) {
+        return accountRepository.findAccountsByUserId(userId);
+    }
 }

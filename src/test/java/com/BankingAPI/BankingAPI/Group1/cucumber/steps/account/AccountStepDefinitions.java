@@ -2,10 +2,13 @@ package com.BankingAPI.BankingAPI.Group1.cucumber.steps.account;
 
 import com.BankingAPI.BankingAPI.Group1.config.testConfigurations.TestConfig;
 import com.BankingAPI.BankingAPI.Group1.cucumber.BaseStepDefinitions;
+import com.BankingAPI.BankingAPI.Group1.model.Account;
+import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
+import com.BankingAPI.BankingAPI.Group1.service.AccountService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -35,6 +38,9 @@ import java.util.List;
 @Log
 public class AccountStepDefinitions extends BaseStepDefinitions {
     HttpHeaders httpHeaders = new HttpHeaders();
+
+    @Autowired
+    private AccountService accountService;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -201,4 +207,23 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
     }
 
 
+    @And("two bank accounts are created for the user with id {long}")
+    public void twoBankAccountsAreCreatedForTheUserWithId(long userId) {
+        List<Account> accounts = accountService.getAccountsByUserId(userId);
+        Assertions.assertEquals(2, accounts.size(), "Expected two bank accounts to be created");
+
+        boolean hasSavingsAccount = accounts.stream().anyMatch(account -> account.getAccountType().equals(AccountType.SAVINGS));
+        boolean hasCheckingAccount = accounts.stream().anyMatch(account -> account.getAccountType().equals(AccountType.CHECKING));
+
+        Assertions.assertTrue(hasSavingsAccount, "Expected a savings account to be created");
+        Assertions.assertTrue(hasCheckingAccount, "Expected a checking account to be created");
+    }
+
+    @And("all bank account of userId {long} are closed")
+    public void allBankAccountOfUserIdAreClosed(long userId) {
+        List<Account> accounts = accountService.getAccountsByUserId(userId);
+        for (Account account : accounts) {
+            Assertions.assertFalse(account.isActive(), "Expected account to be closed, but it is active: " + account);
+        }
+    }
 }
