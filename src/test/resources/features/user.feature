@@ -61,9 +61,9 @@ Feature: User API tests
     And I get message "User not found with id: 99"
 
   Scenario: daily limit is negative
-    Given The endpoint for "/users/2/approve" is available for method "PUT"
+    Given The endpoint for "/users/3/approve" is available for method "PUT"
     And I log in as employee
-    When I approve the user with userId 2 and set the dailyLimit to -100.0, the absoluteSavingsLimit to 0.0, and the absoluteCheckingLimit to -200.0
+    When I approve the user with userId 3 and set the dailyLimit to -100.0, the absoluteSavingsLimit to 0.0, and the absoluteCheckingLimit to -200.0
     Then I get http status 422
     And I get message "The daily limit can't be set to a negative amount."
 
@@ -113,15 +113,15 @@ Feature: User API tests
 
 #  no idea why this does not work
   Scenario: Closing an employee account
-    Given The endpoint for "/users/4" is available for method "DELETE"
+    Given The endpoint for "/users/5" is available for method "DELETE"
     And I log in as employee
-    When I close the account for a user with id 4
+    When I close the account for a user with id 5
     Then I get http status 401
     And I get message "Employee accounts cannot be closed."
 
   Scenario: Closing an account that is already closed or not approved
-    Given The endpoint for "/users/2" is available for method "DELETE"
+    Given The endpoint for "/users/3" is available for method "DELETE"
     And I log in as employee
-    When I close the account for a user with id 2
+    When I close the account for a user with id 3
     Then I get http status 422
     And I get message "This account can't be closed."
