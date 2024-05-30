@@ -41,7 +41,7 @@ Feature: Transaction API tests
     Given I log in as user with valid accounts for transactions
     When I retrieve transaction history for user 1
     Then I receive transaction history http status 200
-    And I should receive transaction history as a list of size 6
+    And I should receive transaction history as a list of size 7
 
   Scenario: Searching transactions
     Given I log in as user with valid accounts for transactions
@@ -54,7 +54,7 @@ Feature: Transaction API tests
     And I log in as user with role employee to view transactions
     When I retrieve all transactions
     Then I receive http status 200 for transactions get request
-    And I should receive all transactions as a list of size 8
+    And I should receive all transactions as a list of size 9
 
   Scenario: Getting ATM transactions
     Given The endpoint for transactions "/transactions/ATM" is available for method "GET"
@@ -69,7 +69,7 @@ Feature: Transaction API tests
     And I log in as user with role employee to view transactions
     When I retrieve all transactions by customers
     Then I receive http status 200 for transactions get request
-    And I should receive all transactions by customers as a list of size 6
+    And I should receive all transactions by customers as a list of size 7
 
 
   Scenario: Getting all transactions by employees
@@ -84,5 +84,5 @@ Feature: Transaction API tests
     And I log in as user with role employee to view transactions
     When I retrieve online transactions
     Then I receive http status 200 for transactions get request
-    And I should receive all online transactions as a list of size 4
+    And I should receive all online transactions as a list of size 5
     And the fromAccount or toAccount of each transaction is different than ATM
