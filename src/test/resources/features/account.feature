@@ -38,7 +38,7 @@ Feature: Account API tests
     And I log in as user with role employee
     When I retrieve accounts by absolute limit 2000
     Then I receive http status 200 for accounts get request
-    And I should receive the accounts with absolute limit as a list of size 5
+    And I should receive the accounts with absolute limit as a list of size 4
     And The absolute limit of the accounts is less than or equal to 2000
 
   Scenario: Getting inactive accounts

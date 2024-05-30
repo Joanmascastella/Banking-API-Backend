@@ -106,6 +106,12 @@ public class TransactionService {
             throw new Exception("Both accounts must belong to the same user");
         }
     }
+    private void validateAccountOwnershipATM(Account account) throws Exception {
+        Long currentUserId = beanFactory.getCurrentUserId();
+            if (account.getUser().getId() != currentUserId) {
+                throw new Exception("The account must belong to the current user");
+            }
+    }
 
     private void validateTransactionLimits(Account fromAccount, double amount) throws Exception {
         if (fromAccount.getBalance() < amount) {
@@ -166,7 +172,8 @@ public class TransactionService {
         Users user = beanFactory.getCurrentUser();
         Account account = getAccount(transactionDTO.fromAccount());
 
-        checkAndUpdateDailyLimit(user, transactionDTO.amount());
+        validateTransactionLimits(account, transactionDTO.amount());
+        validateAccountOwnershipATM(account);
         updateAccountBalance(account, -transactionDTO.amount());
 
         Transaction transaction = new Transaction(user, account.getIBAN(), "ATM", transactionDTO.amount(), LocalDate.now());
@@ -190,16 +197,13 @@ public class TransactionService {
         accountService.save(account);
     }
 
-    private void checkAndUpdateDailyLimit(Users user, double amount) throws Exception {
-        if (!userService.checkAndUpdateDailyLimit(user, amount)) {
-            throw new Exception("Daily limit exceeded");
-        }
-    }
+
 
     public TransactionGETPOSTResponseDTO processDeposit(TransferMoneyPOSTResponse transactionDTO) throws Exception {
         Users user = beanFactory.getCurrentUser();
         Account account = getAccount(transactionDTO.toAccount());
-
+        validateTransactionLimits(account, transactionDTO.amount());
+        validateAccountOwnershipATM(account);
         updateAccountBalance(account, transactionDTO.amount());
 
         Transaction transaction = new Transaction(user, "ATM", account.getIBAN(), transactionDTO.amount(), LocalDate.now());

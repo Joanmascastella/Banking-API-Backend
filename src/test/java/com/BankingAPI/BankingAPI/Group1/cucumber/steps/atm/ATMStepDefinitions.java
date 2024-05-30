@@ -2,9 +2,7 @@ package com.BankingAPI.BankingAPI.Group1.cucumber.steps.atm;
 
 import com.BankingAPI.BankingAPI.Group1.config.testConfigurations.TestConfig;
 import com.BankingAPI.BankingAPI.Group1.cucumber.BaseStepDefinitions;
-import com.BankingAPI.BankingAPI.Group1.model.dto.ATMLoginDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
+import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
@@ -35,15 +33,20 @@ public class ATMStepDefinitions extends BaseStepDefinitions {
 
     @Autowired
     private TestConfig testConfig;
-
+    private String LOGIN_ENDPOINT;
     private ResponseEntity<String> response;
     private String token;
+    private ATMLoginDTO loginDTO;
+
 
     @SneakyThrows
     @Before
     public void init() {
+
+        LOGIN_ENDPOINT = testConfig.getBaseUrl() + "/atm/login";
         log.info("Initialized step definitions");
     }
+
 
     private String getToken(ATMLoginDTO loginDTO) throws JsonProcessingException {
         response = restTemplate.exchange(
@@ -54,13 +57,39 @@ public class ATMStepDefinitions extends BaseStepDefinitions {
         TokenDTO tokenDTO = mapper.readValue(response.getBody(), TokenDTO.class);
         return tokenDTO.token();
     }
+    @Then("I receive an ATM token")
+    public void iReceiveAToken() throws JsonProcessingException {
+        String responseBody = response.getBody();
+        Assertions.assertNotNull(responseBody, "Response body is null");
+        TokenDTO tokenDTO = mapper.readValue(responseBody, TokenDTO.class);
+        token = tokenDTO.token();
+        Assertions.assertNotNull(token, "Token is null");
+    }
 
     @Given("I log in to the ATM as user with valid credentials")
     public void iLogInToTheATMAsUserWithValidCredentials() throws JsonProcessingException {
+        loginDTO = new ATMLoginDTO("john.doe@example.com", "123");
         httpHeaders.clear();
         httpHeaders.add("Content-Type", "application/json");
-        ATMLoginDTO loginDTO = new ATMLoginDTO(VALID_USER_EMAIL, VALID_USER_PASSWORD);
         token = getToken(loginDTO);
+        httpHeaders.add("Authorization", "Bearer " + token);
+    }
+    @Given("I log in to the ATM as user with invalid credentials")
+    public void iLogInToTheATMAsUserWithInvalidCredentials() throws JsonProcessingException {
+        loginDTO = new ATMLoginDTO("invalid.email@example.com", "wrongpassword");
+        httpHeaders.clear();
+        httpHeaders.add("Content-Type", "application/json");
+    }
+    @When("I call the ATM login endpoint")
+    public void iCallTheApplicationLoginEndpoint() throws JsonProcessingException {
+        httpHeaders.add("Content-Type", "application/json");
+        response = restTemplate.exchange(
+                LOGIN_ENDPOINT,
+                HttpMethod.POST,
+                new HttpEntity<>(mapper.writeValueAsString(loginDTO), httpHeaders),
+                String.class
+        );
+        log.info("Response body: " + response.getBody());
     }
 
     @When("I perform an ATM deposit of {double} to account {string}")
@@ -93,18 +122,50 @@ public class ATMStepDefinitions extends BaseStepDefinitions {
         );
     }
 
-    @Then("I get ATM transaction http status {int}")
+    @Then("I get ATM http status {int}")
     public void iGetATMTransactionHttpStatus(int status) {
         int actual = response.getStatusCode().value();
         Assertions.assertEquals(status, actual);
     }
-
-    @Then("I get ATM transaction message {string}")
-    public void iGetATMTransactionMessage(String expectedMessage) {
+    @Then("I receive error message {string}")
+    public void iReceiveErrorMessage(String expectedMessage) {
         String responseBody = response.getBody();
         Assertions.assertNotNull(responseBody, "Response body is null");
         Assertions.assertTrue(responseBody.contains(expectedMessage), "Expected message: " + expectedMessage + ", but got: " + responseBody);
     }
+
+
+    @Then("the ATM deposit to account {string} is successful")
+    public void theATMDepositToAccountIsSuccessful(String toAccount) throws JsonProcessingException {
+        String responseBody = response.getBody();
+        Assertions.assertNotNull(responseBody, "Response body is null");
+
+        // Parse the response body to get the transaction details
+        TransactionGETPOSTResponseDTO transactionResponse = mapper.readValue(responseBody, TransactionGETPOSTResponseDTO.class);
+
+        // Check the transaction details
+        Assertions.assertEquals("ATM", transactionResponse.fromAccount(), "From account mismatch");
+        Assertions.assertEquals(toAccount, transactionResponse.toAccount(), "To account mismatch");
+        Assertions.assertNotNull(transactionResponse.amount(), "Amount is null");
+        Assertions.assertNotNull(transactionResponse.date(), "Date is null");
+        Assertions.assertNotNull(transactionResponse.userId(), "User ID is null");
+    }
+    @Then("the ATM withdrawal from account {string} is successful")
+    public void theATMWithdrawalFromAccountIsSuccessful(String fromAccount) throws JsonProcessingException {
+        String responseBody = response.getBody();
+        Assertions.assertNotNull(responseBody, "Response body is null");
+
+        // Parse the response body to get the transaction details
+        TransactionGETPOSTResponseDTO transactionResponse = mapper.readValue(responseBody, TransactionGETPOSTResponseDTO.class);
+
+        // Check the transaction details
+        Assertions.assertEquals(fromAccount, transactionResponse.fromAccount(), "From account mismatch");
+        Assertions.assertEquals("ATM", transactionResponse.toAccount(), "To account mismatch");
+        Assertions.assertNotNull(transactionResponse.amount(), "Amount is null");
+        Assertions.assertNotNull(transactionResponse.date(), "Date is null");
+        Assertions.assertNotNull(transactionResponse.userId(), "User ID is null");
+    }
+
 
 
 }
