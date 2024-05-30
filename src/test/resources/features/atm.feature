@@ -1,8 +1,9 @@
 Feature: atm
 
-  Scenario: Successful ATM login
+  Scenario: ATM login with valid credentials
     Given I log in to the ATM as user with valid credentials
     Then I receive http status 200
+    And I receive a token
 
   Scenario: Successful ATM deposit
     Given I log in to the ATM as user with valid credentials

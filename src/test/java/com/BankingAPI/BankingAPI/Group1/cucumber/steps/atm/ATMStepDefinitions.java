@@ -100,6 +100,7 @@ public class ATMStepDefinitions extends BaseStepDefinitions {
         Assertions.assertEquals(status, actual);
     }
 
+
     @Then("the ATM deposit to account {string} is successful")
     public void theATMDepositToAccountIsSuccessful(String toAccount) throws JsonProcessingException {
         String responseBody = response.getBody();
