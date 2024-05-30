@@ -62,7 +62,7 @@ public class ATMController {
         } catch (Exception e) {
             if (e.getMessage().contains("not found")) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            } else if (e.getMessage().contains("daily limit") || e.getMessage().contains("exceeds absolute limit")) {
+            } else if (e.getMessage().contains("daily limit")) {
                 return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

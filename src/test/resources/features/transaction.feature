@@ -37,17 +37,15 @@ Feature: Transaction API tests
     Then I get transaction transfer http status 400
     And I get transaction transfer message "Cannot transfer money between savings accounts."
 
-    #    This fails
   Scenario: Getting transaction history
     Given I log in as user with valid accounts for transactions
     When I retrieve transaction history for user 1
     Then I receive transaction history http status 200
-    And I should receive transaction history as a list of size 4
+    And I should receive transaction history as a list of size 6
 
-#    This fails
   Scenario: Searching transactions
     Given I log in as user with valid accounts for transactions
-    When I search transactions with criteria IBAN "123456789", amount 100.0, amountGreater 50.0, amountLess 200.0, startDate "2023-01-01", endDate "2023-12-31"
+    When I search transactions with criteria IBAN "NL89INHO0044053200", amount 9500.0, amountGreater 50.0, amountLess 10000.0, startDate "2024-01-01", endDate "2024-12-31"
     Then I receive search transactions http status 200
     And I should receive search results as a list of size 1
 
