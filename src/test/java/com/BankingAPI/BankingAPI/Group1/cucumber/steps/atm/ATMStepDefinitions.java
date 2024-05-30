@@ -4,6 +4,7 @@ import com.BankingAPI.BankingAPI.Group1.config.testConfigurations.TestConfig;
 import com.BankingAPI.BankingAPI.Group1.cucumber.BaseStepDefinitions;
 import com.BankingAPI.BankingAPI.Group1.model.dto.ATMLoginDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -99,12 +100,37 @@ public class ATMStepDefinitions extends BaseStepDefinitions {
         Assertions.assertEquals(status, actual);
     }
 
-    @Then("I get ATM transaction message {string}")
-    public void iGetATMTransactionMessage(String expectedMessage) {
+    @Then("the ATM deposit to account {string} is successful")
+    public void theATMDepositToAccountIsSuccessful(String toAccount) throws JsonProcessingException {
         String responseBody = response.getBody();
         Assertions.assertNotNull(responseBody, "Response body is null");
-        Assertions.assertTrue(responseBody.contains(expectedMessage), "Expected message: " + expectedMessage + ", but got: " + responseBody);
+
+        // Parse the response body to get the transaction details
+        TransactionGETPOSTResponseDTO transactionResponse = mapper.readValue(responseBody, TransactionGETPOSTResponseDTO.class);
+
+        // Check the transaction details
+        Assertions.assertEquals("ATM", transactionResponse.fromAccount(), "From account mismatch");
+        Assertions.assertEquals(toAccount, transactionResponse.toAccount(), "To account mismatch");
+        Assertions.assertNotNull(transactionResponse.amount(), "Amount is null");
+        Assertions.assertNotNull(transactionResponse.date(), "Date is null");
+        Assertions.assertNotNull(transactionResponse.userId(), "User ID is null");
     }
+    @Then("the ATM withdrawal from account {string} is successful")
+    public void theATMWithdrawalFromAccountIsSuccessful(String fromAccount) throws JsonProcessingException {
+        String responseBody = response.getBody();
+        Assertions.assertNotNull(responseBody, "Response body is null");
+
+        // Parse the response body to get the transaction details
+        TransactionGETPOSTResponseDTO transactionResponse = mapper.readValue(responseBody, TransactionGETPOSTResponseDTO.class);
+
+        // Check the transaction details
+        Assertions.assertEquals(fromAccount, transactionResponse.fromAccount(), "From account mismatch");
+        Assertions.assertEquals("ATM", transactionResponse.toAccount(), "To account mismatch");
+        Assertions.assertNotNull(transactionResponse.amount(), "Amount is null");
+        Assertions.assertNotNull(transactionResponse.date(), "Date is null");
+        Assertions.assertNotNull(transactionResponse.userId(), "User ID is null");
+    }
+
 
 
 }
