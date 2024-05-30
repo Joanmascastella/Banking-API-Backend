@@ -8,6 +8,7 @@ import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
+import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -32,8 +33,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Log
 public class AccountStepDefinitions extends BaseStepDefinitions {
@@ -41,6 +41,9 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private AccountRepository accountRepository;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -225,5 +228,38 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
         for (Account account : accounts) {
             Assertions.assertFalse(account.isActive(), "Expected account to be closed, but it is active: " + account);
         }
+    }
+
+    @When("I update the absolute limit of the account with IBAN {string} to {double}")
+    public void iUpdateTheAccountWithUserId(String IBAN, double absoluteLimit ) {
+        httpHeaders.clear();
+        httpHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json");
+        httpHeaders.add("Authorization", "Bearer " + token);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("IBAN", IBAN);
+        requestBody.put("absoluteLimit", absoluteLimit);
+
+        HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+
+        response = restTemplate.exchange(testConfig.getBaseUrl() + "/accounts/customers",
+                HttpMethod.PUT,
+                requestEntity,
+                String.class);
+    }
+
+    @And("the absolute limit of account with IBAN {string} is updated to {double}")
+    public void theAccountWithUserIdIsUpdatedWithTheNewData(String IBAN, double absoluteLimit) {
+        Optional<Account> accountOptional = accountRepository.findByIBAN(IBAN);
+        if (accountOptional.isPresent()) {
+            Account account = accountOptional.get();
+            Assertions.assertEquals(absoluteLimit, account.getAbsoluteLimit());
+        }
+    }
+
+    @And("I get an empty account response body")
+    public void iGetAnEmptyAccountResponseBody() {
+        String responseBody = response.getBody().toString();
+        Assertions.assertEquals("[]", responseBody, "Response body should be an empty list");
     }
 }
