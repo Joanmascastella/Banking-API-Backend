@@ -1,5 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
+import com.BankingAPI.BankingAPI.Group1.exception.RestResponseEntityExceptionHandler;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
@@ -8,10 +9,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/transactions")
-public class TransactionController {
+public class TransactionController extends RestResponseEntityExceptionHandler {
 
 
     private final TransactionService transactionService;
@@ -88,202 +87,68 @@ public class TransactionController {
 
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     @GetMapping
-    public ResponseEntity<Object> getAllTransactions() {
-        try {
-            return ResponseEntity.status(200).body(transactionService.findAllTransactions());
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<Object> getAllTransactions() throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.findAllTransactions());
     }
 
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     @GetMapping("/customer/{userId}")
-    public ResponseEntity<Object> getTransactionsOfCustomerByEmployee(@PathVariable("userId") long userId) {
-        try {
-            return ResponseEntity.status(200).body(transactionService.getTransactionsByUserId(userId));
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<Object> getTransactionsOfCustomerByEmployee(@PathVariable("userId") long userId) throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.getTransactionsByUserId(userId));
     }
-
-
 
     @GetMapping("/byCustomers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getTransactionsInitializedByCustomers() {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findTransactionsInitializedByCustomers());
-        }
-       catch (Exception exception) {
-                if (exception instanceof BadCredentialsException){
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-                }
-                else if (exception instanceof AuthenticationException) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-                }
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
+    public ResponseEntity getTransactionsInitializedByCustomers() throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.findTransactionsInitializedByCustomers());
     }
 
     @GetMapping("/byEmployees")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getTransactionsInitializedByEmployees() {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findTransactionsInitializedByEmployees());
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity getTransactionsInitializedByEmployees() throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.findTransactionsInitializedByEmployees());
     }
-
-
-
 
     @GetMapping("/ATM")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getATMTransactions() {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findATMTransactions());}
-        catch (Exception exception) {
-                if (exception instanceof BadCredentialsException){
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-                }
-                else if (exception instanceof AuthenticationException) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-                }
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
+    public ResponseEntity getATMTransactions() throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.findATMTransactions());
     }
-
-
-
 
     @GetMapping("/ATM/withdrawals/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity<Object> getATMWithdrawalsByUserId(@PathVariable long userId) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findATMWithdrawalsByUserId(userId));
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            } else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            } else if (exception instanceof IllegalArgumentException) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<Object> getATMWithdrawalsByUserId(@PathVariable long userId) throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.findATMWithdrawalsByUserId(userId));
     }
-
-
 
     @GetMapping("/ATM/deposits/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity<Object> getATMDepositsByUserId(@PathVariable long userId) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findATMDepositsByUserId(userId));
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            } else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            } else if (exception instanceof IllegalArgumentException) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<Object> getATMDepositsByUserId(@PathVariable long userId) throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.findATMDepositsByUserId(userId));
     }
 
     @GetMapping("/online")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getOnlineTransactions() {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactions());}
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
+    public ResponseEntity getOnlineTransactions() throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactions());
     }
 
-
     @GetMapping("/online/byEmployees")
-     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getOnlineTransactionsByEmployees() {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactionsByEmployees());}
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ResponseEntity getOnlineTransactionsByEmployees() throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactionsByEmployees());
     }
 
     @GetMapping("/online/byCustomers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getOnlineTransactionsByCustomers() {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactionsByCustomers());}
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
+    public ResponseEntity getOnlineTransactionsByCustomers() throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactionsByCustomers());
     }
 
     @GetMapping("/online/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity<Object> getOnlineTransactionsByUserId(@PathVariable long userId) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactionsByUserId(userId));
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            } else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            } else if (exception instanceof IllegalArgumentException) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<Object> getOnlineTransactionsByUserId(@PathVariable long userId) throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.findOnlineTransactionsByUserId(userId));
     }
 
 }

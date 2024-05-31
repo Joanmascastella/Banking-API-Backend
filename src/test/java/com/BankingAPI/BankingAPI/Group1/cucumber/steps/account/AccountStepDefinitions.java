@@ -6,7 +6,6 @@ import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;

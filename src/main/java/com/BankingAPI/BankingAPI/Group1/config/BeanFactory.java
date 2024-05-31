@@ -22,6 +22,10 @@ public class BeanFactory {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public Exception exception() {
+        return new Exception();
+    }
     public Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
