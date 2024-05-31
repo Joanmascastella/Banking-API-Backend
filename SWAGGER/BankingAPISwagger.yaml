@@ -65,7 +65,8 @@ paths:
           description: Transfer cannot be completed, insufficient funds or account restrictions.
       security:
         - bearerAuth: []
-  /accounts/{accountId}:
+
+  /users/{userId}:
     delete:
       tags:
         - Employee
@@ -74,7 +75,7 @@ paths:
       operationId: closeAccount
       parameters:
         - in: path
-          name: accountId
+          name: userId
           required: true
           schema:
             type: integer
@@ -99,7 +100,8 @@ paths:
           description: Internal server error
       security:
         - bearerAuth: [ ]
-  /customers/iban:
+
+  /users/iban:
     get:
       tags:
         - Customer
@@ -132,6 +134,7 @@ paths:
           description: No IBAN found for the provided customer name.
       security:
         - bearerAuth: []
+
   /transactions/transfers:
     post:
       tags:
@@ -160,6 +163,7 @@ paths:
           description: Transfer cannot be completed, insufficient funds or account restrictions.
       security:
         - bearerAuth: []
+
   /accounts/{userId}/details:
     get:
       tags:
@@ -184,6 +188,7 @@ paths:
           description: User ID not found.
       security:
         - bearerAuth: []
+
   /transactions/{userId}/history:
     get:
       tags:
@@ -197,6 +202,7 @@ paths:
           schema:
             type: string
             format: uuid
+
       responses:
         '200':
           description: Transaction history retrieved
@@ -210,6 +216,7 @@ paths:
           description: User ID not found.
       security:
         - bearerAuth: []
+
   /atm/login:
     post:
       tags:
@@ -236,13 +243,15 @@ paths:
               schema:
                 type: object
                 properties:
+                  token:
+                    type: string
+                    description: JWT to be used for authentication in subsequent requests
                   message:
                     type: string
                     example: "Login successful."
         '401':
           description: Unauthorized, incorrect credentials.
-      security:
-        - bearerAuth: []
+
   /atm/withdrawals:
     post:
       tags:
@@ -270,6 +279,7 @@ paths:
           description: Operation failed due to ATM limits or other operational reasons.
       security:
         - bearerAuth: []
+
   /atm/deposits:
     post:
       tags:
@@ -297,6 +307,7 @@ paths:
           description: Operation failed due to ATM limits or other operational reasons.
       security:
         - bearerAuth: []
+
   /transactions/search:
     get:
       tags:
@@ -342,13 +353,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Transaction'
-        '400':
-          description: Invalid query parameters, such as improperly formatted dates or invalid numeric filters.
-        '404':
-          description: No transactions found matching the criteria.
-
       security:
         - bearerAuth: []
+
   /users/noncustomers:
     get:
       tags:
@@ -365,21 +372,25 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
-        '400':
-          description: Invalid query or request parameters.
-        '404':
-          description: No non-customer users found.
-        '403':
-          description: User must be role of employee.
+        '500':
+          description: Problems accessing database
       security:
         - bearerAuth: []
-  /users/approve:
+
+  /users/{userId}/approve:
     put:
       tags:
         - Employee
       summary: Approve customer after user registration
       description: This can only be done by the employee.
       operationId: approveCustomer
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         description: Updated user object and absolute saving and checking limits
         required: true
@@ -408,13 +419,15 @@ paths:
           description: User approved successfully.
         "400":
           description: Invalid user supplied
+        '409':
+          description: User already approved.
         '403':
           description: User must be role of employee.
         "404":
           description: User not found
-
       security:
         - bearerAuth: [ ]
+
   /accounts/customers:
     get:
       tags:
@@ -492,9 +505,7 @@ paths:
           description: User is not authorized
       security:
         - bearerAuth: []
-        
- 
-        
+
   /accounts/byAbsoluteLimit:
     get:
       tags:
@@ -872,7 +883,7 @@ paths:
           description: User is not authorized
       security:
         - bearerAuth: []
-  /users/login:
+  /login:
     post:
       tags:
         - User

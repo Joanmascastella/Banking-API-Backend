@@ -6,6 +6,7 @@ Feature: atm
     Then I get ATM http status 200
     And I receive an ATM token
 
+# This fails due to dependency
   Scenario: ATM login with invalid credentials
     Given I log in to the ATM as user with invalid credentials
     When I call the ATM login endpoint

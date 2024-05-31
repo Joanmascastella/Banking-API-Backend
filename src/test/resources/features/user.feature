@@ -116,7 +116,7 @@ Feature: User API tests
     Then I get http status 404                                           
     And I get message "User not found with id: 9"
 
-#  no idea why this does not work
+# This fails due to dependency
   Scenario: Closing an employee account
     Given The endpoint for "/users/5" is available for method "DELETE"
     And I log in as employee
