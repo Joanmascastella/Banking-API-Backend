@@ -85,4 +85,60 @@ Feature: Transaction API tests
     When I retrieve online transactions
     Then I receive http status 200 for transactions get request
     And I should receive all online transactions as a list of size 5
-    And the fromAccount or toAccount of each transaction is different than ATM
+    And the fromAccount and toAccount of each transaction is different than ATM
+
+  Scenario: Getting online transactions by customers
+    Given The endpoint for transactions "/transactions/online/byCustomers" is available for method "GET"
+    And I log in as user with role employee to view transactions
+    When I retrieve online transactions by customers
+    Then I receive http status 200 for transactions get request
+    And I should receive all online transactions by customers as a list of size 3
+    And the fromAccount and toAccount of each transaction is different than ATM
+
+  Scenario: Getting online transactions by employees
+    Given The endpoint for transactions "/transactions/online/byEmployees" is available for method "GET"
+    And I log in as user with role employee to view transactions
+    When I retrieve online transactions by employees
+    Then I receive http status 200 for transactions get request
+    And I should receive all online transactions by employees as a list of size 2
+    And the fromAccount and toAccount of each transaction is different than ATM
+
+
+  Scenario: Getting all transactions of user by employee
+    Given The endpoint for transactions "/transactions/customer/1" is available for method "GET"
+    And I log in as user with role employee to view transactions
+    When I retrieve all transactions of the user with id 1
+    Then I receive http status 200 for transactions get request
+    And I should receive transaction history as a list of size 7
+    And the user id of each transaction should be 1
+
+
+  Scenario: Getting ATM deposits of user
+    Given The endpoint for transactions "/transactions/ATM/deposits/1" is available for method "GET"
+    And I log in as user with role employee to view transactions
+    When I retrieve all ATM deposits of the user with id 1
+    Then I receive http status 200 for transactions get request
+    And I should receive transaction history as a list of size 2
+    And the user id of each transaction should be 1
+    And the toAccount of each transaction should be ATM
+
+
+  Scenario: Getting ATM withdrawals of user
+    Given The endpoint for transactions "/transactions/ATM/withdrawals/1" is available for method "GET"
+    And I log in as user with role employee to view transactions
+    When I retrieve all ATM withdrawals of the user with id 1
+    Then I receive http status 200 for transactions get request
+    And I should receive transaction history as a list of size 2
+    And the user id of each transaction should be 1
+    And the fromAccount of each transaction should be ATM
+
+
+  Scenario: Getting online transactions of user
+    Given The endpoint for transactions "/transactions/online/1" is available for method "GET"
+    And I log in as user with role employee to view transactions
+    When I retrieve all online transactions of the user with id 1
+    Then I receive http status 200 for transactions get request
+    And I should receive transaction history as a list of size 3
+    And the user id of each transaction should be 1
+    And the fromAccount and toAccount of each transaction is different than ATM
+

@@ -185,6 +185,7 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
         httpHeaders.add("Content-Type", "application/json");
 
         response = restTemplate.exchange(testConfig.getBaseUrl() + "/transactions", HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
+
     }
 
 
@@ -209,7 +210,6 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
         httpHeaders.add("Content-Type", "application/json");
 
         response = restTemplate.exchange(testConfig.getBaseUrl() + "/transactions/ATM", HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
-        System.out.println(response.getBody());
     }
 
     @And("I should receive all ATM transactions as a list of size {int}")
@@ -239,7 +239,6 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
         httpHeaders.add("Content-Type", "application/json");
 
         response = restTemplate.exchange(testConfig.getBaseUrl() + "/transactions/byCustomers", HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
-        System.out.println(response.getBody());
     }
 
     @And("I should receive all transactions by customers as a list of size {int}")
@@ -257,7 +256,6 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
         httpHeaders.add("Content-Type", "application/json");
 
         response = restTemplate.exchange(testConfig.getBaseUrl() + "/transactions/byEmployees", HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
-        System.out.println(response.getBody());
     }
 
     @And("I should receive all transactions by employees as a list of size {int}")
@@ -275,7 +273,6 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
         httpHeaders.add("Content-Type", "application/json");
 
         response = restTemplate.exchange(testConfig.getBaseUrl() + "/transactions/online", HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
-        System.out.println(response.getBody());
     }
 
     @And("I should receive all online transactions as a list of size {int}")
@@ -286,17 +283,152 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
     }
 
 
-    @And("the fromAccount or toAccount of each transaction is different than ATM")
+    @And("the fromAccount and toAccount of each transaction is different than ATM")
     public void iShouldReceiveTransactionsFromAccountOrToAccountNotATM() throws IOException {
         JsonNode res = mapper.readTree(response.getBody());
         ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETPOSTResponseDTO>>() {});
         List<TransactionGETPOSTResponseDTO> retrievedData = reader.readValue(res);
 
-        Boolean filteredData = retrievedData.stream().allMatch(item -> !(item.fromAccount().equals("ATM") && item.toAccount().equals("ATM")));
+        Boolean filteredData = retrievedData.stream().allMatch(item -> !item.fromAccount().equals("ATM") && !item.toAccount().equals("ATM"));
 
         Assertions.assertTrue(filteredData);
 
     }
 
+
+    @When("I retrieve online transactions by customers")
+    public void iRetrieveOnlineTransactionsByCustomers() throws JsonProcessingException {
+
+        httpHeaders.clear();
+        httpHeaders.add("Authorization", "Bearer " + token);
+        httpHeaders.add("Content-Type", "application/json");
+
+        response = restTemplate.exchange(testConfig.getBaseUrl() + "/transactions/online/byCustomers", HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
+    }
+
+    @And("I should receive all online transactions by customers as a list of size {int}")
+    public void iShouldReceiveAllOnlineTransactionsByCustomers(int count) {
+        int actual = JsonPath.read(response.getBody(), "$.size()");
+        Assertions.assertEquals(count, actual);
+
+    }
+
+    @When("I retrieve online transactions by employees")
+    public void iRetrieveOnlineTransactionsByEmployees() throws JsonProcessingException {
+
+        httpHeaders.clear();
+        httpHeaders.add("Authorization", "Bearer " + token);
+        httpHeaders.add("Content-Type", "application/json");
+
+        response = restTemplate.exchange(testConfig.getBaseUrl() + "/transactions/online/byEmployees", HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
+    }
+
+    @And("I should receive all online transactions by employees as a list of size {int}")
+    public void iShouldReceiveAllOnlineTransactionsByEmployees(int count) {
+        int actual = JsonPath.read(response.getBody(), "$.size()");
+        Assertions.assertEquals(count, actual);
+
+    }
+
+
+
+    @When("I retrieve all transactions of the user with id {int}")
+    public void iRetrieveAllTransactionsOfUserWithId(int userId) throws JsonProcessingException {
+
+        httpHeaders.clear();
+        httpHeaders.add("Authorization", "Bearer " + token);
+        httpHeaders.add("Content-Type", "application/json");
+
+        response = restTemplate.exchange(UriComponentsBuilder
+                        .fromUriString(testConfig.getBaseUrl() + "/transactions/customer")
+                        .pathSegment(String.valueOf(userId))
+                        .toUriString(),
+                HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
+
+    }
+
+    @And("the user id of each transaction should be {int}")
+    public void iShouldReceiveTransactionsOfTheUserWithId(int userId) throws IOException {
+        JsonNode res = mapper.readTree(response.getBody());
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETPOSTResponseDTO>>() {});
+        List<TransactionGETPOSTResponseDTO> retrievedData = reader.readValue(res);
+
+        Boolean filteredData = retrievedData.stream().allMatch(item -> item.userId().equals(Long.valueOf(userId)));
+
+        Assertions.assertTrue(filteredData);
+
+    }
+
+
+    @When("I retrieve all ATM deposits of the user with id {int}")
+    public void iRetrieveAllATMDepositsOfUserWithId(int userId) throws JsonProcessingException {
+
+        httpHeaders.clear();
+        httpHeaders.add("Authorization", "Bearer " + token);
+        httpHeaders.add("Content-Type", "application/json");
+
+        response = restTemplate.exchange(UriComponentsBuilder
+                        .fromUriString(testConfig.getBaseUrl() + "/transactions/ATM/deposits/")
+                        .pathSegment(String.valueOf(userId))
+                        .toUriString(),
+                HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
+
+    }
+
+
+    @And("the toAccount of each transaction should be ATM")
+    public void iShouldReceiveTransactionsToAccountATM() throws IOException {
+        JsonNode res = mapper.readTree(response.getBody());
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETPOSTResponseDTO>>() {});
+        List<TransactionGETPOSTResponseDTO> retrievedData = reader.readValue(res);
+
+        Boolean filteredData = retrievedData.stream().allMatch(item -> item.toAccount().equals("ATM"));
+
+        Assertions.assertTrue(filteredData);
+
+    }
+
+
+    @When("I retrieve all ATM withdrawals of the user with id {int}")
+    public void iRetrieveAllATMWithdrawalsOfUserWithId(int userId) throws JsonProcessingException {
+
+        httpHeaders.clear();
+        httpHeaders.add("Authorization", "Bearer " + token);
+        httpHeaders.add("Content-Type", "application/json");
+
+        response = restTemplate.exchange(UriComponentsBuilder
+                        .fromUriString(testConfig.getBaseUrl() + "/transactions/ATM/withdrawals/")
+                        .pathSegment(String.valueOf(userId))
+                        .toUriString(),
+                HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
+
+    }
+
+    @And("the fromAccount of each transaction should be ATM")
+    public void iShouldReceiveTransactionsFromAccountATM() throws IOException {
+        JsonNode res = mapper.readTree(response.getBody());
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETPOSTResponseDTO>>() {});
+        List<TransactionGETPOSTResponseDTO> retrievedData = reader.readValue(res);
+
+        Boolean filteredData = retrievedData.stream().allMatch(item -> item.fromAccount().equals("ATM"));
+
+        Assertions.assertTrue(filteredData);
+
+    }
+
+    @When("I retrieve all online transactions of the user with id {int}")
+    public void iRetrieveAllOnlineTransactionsOfUserWithId(int userId) throws JsonProcessingException {
+
+        httpHeaders.clear();
+        httpHeaders.add("Authorization", "Bearer " + token);
+        httpHeaders.add("Content-Type", "application/json");
+
+        response = restTemplate.exchange(UriComponentsBuilder
+                        .fromUriString(testConfig.getBaseUrl() + "/transactions/online/")
+                        .pathSegment(String.valueOf(userId))
+                        .toUriString(),
+                HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
+
+    }
 
 }
