@@ -1,6 +1,7 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
 import com.BankingAPI.BankingAPI.Group1.exception.InvalidLimitException;
+import com.BankingAPI.BankingAPI.Group1.exception.RestResponseEntityExceptionHandler;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
@@ -10,18 +11,16 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
-
-import javax.naming.AuthenticationException;
 
 @RestController
 @RequestMapping(value = "/accounts")
-public class AccountController {
+public class AccountController extends RestResponseEntityExceptionHandler {
     private final AccountService accountService;
     private final TransactionService transactionService;
 
     public AccountController(AccountService accountService, TransactionService transactionService) {
+
         this.accountService = accountService;
         this.transactionService = transactionService;
     }
@@ -74,53 +73,20 @@ public class AccountController {
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     @GetMapping(value = "/customers")
-    public ResponseEntity<Object> getAllCustomerAccounts() {
-        try{
-            return ResponseEntity.status(200).body(accountService.getAllCustomerAccounts());
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();}
-        }
+    public ResponseEntity<Object> getAllCustomerAccounts() throws Exception {
+            return ResponseEntity.status(HttpStatus.OK).body(accountService.getAllCustomerAccounts());
     }
 
     @GetMapping("/byAbsoluteLimit")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity<Object> getAccountsByAbsoluteLimit(@RequestParam(required = true) double absoluteLimit) {
-        try {
+    public ResponseEntity<Object> getAccountsByAbsoluteLimit(@RequestParam(required = true) double absoluteLimit) throws Exception {
             return ResponseEntity.status(HttpStatus.OK).body(accountService.findByAbsoluteLimit(absoluteLimit));
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
     }
 
     @GetMapping("/inactive")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getInactiveAccounts() {
-        try {
+    public ResponseEntity getInactiveAccounts() throws Exception {
             return ResponseEntity.status(HttpStatus.OK).body(accountService.findByInactiveTag());
-        }
-        catch (Exception exception) {
-            if (exception instanceof BadCredentialsException){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            else if (exception instanceof AuthenticationException) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+
     }
 }
