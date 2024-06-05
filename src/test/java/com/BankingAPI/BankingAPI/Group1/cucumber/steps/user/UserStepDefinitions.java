@@ -293,4 +293,9 @@ public class UserStepDefinitions extends BaseStepDefinitions {
                 requestEntity,
                 String.class);
     }
+
+    @And("I have a valid employee token")
+    public void iHaveAValidEmployeeToken() {
+        this.token = testConfig.getToken();
+    }
 }
