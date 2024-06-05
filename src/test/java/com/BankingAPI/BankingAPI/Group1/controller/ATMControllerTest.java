@@ -3,7 +3,9 @@ package com.BankingAPI.BankingAPI.Group1.controller;
 import com.BankingAPI.BankingAPI.Group1.config.ApiTestConfiguration;
 import com.BankingAPI.BankingAPI.Group1.config.testConfigurations.TestSecurityConfig;
 import com.BankingAPI.BankingAPI.Group1.exception.CustomAuthenticationException;
-import com.BankingAPI.BankingAPI.Group1.model.dto.*;
+import com.BankingAPI.BankingAPI.Group1.model.dto.ATMLoginDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +21,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+
 import java.time.LocalDate;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -46,12 +50,12 @@ class ATMControllerTest {
     private ObjectMapper objectMapper;
 
     private TransferMoneyPOSTResponse transactionDTO;
-    private TransactionGETPOSTResponseDTO responseDTO;
+    private TransactionGETDTO responseDTO;
 
     @BeforeEach
     void setUp() {
         transactionDTO = new TransferMoneyPOSTResponse("DE89370400440532013000", "DE89370400440532013012", 100.0);
-        responseDTO = new TransactionGETPOSTResponseDTO("DE89370400440532013000", "DE89370400440532013012", 100.0, LocalDate.now(), 1L);
+        responseDTO = new TransactionGETDTO("DE89370400440532013000", "DE89370400440532013012", 100.0, LocalDate.now(), 1L);
     }
     @Test
     void testLogin_Success() throws Exception {

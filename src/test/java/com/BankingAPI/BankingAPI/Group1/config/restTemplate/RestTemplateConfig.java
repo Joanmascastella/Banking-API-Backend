@@ -5,9 +5,9 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.io.IOException;
 public class RestTemplateConfig {
 
     @Bean
-    public TestRestTemplate testRestTemplate(RestTemplateBuilder builder) {
+    public TestRestTemplate customTestRestTemplate(RestTemplateBuilder builder) {
         return new TestRestTemplate(builder
                 .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
                 .errorHandler(new ResponseErrorHandler() {
@@ -34,7 +34,7 @@ public class RestTemplateConfig {
     }
 
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    public RestTemplate customRestTemplate2(RestTemplateBuilder builder) {
         return builder
                 .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
                 .errorHandler(new ResponseErrorHandler() {

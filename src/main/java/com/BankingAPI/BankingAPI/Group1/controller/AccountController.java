@@ -54,8 +54,6 @@ public class AccountController extends RestResponseEntityExceptionHandler {
     }
 
 
-
-
     @PutMapping("/customers")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<Object> updateAccount(@RequestBody AccountGETPOSTResponseDTO account) {

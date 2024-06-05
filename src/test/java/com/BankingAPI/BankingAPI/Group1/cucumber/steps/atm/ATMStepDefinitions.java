@@ -2,11 +2,13 @@ package com.BankingAPI.BankingAPI.Group1.cucumber.steps.atm;
 
 import com.BankingAPI.BankingAPI.Group1.config.testConfigurations.TestConfig;
 import com.BankingAPI.BankingAPI.Group1.cucumber.BaseStepDefinitions;
-import com.BankingAPI.BankingAPI.Group1.model.dto.*;
+import com.BankingAPI.BankingAPI.Group1.model.dto.ATMLoginDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
-
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -141,7 +143,7 @@ public class ATMStepDefinitions extends BaseStepDefinitions {
         Assertions.assertNotNull(responseBody, "Response body is null");
 
         // Parse the response body to get the transaction details
-        TransactionGETPOSTResponseDTO transactionResponse = mapper.readValue(responseBody, TransactionGETPOSTResponseDTO.class);
+        TransactionGETDTO transactionResponse = mapper.readValue(responseBody, TransactionGETDTO.class);
 
         // Check the transaction details
         Assertions.assertEquals("ATM", transactionResponse.fromAccount(), "From account mismatch");
@@ -156,7 +158,7 @@ public class ATMStepDefinitions extends BaseStepDefinitions {
         Assertions.assertNotNull(responseBody, "Response body is null");
 
         // Parse the response body to get the transaction details
-        TransactionGETPOSTResponseDTO transactionResponse = mapper.readValue(responseBody, TransactionGETPOSTResponseDTO.class);
+        TransactionGETDTO transactionResponse = mapper.readValue(responseBody, TransactionGETDTO.class);
 
         // Check the transaction details
         Assertions.assertEquals(fromAccount, transactionResponse.fromAccount(), "From account mismatch");

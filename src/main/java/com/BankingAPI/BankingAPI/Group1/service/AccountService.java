@@ -4,19 +4,15 @@ import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.exception.IBANGenerationException;
 import com.BankingAPI.BankingAPI.Group1.exception.InvalidLimitException;
 import com.BankingAPI.BankingAPI.Group1.model.Account;
-
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserApprovalDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.UserDetailsDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
-
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-
-import jakarta.persistence.EntityNotFoundException;
-
 
 import java.util.List;
 import java.util.Optional;

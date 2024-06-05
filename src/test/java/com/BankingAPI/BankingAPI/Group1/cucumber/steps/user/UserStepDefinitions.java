@@ -4,14 +4,11 @@ import com.BankingAPI.BankingAPI.Group1.config.testConfigurations.TestConfig;
 import com.BankingAPI.BankingAPI.Group1.cucumber.BaseStepDefinitions;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
 import com.BankingAPI.BankingAPI.Group1.repository.UserRepository;
-import com.BankingAPI.BankingAPI.Group1.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.Before;
-import io.cucumber.java.bs.A;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -21,7 +18,10 @@ import lombok.extern.java.Log;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 
@@ -30,7 +30,7 @@ public class UserStepDefinitions extends BaseStepDefinitions {
     HttpHeaders httpHeaders = new HttpHeaders();
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplate customRestTemplate2;
 
     @Autowired
     private ObjectMapper mapper;
@@ -55,7 +55,7 @@ public class UserStepDefinitions extends BaseStepDefinitions {
         String url = testConfig.getBaseUrl() + "/" + endpoint;
         log.info("Checking availability of endpoint: " + url + " for method: " + method);
 
-        response = restTemplate.exchange(
+        response = customRestTemplate2.exchange(
                 url,
                 HttpMethod.OPTIONS,
                 new HttpEntity<>(null, httpHeaders),
@@ -100,7 +100,7 @@ public class UserStepDefinitions extends BaseStepDefinitions {
     public void iRetrieveUserDetails() {
         httpHeaders.clear();
         httpHeaders.add("Authorization", "Bearer " + token);
-        response = restTemplate.exchange(
+        response = customRestTemplate2.exchange(
                 testConfig.getBaseUrl() + "/users/details",
                 HttpMethod.GET,
                 new HttpEntity<>(null, httpHeaders),
@@ -131,7 +131,7 @@ public class UserStepDefinitions extends BaseStepDefinitions {
     public void iProvideFirstNameAndLastName(String firstName, String lastName) {
         httpHeaders.clear();
         httpHeaders.add("Authorization", "Bearer " + token);
-        response = restTemplate.exchange(
+        response = customRestTemplate2.exchange(
                 testConfig.getBaseUrl() + "/users/iban?firstName=" + firstName + "&lastName=" + lastName,
                 HttpMethod.GET,
                 new HttpEntity<>(null, httpHeaders),
@@ -150,7 +150,7 @@ public class UserStepDefinitions extends BaseStepDefinitions {
     public void iRetrieveAllUsers() {
         httpHeaders.clear();
         httpHeaders.add("Authorization", "Bearer " + token);
-        response = restTemplate.exchange(
+        response = customRestTemplate2.exchange(
              testConfig.getBaseUrl() + "/users",
              HttpMethod.GET,
              new HttpEntity<>(null, httpHeaders),
@@ -176,7 +176,7 @@ public class UserStepDefinitions extends BaseStepDefinitions {
     public void iRetrieveAllUnapprovedUsers() {
         httpHeaders.clear();
         httpHeaders.add("Authorization", "Bearer " + token);
-        response = restTemplate.exchange(
+        response = customRestTemplate2.exchange(
                 testConfig.getBaseUrl() + "/users/noncustomers",
                 HttpMethod.GET,
                 new HttpEntity<>(null, httpHeaders),
@@ -204,7 +204,7 @@ public class UserStepDefinitions extends BaseStepDefinitions {
 
         HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
 
-        response = restTemplate.exchange(testConfig.getBaseUrl() + "/users/" + userId + "/approve",
+        response = customRestTemplate2.exchange(testConfig.getBaseUrl() + "/users/" + userId + "/approve",
                 HttpMethod.PUT,
                 requestEntity,
                 String.class);
@@ -238,7 +238,7 @@ public class UserStepDefinitions extends BaseStepDefinitions {
 
         HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
 
-        response = restTemplate.exchange(testConfig.getBaseUrl() + "/users",
+        response = customRestTemplate2.exchange(testConfig.getBaseUrl() + "/users",
                 HttpMethod.PUT,
                 requestEntity,
                 String.class);
@@ -259,7 +259,7 @@ public class UserStepDefinitions extends BaseStepDefinitions {
         httpHeaders.clear();
         httpHeaders.add("Authorization", "Bearer " + token);
 
-        response = restTemplate.exchange(testConfig.getBaseUrl() + "/users/" + userId,
+        response = customRestTemplate2.exchange(testConfig.getBaseUrl() + "/users/" + userId,
                 HttpMethod.DELETE,
                 new HttpEntity<>(httpHeaders),
                 String.class);
@@ -288,7 +288,7 @@ public class UserStepDefinitions extends BaseStepDefinitions {
 
         HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
 
-        response = restTemplate.exchange(testConfig.getBaseUrl() + "/users/" + userId + "/approve",
+        response = customRestTemplate2.exchange(testConfig.getBaseUrl() + "/users/" + userId + "/approve",
                 HttpMethod.PUT,
                 requestEntity,
                 String.class);

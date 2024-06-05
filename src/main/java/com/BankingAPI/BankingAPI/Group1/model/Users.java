@@ -2,7 +2,6 @@ package com.BankingAPI.BankingAPI.Group1.model;
 
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
