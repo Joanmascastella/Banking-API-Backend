@@ -3,7 +3,7 @@ package com.BankingAPI.BankingAPI.Group1.controller;
 import com.BankingAPI.BankingAPI.Group1.exception.CustomAuthenticationException;
 import com.BankingAPI.BankingAPI.Group1.model.dto.ATMLoginDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
@@ -41,7 +41,7 @@ public class ATMController {
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<Object> withdraw(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
-            TransactionGETDTO result = transactionService.processWithdrawal(transactionDTO);
+            TransactionGETPOSTResponseDTO result = transactionService.processWithdrawal(transactionDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
             if (e.getMessage().contains("not found")) {
@@ -57,7 +57,7 @@ public class ATMController {
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<Object> deposit(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
-            TransactionGETDTO result = transactionService.processDeposit(transactionDTO);
+            TransactionGETPOSTResponseDTO result = transactionService.processDeposit(transactionDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
             if (e.getMessage().contains("not found")) {

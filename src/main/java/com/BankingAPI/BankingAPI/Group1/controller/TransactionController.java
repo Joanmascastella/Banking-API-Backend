@@ -2,7 +2,7 @@ package com.BankingAPI.BankingAPI.Group1.controller;
 
 import com.BankingAPI.BankingAPI.Group1.exception.RestResponseEntityExceptionHandler;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -32,7 +32,7 @@ public class TransactionController extends RestResponseEntityExceptionHandler {
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<Object> transferToOtherCustomer(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
-            TransactionGETDTO result = transactionService.transferToOtherCustomer(transactionDTO);
+            TransactionGETPOSTResponseDTO result = transactionService.transferToOtherCustomer(transactionDTO);
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Transfer successful");
             response.put("transaction", result);
@@ -69,7 +69,7 @@ public class TransactionController extends RestResponseEntityExceptionHandler {
 
     @GetMapping("/search")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
-    public ResponseEntity<List<TransactionGETDTO>> searchTransactions(
+    public ResponseEntity<List<TransactionGETPOSTResponseDTO>> searchTransactions(
             @RequestParam(required = false) String IBAN,
             @RequestParam(required = false) Double amount,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -78,8 +78,8 @@ public class TransactionController extends RestResponseEntityExceptionHandler {
             @RequestParam(required = false) Double amountLess) {
 
         List<Transaction> transactions = transactionService.filterTransactions(IBAN, amount,amountGreater,amountLess, startDate, endDate);
-        List<TransactionGETDTO> transactionDto = transactions.stream()
-                .map(t -> new TransactionGETDTO(t.getFromAccount(), t.getToAccount(), t.getAmount(), t.getDate(), t.getUser().getId()))
+        List<TransactionGETPOSTResponseDTO> transactionDto = transactions.stream()
+                .map(t -> new TransactionGETPOSTResponseDTO(t.getFromAccount(), t.getToAccount(), t.getAmount(), t.getDate(), t.getUser().getId()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(transactionDto);

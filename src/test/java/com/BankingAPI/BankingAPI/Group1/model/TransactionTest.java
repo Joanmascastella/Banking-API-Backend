@@ -1,6 +1,6 @@
 package com.BankingAPI.BankingAPI.Group1.model;
 
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
@@ -84,7 +84,7 @@ class TransactionTest {
         Users user = new Users();
         Transaction transaction =  new Transaction(user, "Account1", "Account2", 100d, LocalDate.now());
 
-        TransactionGETDTO transactionDTO = mapper.convertValue(transaction, TransactionGETDTO.class);
+        TransactionGETPOSTResponseDTO transactionDTO = mapper.convertValue(transaction, TransactionGETPOSTResponseDTO.class);
         assertEquals(transaction.getId(), transactionDTO.id());
         assertEquals(transaction.getFromAccount(), transactionDTO.fromAccount());
         assertEquals(transaction.getToAccount(), transactionDTO.toAccount());
