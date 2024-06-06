@@ -400,13 +400,7 @@ paths:
               type: object
               properties:
                 user:
-                  $ref: "#/components/schemas/User"
-                absoluteSavingLimit:
-                  type: number
-                  description: Absolute limit for saving account
-                absoluteCheckingLimit:
-                  type: number
-                  description: Absolute limit for checking account
+                  $ref: "#/components/schemas/UserApprovalDTO"
             examples:
               User123e4567-e89b-12d3-a456-426614174000:
                 value:
@@ -417,14 +411,16 @@ paths:
       responses:
         '200':
           description: User approved successfully.
-        "400":
-          description: Invalid user supplied
+        '422':
+          description: Invalid request body supplied
         '409':
           description: User already approved.
         '403':
           description: User must be role of employee.
-        "404":
+        '404':
           description: User not found
+        '500':
+          description: Error generating IBAN or accessing database
       security:
         - bearerAuth: [ ]
 
@@ -478,12 +474,20 @@ paths:
           description: User must be of role employee
       security:
         - bearerAuth: []
+  /accounts/customers/{IBAN}:
     put:
       tags:
         - Employee
       summary: Update account
       description: This can only be done by the employee
       operationId: updateAccount
+      parameters:
+        - in: path
+          name: IBAN
+          required: true
+          schema:
+            type: string
+            format: IBAN
       requestBody:
         description: Updated account object
         content:
@@ -495,14 +499,14 @@ paths:
                 $ref: "#/components/examples/Account789e4567-e89b-12d3-a456-426614174000"
         required: true
       responses:
-        "400":
-          description: Invalid account supplied
+        '200':
+          description: account updated successfully
         "404":
           description: Account not found
         '403':
           description: User must be of role employee
-        '401':
-          description: User is not authorized
+        '422':
+          description: invalid daily limit
       security:
         - bearerAuth: []
 
@@ -1086,7 +1090,7 @@ components:
           example: "123e4567-e89b-12d3-a456-426614174000"
         IBAN:
           type: string
-          example: "NL91ABNA0417164300"
+          example: "NL91INHO00171643"
         currency:
           type: string
           example: "EUR"
@@ -1104,3 +1108,22 @@ components:
           type: number
           format: double
           example: 0
+    UserApprovalDTO:
+      type: object
+      properties:
+        dailyLimit:
+          type: number
+          description: Daily limit for the user.
+          example: 500.00
+        absoluteSavingLimit:
+          type: number
+          description: Absolute limit for the user's saving account.
+          example: 0.00
+        absoluteCheckingLimit:
+          type: number
+          description: Absolute limit for the user's checking account.
+          example: -200.00
+      required:
+        - dailyLimit
+        - absoluteSavingLimit
+        - absoluteCheckingLimit

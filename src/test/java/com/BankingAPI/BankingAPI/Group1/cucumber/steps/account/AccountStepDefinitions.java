@@ -242,7 +242,7 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
 
         HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
 
-        response = restTemplate.exchange(testConfig.getBaseUrl() + "/accounts/customers",
+        response = restTemplate.exchange(testConfig.getBaseUrl() + "/accounts/customers/" + IBAN,
                 HttpMethod.PUT,
                 requestEntity,
                 String.class);
@@ -275,7 +275,7 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
 
         HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
 
-        response = restTemplate.exchange(testConfig.getBaseUrl() + "/accounts/customers",
+        response = restTemplate.exchange(testConfig.getBaseUrl() + "/accounts/customers/" + IBAN,
                 HttpMethod.PUT,
                 requestEntity,
                 String.class);

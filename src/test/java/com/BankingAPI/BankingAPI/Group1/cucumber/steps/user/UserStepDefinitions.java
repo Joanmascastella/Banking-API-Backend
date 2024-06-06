@@ -238,7 +238,7 @@ public class UserStepDefinitions extends BaseStepDefinitions {
 
         HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
 
-        response = customRestTemplate2.exchange(testConfig.getBaseUrl() + "/users",
+        response = customRestTemplate2.exchange(testConfig.getBaseUrl() + "/users/" + userId,
                 HttpMethod.PUT,
                 requestEntity,
                 String.class);

@@ -121,9 +121,9 @@ public class AccountService {
         return accountRepository.existsByIBAN(iban);
     }
 
-    public void updateAccount(AccountGETPOSTResponseDTO account) throws EntityNotFoundException, InvalidLimitException {
-        Account currentAccount = accountRepository.findByIBAN(account.IBAN())
-                .orElseThrow(() -> new EntityNotFoundException("Account not found by IBAN: " + account.IBAN()));
+    public void updateAccount(String IBAN, AccountGETPOSTResponseDTO account) throws EntityNotFoundException, InvalidLimitException {
+        Account currentAccount = accountRepository.findByIBAN(IBAN)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found by IBAN: " + IBAN));
         if (account.absoluteLimit() == null){
             throw new InvalidLimitException("Can't leave absolute limit empty. Please enter a valid amount.");
         }

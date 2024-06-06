@@ -54,11 +54,11 @@ public class AccountController extends RestResponseEntityExceptionHandler {
     }
 
 
-    @PutMapping("/customers")
+    @PutMapping("/customers/{IBAN}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity<Object> updateAccount(@RequestBody AccountGETPOSTResponseDTO account) {
+    public ResponseEntity<Object> updateAccount(@PathVariable String IBAN, @RequestBody AccountGETPOSTResponseDTO account) {
         try {
-            accountService.updateAccount(account);
+            accountService.updateAccount(IBAN, account);
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

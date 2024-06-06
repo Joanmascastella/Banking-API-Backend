@@ -80,7 +80,7 @@ Feature: User API tests
    And I get message "The user is already approved."
 
   Scenario: Updating limit for a valid user
-    Given The endpoint for "/users" is available for method "PUT"
+    Given The endpoint for "/users/1" is available for method "PUT"
     And I log in as employee
     When I update the daily limit for user with id 1 to 500.0
     Then I get http status 200
@@ -88,18 +88,18 @@ Feature: User API tests
     And the dailyLimit for userId 1 is 500.0
     
   Scenario: Updating limit to invalid amount
-    Given The endpoint for "/users" is available for method "PUT"
+    Given The endpoint for "/users/1" is available for method "PUT"
     And I log in as employee
     When I update the daily limit for user with id 1 to -500.0
     Then I get http status 422
     And I get message "The daily limit can't be set to a negative amount or be left empty."
 
   Scenario: Updating limit for non existent user
-    Given The endpoint for "/users" is available for method "PUT"
+    Given The endpoint for "/users/99" is available for method "PUT"
     And I log in as employee
-    When I update the daily limit for user with id 6 to 500.0
+    When I update the daily limit for user with id 99 to 500.0
     Then I get http status 404                                            
-    And I get message "User not found with id: 6"
+    And I get message "User not found with id: 99"
 
   Scenario: Closing a users account
     Given The endpoint for "/users/1" is available for method "DELETE"

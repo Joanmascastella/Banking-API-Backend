@@ -30,6 +30,7 @@ import java.util.Arrays;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -192,10 +193,11 @@ class AccountControllerTest {
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     public void updateAccount() throws Exception {
+        String IBAN = "NL89INHO0044053200";
         AccountGETPOSTResponseDTO account = new AccountGETPOSTResponseDTO(1L, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 2500, -200.0);
-        Mockito.doNothing().when(accountService).updateAccount(any(AccountGETPOSTResponseDTO.class));
+        Mockito.doNothing().when(accountService).updateAccount(eq(IBAN),any(AccountGETPOSTResponseDTO.class));
 
-        mockMvc.perform(put("/accounts/customers")
+        mockMvc.perform(put("/accounts/customers/" + IBAN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(account))
                 .with(csrf()))
@@ -206,10 +208,11 @@ class AccountControllerTest {
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     public void updateAccount_AccountNotFound() throws Exception {
+        String IBAN = "NL89INHO0044053200";
         AccountGETPOSTResponseDTO account = new AccountGETPOSTResponseDTO(1L, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 2500, -200.0);
-        Mockito.doThrow(new EntityNotFoundException("Account not found.")).when(accountService).updateAccount(any(AccountGETPOSTResponseDTO.class));
+        Mockito.doThrow(new EntityNotFoundException("Account not found.")).when(accountService).updateAccount(eq(IBAN), any(AccountGETPOSTResponseDTO.class));
 
-        mockMvc.perform(put("/accounts/customers")
+        mockMvc.perform(put("/accounts/customers/" + IBAN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(account))
                         .with(csrf()))
@@ -220,10 +223,11 @@ class AccountControllerTest {
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     public void updateAccount_GeneralException() throws Exception {
+        String IBAN = "NL89INHO0044053200";
         AccountGETPOSTResponseDTO account = new AccountGETPOSTResponseDTO(1L, "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 2500, -200.0);
-        Mockito.doThrow(new RuntimeException("Unexpected error.")).when(accountService).updateAccount(any(AccountGETPOSTResponseDTO.class));
+        Mockito.doThrow(new RuntimeException("Unexpected error.")).when(accountService).updateAccount(eq(IBAN), any(AccountGETPOSTResponseDTO.class));
 
-        mockMvc.perform(put("/accounts/customers")
+        mockMvc.perform(put("/accounts/customers/" + IBAN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(account))
                         .with(csrf()))
