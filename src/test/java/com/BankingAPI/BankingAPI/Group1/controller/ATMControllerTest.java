@@ -4,7 +4,7 @@ import com.BankingAPI.BankingAPI.Group1.config.ApiTestConfiguration;
 import com.BankingAPI.BankingAPI.Group1.config.testConfigurations.TestSecurityConfig;
 import com.BankingAPI.BankingAPI.Group1.exception.CustomAuthenticationException;
 import com.BankingAPI.BankingAPI.Group1.model.dto.ATMLoginDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
@@ -50,12 +50,12 @@ class ATMControllerTest {
     private ObjectMapper objectMapper;
 
     private TransferMoneyPOSTResponse transactionDTO;
-    private TransactionGETDTO responseDTO;
+    private TransactionGETPOSTResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
         transactionDTO = new TransferMoneyPOSTResponse("DE89370400440532013000", "DE89370400440532013012", 100.0);
-        responseDTO = new TransactionGETDTO("DE89370400440532013000", "DE89370400440532013012", 100.0, LocalDate.now(), 1L);
+        responseDTO = new TransactionGETPOSTResponseDTO("DE89370400440532013000", "DE89370400440532013012", 100.0, LocalDate.now(), 1L);
     }
     @Test
     void testLogin_Success() throws Exception {
