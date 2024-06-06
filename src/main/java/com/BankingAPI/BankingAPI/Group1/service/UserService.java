@@ -10,6 +10,7 @@ import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.UserRepository;
 import com.BankingAPI.BankingAPI.Group1.util.JwtTokenProvider;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -195,14 +196,14 @@ public class UserService {
         userRepository.save(currentUser);
     }
 
-    public void updateDailyLimit(Users user) throws EntityNotFoundException, InvalidLimitException {
-        Users currentUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
+    public void updateDailyLimit(long userId, UserGETResponseDTO user) throws EntityNotFoundException, InvalidLimitException {
+        Users currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-        if (user.getDailyLimit() == null || user.getDailyLimit() < 0.0){
+        if (user.dailyLimit() == null || user.dailyLimit() < 0.0){
             throw new InvalidLimitException("The daily limit can't be set to a negative amount or be left empty.");
         }
-        currentUser.setDailyLimit(user.getDailyLimit());
+        currentUser.setDailyLimit(user.dailyLimit());
         userRepository.save(currentUser);
     }
 

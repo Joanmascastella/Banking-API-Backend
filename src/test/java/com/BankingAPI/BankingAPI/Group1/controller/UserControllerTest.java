@@ -116,8 +116,8 @@ class UserControllerTest {
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     void getAllUsers() throws Exception {
         Mockito.when(userService.getAllUsers()).thenReturn(
-                List.of(new UserGETResponseDTO(2, "janedoe", "jane@doe.com", "jane", "doe", "12345678", "0123456789", LocalDate.of(1998, 4, 14), 0, 0, false, true, UserType.ROLE_CUSTOMER),
-                        new UserGETResponseDTO(5, "sara", "sara@doe.com", "sara", "doe", "12345678", "0123456789", LocalDate.of(2000, 12, 4), 0, 0, true, true, UserType.ROLE_CUSTOMER)));
+                List.of(new UserGETResponseDTO(2, "janedoe", "jane@doe.com", "jane", "doe", "12345678", "0123456789", LocalDate.of(1998, 4, 14), 0, 0.0, false, true, UserType.ROLE_CUSTOMER),
+                        new UserGETResponseDTO(5, "sara", "sara@doe.com", "sara", "doe", "12345678", "0123456789", LocalDate.of(2000, 12, 4), 0, 0.0, true, true, UserType.ROLE_CUSTOMER)));
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -144,8 +144,8 @@ class UserControllerTest {
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     void getUnapprovedUsers() throws Exception {
         Mockito.when(userService.getUnapprovedUsers()).thenReturn(
-                List.of(new UserGETResponseDTO(2, "janedoe", "jane@doe.com", "jane", "doe", "12345678", "0123456789", LocalDate.of(1998, 4, 14), 0, 0, false, true, UserType.ROLE_CUSTOMER),
-                        new UserGETResponseDTO(5, "sara", "sara@doe.com", "sara", "doe", "12345678", "0123456789", LocalDate.of(2000, 12, 4), 0, 0, false, true, UserType.ROLE_CUSTOMER)));
+                List.of(new UserGETResponseDTO(2, "janedoe", "jane@doe.com", "jane", "doe", "12345678", "0123456789", LocalDate.of(1998, 4, 14), 0, 0.0, false, true, UserType.ROLE_CUSTOMER),
+                        new UserGETResponseDTO(5, "sara", "sara@doe.com", "sara", "doe", "12345678", "0123456789", LocalDate.of(2000, 12, 4), 0, 0.0, false, true, UserType.ROLE_CUSTOMER)));
         mockMvc.perform(get("/users/noncustomers"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -285,12 +285,13 @@ class UserControllerTest {
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     void updateDailyLimit() throws Exception {
-        Users user = new Users("joan", "joan.doe@example.com", "Joan", "Doe", "12345673", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, true, UserType.ROLE_CUSTOMER,"1234");
-        Mockito.doNothing().when(userService).updateDailyLimit(user);
+        Long userId = 4L;
+        UserGETResponseDTO user = new UserGETResponseDTO(4,"joan", "joan.doe@example.com", "Joan", "Doe", "12345673", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, true, UserType.ROLE_CUSTOMER);
+        Mockito.doNothing().when(userService).updateDailyLimit(userId, user);
 
-        mockMvc.perform(put("/users")
+        mockMvc.perform(put("/users/" + userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"joan\",\"email\":\"joan.doe@example.com\",\"firstName\":\"Joan\",\"lastName\":\"Doe\",\"BSN\":\"12345673\",\"phoneNumber\":\"0123456789\",\"dateOfBirth\":\"1990-01-01\",\"balance\":5000.0,\"dailyLimit\":1000.0,\"isApproved\":true,\"isActive\":true,\"userType\":\"ROLE_CUSTOMER\",\"password\":\"1234\"}")
+                        .content("{\"username\":\"joan\",\"email\":\"joan.doe@example.com\",\"firstName\":\"Joan\",\"lastName\":\"Doe\",\"BSN\":\"12345673\",\"phoneNumber\":\"0123456789\",\"dateOfBirth\":\"1990-01-01\",\"balance\":5000.0,\"dailyLimit\":1000.0,\"isApproved\":true,\"isActive\":true,\"userType\":\"ROLE_CUSTOMER\"}")
                 .with(csrf()))
                 .andExpect(status().isOk());
     }
@@ -302,9 +303,9 @@ class UserControllerTest {
         user.setId(4L);
         user.setDailyLimit(100.0);
 
-        Mockito.doThrow(new EntityNotFoundException("User not found with id: 4")).when(userService).updateDailyLimit(any(Users.class));
+        Mockito.doThrow(new EntityNotFoundException("User not found with id: 4")).when(userService).updateDailyLimit(eq(user.getId()), any(UserGETResponseDTO.class));
 
-        mockMvc.perform(put("/users")
+        mockMvc.perform(put("/users/" + user.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(user))
                         .with(csrf()))
@@ -319,9 +320,9 @@ class UserControllerTest {
         user.setId(4L);
         user.setDailyLimit(100.0);
 
-        Mockito.doThrow(new InvalidLimitException("The daily limit can't be set to a negative amount.")).when(userService).updateDailyLimit(any(Users.class));
+        Mockito.doThrow(new InvalidLimitException("The daily limit can't be set to a negative amount.")).when(userService).updateDailyLimit(eq(user.getId()), any(UserGETResponseDTO.class));
 
-        mockMvc.perform(put("/users")
+        mockMvc.perform(put("/users/" + user.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(user))
                         .with(csrf()))

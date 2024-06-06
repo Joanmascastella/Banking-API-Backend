@@ -105,11 +105,11 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    @PutMapping
+    @PutMapping("/{userId}")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity<Object> updateDailyLimit(@RequestBody Users user){
+    public ResponseEntity<Object> updateDailyLimit(@PathVariable long userId, @RequestBody UserGETResponseDTO user){
         try {
-            userService.updateDailyLimit(user);
+            userService.updateDailyLimit(userId, user);
             return ResponseEntity.status(HttpStatus.OK).body(new Object[0]);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
