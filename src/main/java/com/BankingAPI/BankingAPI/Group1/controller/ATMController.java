@@ -1,15 +1,15 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
+
 import com.BankingAPI.BankingAPI.Group1.exception.CustomAuthenticationException;
-import com.BankingAPI.BankingAPI.Group1.model.Transaction;
-import com.BankingAPI.BankingAPI.Group1.model.Users;
-import com.BankingAPI.BankingAPI.Group1.model.dto.*;
-import com.BankingAPI.BankingAPI.Group1.service.AccountService;
+import com.BankingAPI.BankingAPI.Group1.model.dto.ATMLoginDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,7 +41,7 @@ public class ATMController {
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<Object> withdraw(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
-            TransactionGETPOSTResponseDTO result = transactionService.processWithdrawal(transactionDTO);
+            TransactionGETDTO result = transactionService.processWithdrawal(transactionDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
             if (e.getMessage().contains("not found")) {
@@ -57,7 +57,7 @@ public class ATMController {
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE')")
     public ResponseEntity<Object> deposit(@RequestBody TransferMoneyPOSTResponse transactionDTO) {
         try {
-            TransactionGETPOSTResponseDTO result = transactionService.processDeposit(transactionDTO);
+            TransactionGETDTO result = transactionService.processDeposit(transactionDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
             if (e.getMessage().contains("not found")) {

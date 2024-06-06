@@ -1,8 +1,8 @@
 package com.BankingAPI.BankingAPI.Group1.controller;
 
 import com.BankingAPI.BankingAPI.Group1.exception.*;
-import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
+import com.BankingAPI.BankingAPI.Group1.model.dto.*;
 import com.BankingAPI.BankingAPI.Group1.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;

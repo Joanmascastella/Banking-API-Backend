@@ -2,7 +2,9 @@ package com.BankingAPI.BankingAPI.Group1.cucumber.steps.transaction;
 
 import com.BankingAPI.BankingAPI.Group1.config.testConfigurations.TestConfig;
 import com.BankingAPI.BankingAPI.Group1.cucumber.BaseStepDefinitions;
-import com.BankingAPI.BankingAPI.Group1.model.dto.*;
+import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -222,8 +224,9 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
     @And("the fromAccount or toAccount of each transaction should be ATM")
     public void iShouldReceiveTransactionsFromAccountOrToAccountATM() throws IOException {
         JsonNode res = mapper.readTree(response.getBody());
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETPOSTResponseDTO>>() {});
-        List<TransactionGETPOSTResponseDTO> retrievedData = reader.readValue(res);
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETDTO>>() {
+        });
+        List<TransactionGETDTO> retrievedData = reader.readValue(res);
 
         Boolean filteredData = retrievedData.stream().allMatch(item -> item.fromAccount().equals("ATM") || item.toAccount().equals("ATM"));
 
@@ -286,8 +289,9 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
     @And("the fromAccount and toAccount of each transaction is different than ATM")
     public void iShouldReceiveTransactionsFromAccountOrToAccountNotATM() throws IOException {
         JsonNode res = mapper.readTree(response.getBody());
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETPOSTResponseDTO>>() {});
-        List<TransactionGETPOSTResponseDTO> retrievedData = reader.readValue(res);
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETDTO>>() {
+        });
+        List<TransactionGETDTO> retrievedData = reader.readValue(res);
 
         Boolean filteredData = retrievedData.stream().allMatch(item -> !item.fromAccount().equals("ATM") && !item.toAccount().equals("ATM"));
 
@@ -350,8 +354,9 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
     @And("the user id of each transaction should be {int}")
     public void iShouldReceiveTransactionsOfTheUserWithId(int userId) throws IOException {
         JsonNode res = mapper.readTree(response.getBody());
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETPOSTResponseDTO>>() {});
-        List<TransactionGETPOSTResponseDTO> retrievedData = reader.readValue(res);
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETDTO>>() {
+        });
+        List<TransactionGETDTO> retrievedData = reader.readValue(res);
 
         Boolean filteredData = retrievedData.stream().allMatch(item -> item.userId().equals(Long.valueOf(userId)));
 
@@ -379,8 +384,9 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
     @And("the toAccount of each transaction should be ATM")
     public void iShouldReceiveTransactionsToAccountATM() throws IOException {
         JsonNode res = mapper.readTree(response.getBody());
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETPOSTResponseDTO>>() {});
-        List<TransactionGETPOSTResponseDTO> retrievedData = reader.readValue(res);
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETDTO>>() {
+        });
+        List<TransactionGETDTO> retrievedData = reader.readValue(res);
 
         Boolean filteredData = retrievedData.stream().allMatch(item -> item.toAccount().equals("ATM"));
 
@@ -407,8 +413,9 @@ public class TransactionStepDefinitions extends BaseStepDefinitions {
     @And("the fromAccount of each transaction should be ATM")
     public void iShouldReceiveTransactionsFromAccountATM() throws IOException {
         JsonNode res = mapper.readTree(response.getBody());
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETPOSTResponseDTO>>() {});
-        List<TransactionGETPOSTResponseDTO> retrievedData = reader.readValue(res);
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<TransactionGETDTO>>() {
+        });
+        List<TransactionGETDTO> retrievedData = reader.readValue(res);
 
         Boolean filteredData = retrievedData.stream().allMatch(item -> item.fromAccount().equals("ATM"));
 

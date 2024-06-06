@@ -6,11 +6,10 @@ import com.BankingAPI.BankingAPI.Group1.model.dto.LoginDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TokenDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.Assertions;

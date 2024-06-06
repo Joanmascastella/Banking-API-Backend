@@ -1,24 +1,20 @@
 package com.BankingAPI.BankingAPI.Group1.util;
 
 
-import com.BankingAPI.BankingAPI.Group1.config.BeanFactory;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
-import com.BankingAPI.BankingAPI.Group1.service.MemberDetailsService;
-import io.jsonwebtoken.*;
-
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
@@ -52,8 +48,6 @@ public class JwtTokenProvider {
         String userID = claims.getBody().getSubject();
         String authority = claims.getBody().get("auth", String.class);
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(authority));
-
-        System.out.println("Authorities: " + authorities);
         UserDetails userDetails = new org.springframework.security.core.userdetails.User(userID, "", authorities);
         return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
     }

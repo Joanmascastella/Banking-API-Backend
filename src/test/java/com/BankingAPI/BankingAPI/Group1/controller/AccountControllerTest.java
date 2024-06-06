@@ -5,7 +5,7 @@ import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.model.dto.AccountGETPOSTResponseDTO;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
@@ -76,7 +76,7 @@ class AccountControllerTest {
         TransferMoneyPOSTResponse transactionDTO = new TransferMoneyPOSTResponse("DE89370400440532013000", "DE89370400440532013012", 100.0);
 
         Mockito.when(transactionService.transferMoneyToOwnAccount(any(TransferMoneyPOSTResponse.class)))
-                .thenReturn(new TransactionGETPOSTResponseDTO(
+                .thenReturn(new TransactionGETDTO(
                         "DE89370400440532013000",
                         "DE89370400440532013012",
                         100.0,

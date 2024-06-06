@@ -4,7 +4,7 @@ import com.BankingAPI.BankingAPI.Group1.config.ApiTestConfiguration;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
 import com.BankingAPI.BankingAPI.Group1.model.Transaction;
 import com.BankingAPI.BankingAPI.Group1.model.Users;
-import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETPOSTResponseDTO;
+import com.BankingAPI.BankingAPI.Group1.model.dto.TransactionGETDTO;
 import com.BankingAPI.BankingAPI.Group1.model.dto.TransferMoneyPOSTResponse;
 import com.BankingAPI.BankingAPI.Group1.service.AccountService;
 import com.BankingAPI.BankingAPI.Group1.service.TransactionService;
@@ -55,16 +55,16 @@ class TransactionControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private TransactionGETPOSTResponseDTO ATMDeposit;
-    private TransactionGETPOSTResponseDTO ATMWithdrawal;
-    private TransactionGETPOSTResponseDTO onlineTransferByCustomer;
-    private TransactionGETPOSTResponseDTO onlineTransferByEmployee;
+    private TransactionGETDTO ATMDeposit;
+    private TransactionGETDTO ATMWithdrawal;
+    private TransactionGETDTO onlineTransferByCustomer;
+    private TransactionGETDTO onlineTransferByEmployee;
 
     private Users customer;
 
     private Users employee;
 
-    private List<TransactionGETPOSTResponseDTO> transactions;
+    private List<TransactionGETDTO> transactions;
 
 
 
@@ -72,10 +72,10 @@ class TransactionControllerTest {
     public void setup() {
         customer = new Users("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("123"));
         employee = new Users("Employee", "employee@example.com", "Em", "Yee", "1234567893", "01234567891", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, true, UserType.ROLE_EMPLOYEE, bCryptPasswordEncoder.encode("employee"));
-        ATMDeposit = new TransactionGETPOSTResponseDTO("123456789", "ATM", 1500.0, LocalDate.now(), customer.getId());
-        ATMWithdrawal= new TransactionGETPOSTResponseDTO("ATM", "123456789", 2000.0, LocalDate.now(), customer.getId());
-        onlineTransferByCustomer = new TransactionGETPOSTResponseDTO("123456789", "123456817", 2800.0, LocalDate.now(), customer.getId());
-        onlineTransferByEmployee = new TransactionGETPOSTResponseDTO("123456789", "123456817", 2800.0, LocalDate.now(), employee.getId());
+        ATMDeposit = new TransactionGETDTO("123456789", "ATM", 1500.0, LocalDate.now(), customer.getId());
+        ATMWithdrawal = new TransactionGETDTO("ATM", "123456789", 2000.0, LocalDate.now(), customer.getId());
+        onlineTransferByCustomer = new TransactionGETDTO("123456789", "123456817", 2800.0, LocalDate.now(), customer.getId());
+        onlineTransferByEmployee = new TransactionGETDTO("123456789", "123456817", 2800.0, LocalDate.now(), employee.getId());
         transactions = new ArrayList<>();
         transactions.add(ATMDeposit);
         transactions.add(ATMWithdrawal);
@@ -91,7 +91,7 @@ class TransactionControllerTest {
     @WithMockUser(username = "johndoe", password = "123", roles = {"CUSTOMER", "EMPLOYEE"})
     void transferToOtherCustomer_Success() throws Exception {
         TransferMoneyPOSTResponse transactionDTO = new TransferMoneyPOSTResponse("DE89370400440532013000", "DE89370400440532013012", 100.0);
-        TransactionGETPOSTResponseDTO responseDTO = new TransactionGETPOSTResponseDTO(
+        TransactionGETDTO responseDTO = new TransactionGETDTO(
                 "DE89370400440532013000",
                 "DE89370400440532013012",
                 100.0,
@@ -241,8 +241,8 @@ class TransactionControllerTest {
                 new Transaction(customer, "123456789", "987654321", 100.0, LocalDate.of(2023, 5, 1))
         );
 
-        List<TransactionGETPOSTResponseDTO> transactionDto = filteredTransactions.stream()
-                .map(t -> new TransactionGETPOSTResponseDTO(t.getFromAccount(), t.getToAccount(), t.getAmount(), t.getDate(), t.getUser().getId()))
+        List<TransactionGETDTO> transactionDto = filteredTransactions.stream()
+                .map(t -> new TransactionGETDTO(t.getFromAccount(), t.getToAccount(), t.getAmount(), t.getDate(), t.getUser().getId()))
                 .collect(Collectors.toList());
 
         given(transactionService.filterTransactions(IBAN, amount, amountGreater, amountLess, startDate, endDate)).willReturn(filteredTransactions);

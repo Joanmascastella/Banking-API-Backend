@@ -1,8 +1,10 @@
 package com.BankingAPI.BankingAPI.Group1.config;
 
-import com.BankingAPI.BankingAPI.Group1.model.*;
+import com.BankingAPI.BankingAPI.Group1.model.Account;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.AccountType;
 import com.BankingAPI.BankingAPI.Group1.model.Enums.UserType;
+import com.BankingAPI.BankingAPI.Group1.model.Transaction;
+import com.BankingAPI.BankingAPI.Group1.model.Users;
 import com.BankingAPI.BankingAPI.Group1.repository.AccountRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.TransactionRepository;
 import com.BankingAPI.BankingAPI.Group1.repository.UserRepository;
@@ -12,7 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 
 @Component
 public class DatabaseInitializer implements ApplicationRunner {
