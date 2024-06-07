@@ -168,9 +168,9 @@ public class TransactionService {
     public TransactionGETPOSTResponseDTO processWithdrawal(TransferMoneyPOSTResponse transactionDTO) throws Exception {
         Users user = beanFactory.getCurrentUser();
         Account account = getAccount(transactionDTO.fromAccount());
-
-        validateTransactionLimits(account, transactionDTO.amount());
         validateAccountOwnershipATM(account);
+        validateTransactionLimits(account, transactionDTO.amount());
+
         updateAccountBalance(account, -transactionDTO.amount());
 
         Transaction transaction = new Transaction(user, account.getIBAN(), "ATM", transactionDTO.amount(), LocalDate.now());

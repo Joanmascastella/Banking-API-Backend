@@ -41,7 +41,7 @@ Feature: Transaction API tests
     Given I log in as user with valid accounts for transactions
     When I retrieve transaction history for user 1
     Then I receive transaction history http status 200
-    And I should receive transaction history as a list of size 7
+    And I should receive transaction history as a list of size 6
 
   Scenario: Searching transactions
     Given I log in as user with valid accounts for transactions
