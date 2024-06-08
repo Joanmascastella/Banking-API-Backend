@@ -155,6 +155,7 @@ class AccountControllerTest {
                 .andExpect(content().string("General error"));
     }
 
+
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     public void getAllCustomerAccountsShouldReturnAccounts() throws Exception {
@@ -168,7 +169,7 @@ class AccountControllerTest {
 
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getAccountsByAbsoluteLimitShouldReturnAccounts() throws Exception {
+    public void getAccountsByAbsoluteLimitShouldReturnFilteredAccounts() throws Exception {
         given(accountService.findByAbsoluteLimit(2000L)).willReturn(Arrays.asList(activeAccount));
         this.mockMvc.perform(get("/accounts/byAbsoluteLimit").queryParam("absoluteLimit", String.valueOf(2000L))).andExpect(
                         status().isOk())

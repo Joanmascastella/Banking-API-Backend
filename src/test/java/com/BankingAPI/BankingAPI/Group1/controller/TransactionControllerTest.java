@@ -259,6 +259,7 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$[0].amount").value(transactionDto.get(0).amount()));
     }
 
+
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
     public void getAllTransactionsShouldReturnTransactions() throws Exception {
@@ -267,12 +268,12 @@ class TransactionControllerTest {
                         status().isOk())
                 .andExpect(jsonPath("$", hasSize(4)))
                 .andExpect(jsonPath("$[0].amount").value(transactions.get(0).amount()));
-
     }
+
 
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getCustomerTransactionsByEmployeeShouldReturnTransactions() throws Exception {
+    public void getCustomerTransactionsByEmployeeShouldReturnFilteredTransactions() throws Exception {
         given(transactionService.getTransactionsByUserId(1L)).willReturn(Arrays.asList(ATMDeposit));
         this.mockMvc.perform(get("/transactions/customer/{userId}",1L)).andExpect(
                         status().isOk())
@@ -281,9 +282,10 @@ class TransactionControllerTest {
 
     }
 
+
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getATMTransactionsShouldReturnTransactions() throws Exception {
+    public void getATMTransactionsShouldReturnFilteredTransactions() throws Exception {
         given(transactionService.findATMTransactions()).willReturn(Arrays.asList(ATMDeposit));
         this.mockMvc.perform(get("/transactions/ATM")).andExpect(
                         status().isOk())
@@ -292,9 +294,10 @@ class TransactionControllerTest {
 
     }
 
+
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getATMDepositsOfUserShouldReturnTransactions() throws Exception {
+    public void getATMDepositsOfUserShouldReturnFilteredTransactions() throws Exception {
         given(transactionService.findATMDepositsByUserId(1L)).willReturn(Arrays.asList(ATMDeposit));
         this.mockMvc.perform(get("/transactions/ATM/deposits/{userId}", 1L)).andExpect(
                         status().isOk())
@@ -303,9 +306,10 @@ class TransactionControllerTest {
 
     }
 
+
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getATMWithdrawalsOfUserShouldReturnTransactions() throws Exception {
+    public void getATMWithdrawalsOfUserShouldReturnFilteredTransactions() throws Exception {
         given(transactionService.findATMWithdrawalsByUserId(1L)).willReturn(Arrays.asList(ATMWithdrawal));
         this.mockMvc.perform(get("/transactions/ATM/withdrawals/{userId}", 1L)).andExpect(
                         status().isOk())
@@ -317,7 +321,7 @@ class TransactionControllerTest {
 
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getTransactionsByCustomersShouldReturnTransactions() throws Exception {
+    public void getTransactionsByCustomersShouldReturnFilteredTransactions() throws Exception {
         given(transactionService.findTransactionsInitializedByCustomers()).willReturn(Arrays.asList(ATMDeposit));
         this.mockMvc.perform(get("/transactions/byCustomers")).andExpect(
                         status().isOk())
@@ -326,9 +330,10 @@ class TransactionControllerTest {
 
     }
 
+
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getTransactionsByEmployeesShouldReturnTransactions() throws Exception {
+    public void getTransactionsByEmployeesShouldReturnFilteredTransactions() throws Exception {
         given(transactionService.findTransactionsInitializedByEmployees()).willReturn(Arrays.asList(onlineTransferByEmployee));
         this.mockMvc.perform(get("/transactions/byEmployees")).andExpect(
                         status().isOk())
@@ -337,9 +342,10 @@ class TransactionControllerTest {
 
     }
 
+
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getOnlineTransactionsShouldReturnTransactions() throws Exception {
+    public void getOnlineTransactionsShouldReturnFilteredTransactions() throws Exception {
         given(transactionService.findOnlineTransactions()).willReturn(Arrays.asList(onlineTransferByCustomer));
         this.mockMvc.perform(get("/transactions/online")).andExpect(
                         status().isOk())
@@ -351,7 +357,7 @@ class TransactionControllerTest {
 
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getOnlineTransactionsOfUserShouldReturnTransactions() throws Exception {
+    public void getOnlineTransactionsOfUserShouldReturnFilteredTransactions() throws Exception {
         given(transactionService.findOnlineTransactionsByUserId(1L)).willReturn(Arrays.asList(onlineTransferByCustomer));
         this.mockMvc.perform(get("/transactions/online/{userId}", 1L)).andExpect(
                         status().isOk())
@@ -359,9 +365,10 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$[0].amount").value(onlineTransferByCustomer.amount()));
     }
 
+
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getOnlineTransactionsByCustomersShouldReturnTransactions() throws Exception {
+    public void getOnlineTransactionsByCustomersShouldReturnFilteredTransactions() throws Exception {
         given(transactionService.findOnlineTransactionsByCustomers()).willReturn(Arrays.asList(onlineTransferByCustomer));
         this.mockMvc.perform(get("/transactions/online/byCustomers")).andExpect(
                         status().isOk())
@@ -370,9 +377,10 @@ class TransactionControllerTest {
 
     }
 
+
     @Test
     @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getOnlineTransactionsByEmployeesShouldReturnTransactions() throws Exception {
+    public void getOnlineTransactionsByEmployeesShouldReturnFilteredTransactions() throws Exception {
         given(transactionService.findOnlineTransactionsByEmployees()).willReturn(Arrays.asList(onlineTransferByEmployee));
         this.mockMvc.perform(get("/transactions/online/byEmployees")).andExpect(
                         status().isOk())

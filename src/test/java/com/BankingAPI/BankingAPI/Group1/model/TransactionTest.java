@@ -76,6 +76,8 @@ class TransactionTest {
         assertEquals(LocalDate.now(), transaction.getDate());
     }
 
+    //This unit test is based on the guide at https://www.baeldung.com/entity-to-and-from-dto-for-a-java-spring-application
+
     @Test
     public void whenConvertTransactionEntityToTransactionDTO_thenCorrect() {
 
