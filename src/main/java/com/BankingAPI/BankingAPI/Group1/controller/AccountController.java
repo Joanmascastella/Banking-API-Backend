@@ -81,10 +81,4 @@ public class AccountController extends RestResponseEntityExceptionHandler {
             return ResponseEntity.status(HttpStatus.OK).body(accountService.findByAbsoluteLimit(absoluteLimit));
     }
 
-    @GetMapping("/inactive")
-    @PreAuthorize("hasAnyRole('EMPLOYEE')")
-    public ResponseEntity getInactiveAccounts() throws Exception {
-            return ResponseEntity.status(HttpStatus.OK).body(accountService.findByInactiveTag());
-
-    }
 }

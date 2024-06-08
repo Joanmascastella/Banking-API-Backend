@@ -543,31 +543,7 @@ paths:
           description: User is not authorized
       security:
         - bearerAuth: []
-        
-  /accounts/inactive:
-    get:
-      tags:
-        - Employee
-      summary: Get all accounts which were set as inactive by the bank
-      description: This can only be done by the employee.
-      operationId: getInactiveAccounts
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Transaction"
-        '403':
-          description: User must be of role employee
-        '401':
-          description: User is not authorized
-        "400":
-          description: Invalid status value.
-      security:
-        - bearerAuth: []
+
         
   /transactions:
     get:

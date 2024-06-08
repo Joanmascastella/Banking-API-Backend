@@ -186,23 +186,6 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
-    public List<AccountGETPOSTResponseDTO> findByInactiveTag() throws Exception {
-        beanFactory.validateAuthentication();
-        List<Account> accounts = accountRepository.findByInactiveTag();
-        return accounts.stream()
-                .map(account -> new AccountGETPOSTResponseDTO(
-                        account.getId(),
-                        account.getUser().getId(),
-                        account.getIBAN(),
-                        account.getCurrency(),
-                        account.getAccountType(),
-                        account.isActive(),
-                        account.getBalance(),
-                        account.getAbsoluteLimit()
-                ))
-                .collect(Collectors.toList());
-    }
-
     public List<Account> getAccountsByUserId(long userId) {
         return accountRepository.findAccountsByUserId(userId);
     }

@@ -55,8 +55,8 @@ public class DatabaseInitializer implements ApplicationRunner {
         Account joanAccount = new Account(joan, "NL89INHO0044053201", "EUR", AccountType.CHECKING, true, 7800.0, 0.00);
         Account joanAccounts = new Account(joan, "NL89INHO004523271", "EUR", AccountType.SAVINGS, true, 5000.0, 0.00);
 
-        Account janeAccount =  new Account(newUser, "NL89INHO0044053282", "EUR", AccountType.CHECKING, true, 2800.0, 3000.0);
-        Account janeAccounts =  new Account(newUser, "NL89INHO0044053283", "EUR", AccountType.SAVINGS, false, 200.0, 0.00);
+        Account janeAccount = new Account(newUser, "NL89INHO0044053282", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
+        Account janeAccounts = new Account(newUser, "NL89INHO0044053283", "EUR", AccountType.SAVINGS, true, 8100.0, 0.00);
 
 
         accountRepository.save(joanAccount);
@@ -65,7 +65,6 @@ public class DatabaseInitializer implements ApplicationRunner {
         accountRepository.save(newAccounts);
         accountRepository.save(janeAccount);
         accountRepository.save(janeAccounts);
-
 
 
         Transaction ATMDeposit = new Transaction(newUsers, newAccount.getIBAN().toString(), "ATM", 9500.0, LocalDate.now());
@@ -91,6 +90,8 @@ public class DatabaseInitializer implements ApplicationRunner {
 
         Transaction newOnlineTransferByEmployee = new Transaction(newEmployee, newAccount.getIBAN().toString(), joanAccount.getIBAN().toString(), 1800.0, LocalDate.now());
         transactionRepository.save(newOnlineTransferByEmployee);
+
+
 
     }
 

@@ -38,16 +38,9 @@ Feature: Account API tests
     And I log in as user with role employee
     When I retrieve accounts by absolute limit 2000
     Then I receive http status 200 for accounts get request
-    And I should receive the accounts with absolute limit as a list of size 4
+    And I should receive the accounts with absolute limit as a list of size 5
     And The absolute limit of the accounts is less than or equal to 2000
 
-  Scenario: Getting inactive accounts
-    Given The endpoint for accounts "/accounts/inactive" is available for method "GET"
-    And I log in as user with role employee
-    When I retrieve inactive accounts
-    Then I receive http status 200 for accounts get request
-    And I should receive the inactive accounts as a list of size 1
-    And Each account has inactive status
 
   Scenario: Successfully update an account
     Given The endpoint for accounts "/accounts/customers/NL89INHO0044053200" is available for method "PUT"

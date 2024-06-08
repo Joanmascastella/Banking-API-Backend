@@ -59,7 +59,6 @@ class AccountControllerTest {
 
     private AccountGETPOSTResponseDTO activeAccount;
 
-    private AccountGETPOSTResponseDTO inactiveAccount;
 
     private Users user;
 
@@ -67,7 +66,6 @@ class AccountControllerTest {
     public void setup() {
         user = new Users("johndoe", "john.doe@example.com", "John", "Doe", "123456789", "0123456789", LocalDate.of(1990, 1, 1), 5000.0, 1000.0, true, true, UserType.ROLE_CUSTOMER, bCryptPasswordEncoder.encode("123"));
         activeAccount = new AccountGETPOSTResponseDTO(user.getId(), "NL89INHO0044053200", "EUR", AccountType.CHECKING, true, 5000.0, 0.00);
-        inactiveAccount = new AccountGETPOSTResponseDTO(user.getId(), "NL89INHO0044053200", "EUR", AccountType.CHECKING, false, 200.0, 0.00);
     }
 
 
@@ -176,17 +174,6 @@ class AccountControllerTest {
                         status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].IBAN").value(activeAccount.IBAN()));
-
-    }
-
-    @Test
-    @WithMockUser(username = "Employee", password = "employee", roles = "EMPLOYEE")
-    public void getAccountsByInactiveTagShouldReturnAccounts() throws Exception {
-        given(accountService.findByInactiveTag()).willReturn(Arrays.asList(inactiveAccount));
-        this.mockMvc.perform(get("/accounts/inactive")).andExpect(
-                        status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].IBAN").value(inactiveAccount.IBAN()));
 
     }
 
