@@ -96,6 +96,7 @@ class AccountTest {
         assertNotNull(account.getAccountType());
     }
 
+    //This unit test is based on the guide at https://www.baeldung.com/entity-to-and-from-dto-for-a-java-spring-application
     @Test
     public void whenConvertAccountEntityToAccountDTO_thenCorrect() {
 
