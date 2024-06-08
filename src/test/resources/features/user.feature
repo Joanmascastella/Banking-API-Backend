@@ -118,7 +118,7 @@ Feature: User API tests
 
   Scenario: Closing an employee account
     Given The endpoint for "/users/5" is available for method "DELETE"
-    And I have a valid employee token
+    And I log in as employee
     When I close the account for a user with id 5
     Then I get http status 401
     And I get message "Invalid JWT token"
