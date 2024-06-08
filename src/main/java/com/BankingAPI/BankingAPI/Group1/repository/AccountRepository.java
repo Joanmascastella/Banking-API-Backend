@@ -23,9 +23,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query("SELECT a FROM Account a  WHERE a.absoluteLimit <= :absoluteLimit")
     List<Account> findByAbsoluteLimit(@Param("absoluteLimit") double absoluteLimit);
 
-    //Find all accounts which were set as inactive by the bank
-    @Query("SELECT a FROM Account a  WHERE a.isActive = FALSE")
-    List<Account> findByInactiveTag();
 
     @Query("SELECT a FROM Account a WHERE a.user.id = :userId")
     List<Account> findAccountsByUserId(@Param("userId") long userId);

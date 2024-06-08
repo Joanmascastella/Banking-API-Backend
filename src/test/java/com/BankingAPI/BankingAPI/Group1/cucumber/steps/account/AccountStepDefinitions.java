@@ -176,37 +176,6 @@ public class AccountStepDefinitions extends BaseStepDefinitions {
 
         Assertions.assertTrue(filteredData);
 
-
-    }
-
-    @When("I retrieve inactive accounts")
-    public void iRetrieveInactiveAccounts() throws JsonProcessingException {
-
-        httpHeaders.clear();
-        httpHeaders.add("Authorization", "Bearer " + token);
-        httpHeaders.add("Content-Type", "application/json");
-
-        response = restTemplate.exchange(testConfig.getBaseUrl() + "/accounts/inactive", HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
-    }
-
-
-    @And("I should receive the inactive accounts as a list of size {int}")
-    public void iShouldReceiveInactiveAccounts(int count) {
-        int actual = JsonPath.read(response.getBody(), "$.size()");
-        Assertions.assertEquals(count, actual);
-
-    }
-
-    @And("Each account has inactive status")
-    public void iShouldReceiveAccountsWithStatusInactive() throws IOException {
-        JsonNode res = mapper.readTree(response.getBody());
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<AccountGETPOSTResponseDTO>>() {});
-        List<AccountGETPOSTResponseDTO> retrievedData = reader.readValue(res);
-
-        Boolean filteredData = retrievedData.stream().allMatch(item -> item.isActive() == false);
-
-        Assertions.assertTrue(filteredData);
-
     }
 
 
