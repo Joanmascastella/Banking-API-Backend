@@ -6,12 +6,11 @@ Feature: atm
     Then I get ATM http status 200
     And I receive an ATM token
 
-# This fails due to dependency
   Scenario: ATM login with invalid credentials
     Given I log in to the ATM as user with invalid credentials
     When I call the ATM login endpoint
     Then I get ATM http status 401
-    And I receive error message "Invalid username/password"
+    And I receive error message "Invalid email/password"
 
   Scenario: Successful ATM deposit
     Given I log in to the ATM as user with valid credentials

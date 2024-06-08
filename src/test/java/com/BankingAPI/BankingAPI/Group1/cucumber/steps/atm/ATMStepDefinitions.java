@@ -78,7 +78,7 @@ public class ATMStepDefinitions extends BaseStepDefinitions {
     }
     @Given("I log in to the ATM as user with invalid credentials")
     public void iLogInToTheATMAsUserWithInvalidCredentials() throws JsonProcessingException {
-        loginDTO = new ATMLoginDTO("invalid.email@example.com", "wrongpassword");
+        loginDTO = new ATMLoginDTO("john.doe@example.com", "wrongpassword");
         httpHeaders.clear();
         httpHeaders.add("Content-Type", "application/json");
     }
